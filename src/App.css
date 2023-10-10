@@ -1,38 +1,191 @@
 .App {
-  text-align: center;
+    background-color: darkturquoise;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.login-container {
+    background-color: #f3f3f3;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+form {
+    display: flex;
+    flex-direction: column;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.form-group {
+    margin-bottom: 15px;
 }
 
-.App-link {
-  color: #61dafb;
+label {
+    font-weight: bold;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.page-header {
+    position: relative;
+    color: black;
+    top: -200px;
+    text-align: center;
+}
+
+ul {
+    list-style: none; /* Removes default list bullet points */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+li {
+    display: block; /* Display list items as block elements (one underneath the other) */
+    margin-bottom: 10px; /* Add spacing between list items if desired */
+}
+
+.car-detail {
+    margin-bottom: 10px;
+    display: block;
+}
+
+.page-header {
+    position: fixed;
+    top: auto;
+    text-align: center;
+    margin: 20px;
+}
+
+.header-buttons {
+    margin-bottom: 20px;
+}
+
+.add-car-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.car-details {
+    display: block;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 24px; /* Larger text size */
+    max-width: 400px; /* Larger container */
+}
+
+.car-detail {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 24px; /* Larger text size */
+}
+
+.car-detail:hover {
+    text-decoration: underline;
+}
+
+/* Updated styles for ServiceHistory component and Navbar */
+.service-history {
+    margin-top: 20px;
+}
+
+.service-history h4 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.navbar {
+    background-color: #333;
+    color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    z-index: 100;
+}
+
+.navbar-menu {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-menu li {
+    margin: 0;
+}
+
+.navbar-menu a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.navbar-menu a:hover {
+    color: #00bcd4;
+}
+
+.service-history-button {
+    text-align: center;
+}
+
+/* Add this to your CSS stylesheet */
+.red-text {
+    color: red;
+}
+
+.table-container {
+    background-color: #f3f3f3;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 20px; /* Add spacing above the table */
+    overflow: auto; /* Add scroll if the table overflows */
+}
+
+.table-container table {
+    width: 100%; /* Ensure the table takes up the full width of the container */
+    border-collapse: collapse; /* Remove spacing between table cells */
+}
+
+.table-container th,
+.table-container td {
+    text-align: center; /* Center-align text in table cells */
+    padding: 8px; /* Add padding for better spacing */
+    border: 1px solid #ddd; /* Add borders to table cells */
 }

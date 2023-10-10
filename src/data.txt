@@ -1,0 +1,20 @@
+Collection: cars
+  Document (Car ID 1)
+    - Make: "Toyota"
+    - Model: "Camry"
+    - Year: 2023
+    - Transmission: "Automatic"
+    - EngineSize: "2.5L"
+    - ...
+  Document (Car ID 2)
+    - Make: "Ford"
+    - Model: "Mustang"
+    - Year: 2022
+    - Transmission: "Manual"
+    - EngineSize: "5.0L"
+    - ...
+  ...
+
+- this is the ideal data format
+- represent data as fields in the document allowing for easier querying, indexing, and updating of individual pieces of data.
+

@@ -1,0 +1,205 @@
+/* Style for the body */
+body {
+    background-image: url('./Images/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    overflow: auto;
+    font-family: Verdana;
+    height: 100%;
+    margin: 0; /* Reset margin to avoid extra space */
+}
+
+/* Style for the page header */
+.page-header {
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Style for the header buttons */
+.header-buttons {
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.add-car-button {
+    background-color: #0074D9;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.add-car-button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for car details container */
+.car-details {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Style for the car detail link */
+.car-detail {
+    text-decoration: none;
+    color: #333;
+}
+
+/* Style for the pagination buttons */
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination button {
+    background-color: #0074D9;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+.pagination button:hover {
+    background-color: #0056b3;
+}
+
+/* Disable the Previous button when on the first page */
+.pagination button:first-child:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Style for the navbar */
+.navbar {
+    background-color: #333;
+    color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    z-index: 100;
+    height: 25px;
+}
+.navbar .logo {
+    position: absolute;
+    left: 0;
+    top: 65%; /* Adjust to vertically center the logo */
+    transform: translateY(-50%);
+}
+
+.navbar .logo img {
+    width: 250px; /* Set your desired width for the logo */
+}
+
+.navbar-menu {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-menu li {
+    margin: 0;
+}
+
+.navbar-menu a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.navbar-menu a:hover {
+    color: #00bcd4;
+}
+
+/* Style for the booking form container */
+.booking-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 40px;
+}
+
+.booking-form-container form {
+    display: block; /* Make the form elements block-level */
+    text-align: center; /* Reset text alignment for form elements */
+    margin-bottom: 20px; /* Add margin to separate form elements */
+}
+
+/* Optional: Style form labels and input elements */
+.booking-form-container label {
+    display: block; /* Make labels block-level */
+    font-weight: bold; /* Style label text */
+    margin-bottom: 5px; /* Add margin for spacing */
+}
+
+.booking-form-container input, .booking-form-container select {
+    width: 50%; /* Make input/select elements full width */
+    padding: 5px; /* Add padding for spacing */
+    margin-bottom: 10px; /* Add margin for spacing */
+}
+
+/* Style for the Welcome component */
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+}
+
+.welcome-container h1 {
+    font-size: 36px;
+    margin: 0;
+    padding: 20px;
+}
+
+.welcome-container .buttons {
+    display: grid;
+    justify-content: center;
+}
+
+.welcome-container .action-button {
+    background-color: #0074D9;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin: 10px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.welcome-container .action-button:hover {
+    background-color: #0056b3;
+}

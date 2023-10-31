@@ -1,5 +1,4 @@
 .App {
-    background-color: darkturquoise;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -72,11 +71,23 @@ li {
     display: block;
 }
 
+.logo {
+    background-image: url('./Images/BookingLITELogo.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+
 .page-header {
     position: fixed;
     top: auto;
     text-align: center;
     margin: 20px;
+
 }
 
 .header-buttons {
@@ -189,3 +200,5 @@ li {
     padding: 8px; /* Add padding for better spacing */
     border: 1px solid #ddd; /* Add borders to table cells */
 }
+
+

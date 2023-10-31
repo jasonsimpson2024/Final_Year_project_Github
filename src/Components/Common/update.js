@@ -9,17 +9,9 @@ function ModifyCar() {
     const { documentId } = useParams();
     const [formData, setFormData] = useState({
         Make: '',
-        Model: '',
-        Year: '',
-        EngineSize: '',
-        Mileage: '',
-        Transmission: '',
-        Colour: '',
-        Price: '',
-        TaxExpiry: null, // Initialize 'TaxExpiry' as null
-        Nct: null, // Initialize 'Nct' as null
-        ServiceHistory: '',
-        LastService: '', // Initialize 'LastService' as empty string
+        model: '',
+        jobType: '', // Add 'JobType'
+        selectedSlot: null, // Add 'SelectedSlot' and initialize as null
     });
     const navigate = useNavigate();
 
@@ -33,14 +25,8 @@ function ModifyCar() {
                     const carData = carSnapshot.data();
 
                     // Convert Firestore Timestamps to JavaScript Date objects
-                    if (carData.TaxExpiry && carData.TaxExpiry.seconds) {
-                        carData.TaxExpiry = new Date(carData.TaxExpiry.seconds * 1000);
-                    }
-                    if (carData.Nct && carData.Nct.seconds) {
-                        carData.Nct = new Date(carData.Nct.seconds * 1000);
-                    }
-                    if (carData.LastService && carData.LastService.seconds) {
-                        carData.LastService = new Date(carData.LastService.seconds * 1000);
+                    if (carData.selectedSlot && carData.selectedSlot.seconds) {
+                        carData.selectedSlot = new Date(carData.selectedSlot.seconds * 1000);
                     }
 
                     setFormData(carData);
@@ -68,21 +54,9 @@ function ModifyCar() {
             const carDocument = doc(db, 'cars', documentId);
             await updateDoc(carDocument, {
                 ...formData,
-                // Convert 'TaxExpiry' and 'Nct' to Firestore Timestamps
-                TaxExpiry: formData.TaxExpiry ? Timestamp.fromDate(new Date(formData.TaxExpiry)) : null,
-                Nct: formData.Nct ? Timestamp.fromDate(new Date(formData.Nct)) : null,
-                // Convert 'LastService' to Firestore Timestamp
-                LastService: formData.LastService ? Timestamp.fromDate(new Date(formData.LastService)) : null,
+                // Convert 'selectedSlot' to Firestore Timestamp
+                selectedSlot: formData.selectedSlot ? Timestamp.fromDate(new Date(formData.selectedSlot)) : null,
             });
-
-            // Calculate and update 'NextService' based on 'LastService'
-            if (formData.LastService) {
-                const nextServiceDate = new Date(formData.LastService);
-                nextServiceDate.setMonth(nextServiceDate.getMonth() + 6);
-                await updateDoc(carDocument, {
-                    NextService: Timestamp.fromDate(nextServiceDate),
-                });
-            }
 
             navigate(`/${documentId}`);
         } catch (error) {
@@ -90,26 +64,24 @@ function ModifyCar() {
         }
     };
 
-    const textInputFields = ['Make', 'Model', 'Year', 'EngineSize', 'Mileage', 'Transmission', 'Colour', 'Price'];
-    const dateInputFields = ['TaxExpiry', 'Nct', 'LastService'];
+    const textInputFields = ['Make', 'model', 'jobType']; // Add 'JobType'
+    const dateInputFields = ['selectedSlot']; // Add 'SelectedSlot'
 
     return (
         <div className="modify-car">
             <h2>Modify Car</h2>
             <form onSubmit={handleSubmit}>
                 {textInputFields.map((field) => (
-                    field !== 'docName' && (
-                        <label key={field}>
-                            {field}:
-                            <input type="text" name={field} value={formData[field]} onChange={handleChange} required />
-                        </label>
-                    )
+                    <label key={field}>
+                        {field}:
+                        <input type="text" name={field} value={formData[field]} onChange={handleChange} required />
+                    </label>
                 ))}
                 {dateInputFields.map((field) => (
                     <label key={field}>
                         {field}:
                         <input
-                            type="date"
+                            type="datetime-local" // Change to datetime-local input for timestamp
                             name={field}
                             value={formData[field] ? new Date(formData[field]).toISOString().split('T')[0] : ''}
                             onChange={handleChange}

@@ -12,6 +12,8 @@ build:
     - mv ./build public  # Rename the 'build' directory to 'public' (required for GitLab Pages)
   only:
     - main  # Build when changes are pushed to the main branch
+  tags:
+    - docker  # Add the 'docker' runner tag to this job
 
 # Job for deploying the built application to GitLab Pages
 pages:

@@ -3,6 +3,10 @@ stages:
   - build
   - deploy
 
+services:
+  - name: docker:dind
+    entrypoint: ["env", "-u", "DOCKER_HOST"]
+
 # Job for building the React application
 build:
   stage: build

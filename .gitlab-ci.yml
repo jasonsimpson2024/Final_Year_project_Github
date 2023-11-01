@@ -1,0 +1,25 @@
+# Define the stages for the CI/CD pipeline
+stages:
+  - build
+  - deploy
+
+# Job for building the React application
+build:
+  stage: build
+  script:
+    - npm install  # Install project dependencies
+    - npm run build  # Build the React application
+    - mv ./build public  # Rename the 'build' directory to 'public' (required for GitLab Pages)
+  only:
+    - master  # Build when changes are pushed to the master branch
+
+# Job for deploying the built application to GitLab Pages
+pages:
+  stage: deploy
+  script:
+    - echo "Deploying to GitLab Pages"
+  artifacts:
+    paths:
+      - public  # This path should match the directory name from the deployment script
+  only:
+    - master  # Deploy when changes are pushed to the master branch

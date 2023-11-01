@@ -104,21 +104,38 @@ function CalendarSlotSelector() {
 
                 // Reference the 'booked' subcollection within the car document
                 const bookedCollection = collection(carDoc, 'booking');
-                console.log('Car Doc Path:', carDoc.path); // Log the path to the car document
-                console.log('Booking Collection Path:', bookedCollection.path);
 
-                // Update the 'selectedSlot' field in the first 'booked' document
-                await updateDoc(doc(bookedCollection, documentId),  {
-                    selectedSlot: selectedSlot
-                });
+                // Fetch the document based on the documentId
+                const bookedDoc = doc(bookedCollection, documentId);
 
-                navigate('/');
+                // Get the actual name and jobType values from the Firestore document
+                const docSnapshot = await getDoc(bookedDoc);
+
+                if (docSnapshot.exists()) {
+                    const name = docSnapshot.data().name; // Replace 'name' with the actual field name in the document
+                    const jobType = docSnapshot.data().jobType; // Replace 'jobType' with the actual field name in the document
+
+                    // Update the 'selectedSlot' field in the first 'booked' document
+                    await updateDoc(bookedDoc, {
+                        selectedSlot: selectedSlot,
+                    });
+
+                    // Redirect to the Booking Confirmation page and pass the data
+                    navigate('/confirmation', {
+                        state: {
+                            name: name,
+                            jobType: jobType,
+                            selectedSlot: moment(selectedSlot).format('LLL'),
+                        },
+                    });
+                } else {
+                    console.error('Document not found');
+                }
             } catch (error) {
                 console.error('Error updating booking document:', error);
             }
         }
     };
-
 
     return (
         <div className="calendar-slot-selector">
@@ -138,7 +155,7 @@ function CalendarSlotSelector() {
             />
 
             {selectedSlot && (
-                <div>
+                <div className='slot-confirm'>
                     <p>Selected Slot: {moment(selectedSlot).format('LLL')}</p>
                     {isSlotAlreadyBooked ? (
                         <p>Selected slot is outside the allowed time frame or already booked.</p>

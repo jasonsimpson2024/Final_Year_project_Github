@@ -6,12 +6,10 @@ function Navbar() {
     return (
         <nav className="navbar">
             <div className="logo">
-                <img src={logoImage} alt="Logo" />
+                <a href="/">
+                    <img src={logoImage} alt="Logo" />
+                </a>
             </div>
-            <ul className="navbar-menu">
-                <li><a href="/">Home</a></li>
-                <li><a href="/book">Book</a></li>
-            </ul>
         </nav>
     );
 }

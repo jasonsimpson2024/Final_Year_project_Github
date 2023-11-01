@@ -68,6 +68,7 @@ function BookingForm() {
     }
 
     return (
+        <div className="form-container">
         <div className="booking-form-container">
             <div className="booking-form">
                 <h2>Book an Appointment</h2>
@@ -123,6 +124,7 @@ function BookingForm() {
                     <button type="submit">Submit</button>
                 </form>
             </div>
+        </div>
         </div>
     );
 }

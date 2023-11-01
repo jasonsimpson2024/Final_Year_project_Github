@@ -24,7 +24,10 @@ function Automotive() {
                 const newCarData = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     Name: doc.data().Name, // Display the 'Name' field
-                    Location: doc.data().Location, // Display the 'Location' field
+                    Street: doc.data().Street, // Display the 'Location' field
+                    Town: doc.data().Town,
+                    County: doc.data().County,
+                    Eircode: doc.data().Eircode,
                 }));
 
                 if (newCarData.length > 0) {
@@ -66,7 +69,7 @@ function Automotive() {
                             {/* Use Link component to redirect to BookingCars */}
                             <Link to={`/bookingcars/${car.id}`} className="car-detail">
                                 Name: {car.Name} <br />
-                                Location: {car.Location}
+                                Location: {car.Street} {car.Town} {car.County} {car.Eircode}
                             </Link>
                         </div>
                     ))}

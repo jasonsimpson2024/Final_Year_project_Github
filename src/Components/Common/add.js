@@ -1,149 +1,144 @@
 import React, { useState } from 'react';
 import { db } from '../../firebase.js';
-import {Timestamp, doc, setDoc} from 'firebase/firestore'; // Import Timestamp, doc, and setDoc from Firestore
-import { useNavigate } from 'react-router-dom';
+import { addDoc, collection } from 'firebase/firestore';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-function Updaters() {
+function ListBusiness() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const carId = location.pathname.split('/').pop(); // Extract the car ID from the URL
+
     const [formData, setFormData] = useState({
-        Make: '',
-        Model: '',
-        Year: '',
-        EngineSize: '',
-        Mileage: '',
-        Transmission: '',
-        Colour: '',
-        Price: '',
-        TaxExpiry: null,
-        Nct: null,
-        LastService: '',
-        NextService: '',
+        Name: '',
+        Street: '',
+        Town: '',
+        County: '',
+        Eircode: '',
+        businessModel: '',
     });
 
-    const handleChange = (e) => {
+    const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
     };
-
-    function generateRandomString(length) {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            result += characters.charAt(randomIndex);
-        }
-        return result;
-    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            // Generate the document name by concatenating Make and Model, removing spaces, and converting to lowercase
-            const docName = generateRandomString(16).toLowerCase();
+            const businessData = {
+                Name: formData.Name,
+                Street: formData.Street,
+                Town: formData.Town,
+                County: formData.County,
+                Eircode: formData.Eircode,
+            };
 
-            // Calculate 'Next Service' based on 'Last Service'
-            const lastServiceDate = new Date(formData.LastService);
-            const nextServiceDate = new Date(lastServiceDate);
-            nextServiceDate.setMonth(nextServiceDate.getMonth() + 6);
+            const businessModel = formData.businessModel;
 
-            // Create a new 'service history' document
+            const businessCollectionRef = collection(db, businessModel);
 
+            await addDoc(businessCollectionRef, businessData);
 
-            // Retrieve the document from the 'cars' collection or create it if it doesn't exist
-            const carDocRef = doc(db, 'cars', docName);
-
-
-                await setDoc(carDocRef, {
-                    ...formData,
-                    docName,
-                    TaxExpiry: formData.TaxExpiry ? Timestamp.fromDate(new Date(formData.TaxExpiry)) : null,
-                    Nct: formData.Nct ? Timestamp.fromDate(new Date(formData.Nct)) : null,
-                    LastService: Timestamp.fromDate(new Date(formData.LastService)),
-                    NextService: Timestamp.fromDate(nextServiceDate),
-                });
-
-            // Clear the form after successful submission
             setFormData({
-                Make: '',
-                Model: '',
-                Year: '',
-                EngineSize: '',
-                Mileage: '',
-                Transmission: '',
-                Colour: '',
-                Price: '',
-                TaxExpiry: null,
-                Nct: null,
-                LastService: '',
-                NextService: '',
+                Name: '',
+                Street: '',
+                Town: '',
+                County: '',
+                Eircode: '',
+                businessModel: '',
             });
 
-            navigate('/home');
+            navigate(`/`);
         } catch (error) {
             console.error('Error adding document:', error);
         }
     };
+
     return (
-        <div className="updaters">
-            <h2>Add a new Car</h2>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Make:
-                    <input type="text" name="Make" value={formData.Make} onChange={handleChange} required />
-                </label>
-                <label>
-                    Model:
-                    <input type="text" name="Model" value={formData.Model} onChange={handleChange} required />
-                </label>
-                <label>
-                    Year:
-                    <input type="text" name="Year" value={formData.Year} onChange={handleChange} required />
-                </label>
-                <label>
-                    Engine Size:
-                    <input type="text" name="EngineSize" value={formData.EngineSize} onChange={handleChange} required />
-                </label>
-                <label>
-                    Mileage:
-                    <input type="text" name="Mileage" value={formData.Mileage} onChange={handleChange} required />
-                </label>
-                <label>
-                    Transmission:
-                    <input type="text" name="Transmission" value={formData.Transmission} onChange={handleChange} required />
-                </label>
-                <label>
-                    Colour:
-                    <input type="text" name="Colour" value={formData.Colour} onChange={handleChange} required />
-                </label>
-                <label>
-                    Price:
-                    <input type="text" name="Price" value={formData.Price} onChange={handleChange} required />
-                </label>
-                <label>
-                    Tax Expiry:
-                    <input type="date" name="TaxExpiry" value={formData.TaxExpiry} onChange={handleChange} required />
-                </label>
-                <label>
-                    NCT Due:
-                    <input type="date" name="Nct" value={formData.Nct} onChange={handleChange} required />
-                </label>
-                <label>
-                    Last Service:
-                    <input
-                        type="date"
-                        name="LastService"
-                        value={formData.LastService}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
-                <button type="submit">Submit</button>
-            </form>
+        <div className="form-container">
+        <div className="booking-form-container">
+            <div className="booking-form">
+                <h2>List your business</h2>
+                <form onSubmit={handleSubmit}>
+                    {/* Personal Information */}
+                    <label>
+                        Name:
+                        <input
+                            type="text"
+                            name="Name" // Use uppercase "N" to match formData key
+                            value={formData.Name}
+                            onChange={handleCarInfoChange}
+                            required
+                        />
+                    </label>
+                    {/* Address */}
+                    <h3>Address:</h3>
+                    <label>
+                        Street:
+                        <input
+                            type="text"
+                            name="Street" // Use uppercase "S" to match formData key
+                            value={formData.Street}
+                            onChange={handleCarInfoChange}
+                            required
+                        />
+                    </label>
+                    <label>
+                        Town:
+                        <input
+                            type="text"
+                            name="Town" // Use uppercase "T" to match formData key
+                            value={formData.Town}
+                            onChange={handleCarInfoChange}
+                            required
+                        />
+                    </label>
+                    <label>
+                        County:
+                        <input
+                            type="text"
+                            name="County" // Use uppercase "C" to match formData key
+                            value={formData.County}
+                            onChange={handleCarInfoChange}
+                            required
+                        />
+                    </label>
+                    <label>
+                        Eircode:
+                        <input
+                            type="text"
+                            name="Eircode" // Use uppercase "E" to match formData key
+                            value={formData.Eircode}
+                            onChange={handleCarInfoChange}
+                            required
+                        />
+                    </label>
+                    {/* Business Model */}
+                    <label>
+                        Business Model:
+                        <select
+                            name="businessModel"
+                            value={formData.businessModel}
+                            onChange={handleCarInfoChange}
+                            required
+                        >
+                            <option value="">Select a business model</option>
+                            <option value="Automotive">Automotive</option>
+                            <option value="Barber">Barber</option>
+                            <option value="HairSalon">Hair Salon</option>
+                        </select>
+                    </label>
+                    <br />
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
         </div>
     );
 }
 
-export default Updaters;
-
-
+export default ListBusiness;

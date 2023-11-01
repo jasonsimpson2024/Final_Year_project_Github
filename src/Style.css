@@ -50,13 +50,26 @@ h1 {
 
 /* Style for car details container */
 .car-details {
-    border: 1px solid #ccc;
-    padding: 10px;
+    padding: 20px; /* Increased padding for more space and better alignment */
     border-radius: 5px;
     background-color: #fff;
     display: block;
     margin-bottom: 20px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Add a box-shadow for the 3D effect */
+    border: 1px solid #ccc;
+    border-top: 2px solid #ccc; /* Create a top border to simulate the 3D effect */
+    font-family: Arial, sans-serif; /* Use a professional font */
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: left; /* Adjust text alignment as needed */
+    transition: all 0.3s ease-in-out; /* Add transitions for smooth effects */
 }
+
+.car-details:hover {
+    background-color: #f3f3f3; /* Change the background color on hover */
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3); /* Adjust the box-shadow on hover */
+}
+
 
 /* Style for the car detail link */
 .car-detail {
@@ -107,7 +120,7 @@ h1 {
 }
 .navbar .logo {
     position: absolute;
-    left: 0;
+    left: 42%;
     top: 65%; /* Adjust to vertically center the logo */
     transform: translateY(-50%);
 }
@@ -142,29 +155,59 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     text-align: center;
-    padding: 40px;
+    padding: 20px;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
-.booking-form-container form {
-    display: block; /* Make the form elements block-level */
-    text-align: center; /* Reset text alignment for form elements */
-    margin-bottom: 20px; /* Add margin to separate form elements */
+/* Container surrounding form fields */
+.form-container {
+    padding: 20px; /* Add padding to the form container */
+    border: 1px solid #ccc; /* Add a border around the form container */
+    border-radius: 5px; /* Add rounded corners */
 }
 
-/* Optional: Style form labels and input elements */
-.booking-form-container label {
-    display: block; /* Make labels block-level */
-    font-weight: bold; /* Style label text */
-    margin-bottom: 5px; /* Add margin for spacing */
+/* Style for form labels and input elements */
+.form-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
 }
 
-.booking-form-container input, .booking-form-container select {
-    width: 50%; /* Make input/select elements full width */
-    padding: 5px; /* Add padding for spacing */
-    margin-bottom: 10px; /* Add margin for spacing */
+.form-container input,
+.form-container select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #555;
 }
+
+.form-container button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #0056b3;
+}
+
+
+
+
+/* Style for the Welcome component */
+/* ... Other CSS rules ... */
 
 /* Style for the Welcome component */
 .welcome-container {
@@ -172,10 +215,12 @@ h1 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.6);
+    background-size: cover;
     color: #fff;
+    padding: 20px;
 }
 
 .welcome-container h1 {
@@ -185,13 +230,14 @@ h1 {
 }
 
 .welcome-container .buttons {
-    display: grid;
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .welcome-container .action-button {
-    background-color: #0074D9;
-    color: #fff;
+    background-color: #0074D9; /* Original background color */
+    color: #fff; /* Original text color */
     padding: 10px 20px;
     border: none;
     cursor: pointer;
@@ -201,5 +247,65 @@ h1 {
 }
 
 .welcome-container .action-button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Original hover background color */
 }
+
+/* ... Other CSS rules ... */
+
+
+.rbc-calendar {
+    background-color: #fff; /* Set the background color to white */
+    margin: 0 auto; /* Center the calendar on the page horizontally */
+    max-width: 800px; /* Adjust the max-width as needed */
+    padding: 20px;
+}
+
+.rbc-calendar .rbc-toolbar {
+    background-color: #fff; /* Set the toolbar background to white */
+    border-bottom: 1px solid #ccc; /* Add a subtle border at the bottom */
+}
+
+.rbc-calendar .rbc-event {
+    background-color: #0074D9; /* Set the event background color */
+    color: #fff; /* Set the event text color */
+}
+
+.rbc-calendar .rbc-event:hover {
+    background-color: #0056b3; /* Change the event color on hover */
+}
+
+.rbc-calendar .rbc-row-bg {
+    background-color: #fff; /* Set the row background to white */
+}
+
+.rbc-calendar .rbc-header {
+    background-color: #fff; /* Set the header background to white */
+}
+
+.slot-confirm{
+    text-align: center;
+}
+
+.booking-confirmation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Centers vertically in the viewport */
+    text-align: center; /* Center text horizontally */
+}
+
+.booking-container {
+    padding: 20px;
+    background-color: #fff; /* White background color for the container */
+    border: 1px solid #ccc; /* Add a border for the container */
+    border-radius: 10px; /* Add rounded corners to the container */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+    max-width: 500px; /* Set a maximum width for the container */
+}
+
+
+
+
+
+

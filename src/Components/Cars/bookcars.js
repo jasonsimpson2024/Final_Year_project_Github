@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { db } from '../../firebase.js';
 import { addDoc, collection, doc } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
+import InputMask from 'react-input-mask';
 
 function BookingForm() {
     const navigate = useNavigate();
@@ -19,6 +20,7 @@ function BookingForm() {
         Make: '',
         model: '',
         year: '',
+        transmission: '',
         reg: '',
         jobType: '',
         selectedSlot: null,
@@ -64,6 +66,7 @@ function BookingForm() {
         }));
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -79,6 +82,7 @@ function BookingForm() {
                 Make: formData.Make,
                 model: formData.model,
                 year: formData.year,
+                transmission: formData.transmission,
                 reg: formData.reg,
                 jobType: formData.jobType,
                 selectedSlot: formData.selectedSlot,
@@ -112,6 +116,7 @@ function BookingForm() {
                 Make: '',
                 model: '',
                 year: '',
+                transmission: '',
                 reg: '',
                 jobType: '',
                 selectedSlot: null,
@@ -124,6 +129,7 @@ function BookingForm() {
     }
 
     return (
+        <div className='form-container'>
         <div className="booking-form-container">
             <div className="booking-form">
                 <h2>Book an Appointment</h2>
@@ -254,8 +260,23 @@ function BookingForm() {
                         </select>
                     </label>
                     <label>
+                        Transmission:
+                        <select
+                            name="jobType"
+                            value={formData.jobType}
+                            onChange={handleCarInfoChange}
+                            required
+                        >
+                            <option value="">Select a transmission</option>
+                            <option value="basic-service">Petrol</option>
+                            <option value="basic-service">Diesel</option>
+                        </select>
+                    </label>
+                    <label>
                         Vehicle Reg Number:
-                        <input
+                        <InputMask
+                            maskChar=""
+                            placeholder="e.g., 12-D-12345 or 141-D-1234"
                             type="text"
                             name="reg"
                             value={formData.reg}
@@ -273,15 +294,19 @@ function BookingForm() {
                         >
                             <option value="">Select a job type</option>
                             <option value="basic-service">Basic Service</option>
-                            <option value="timing-belt">Timing Belt</option>
+                            <option value="brake-pads">Brake Pads and Shoes</option>
+                            <option value="brake-fluid">Brake Fluid</option>
                             <option value="tyre-change">Tyre Change</option>
-                            <option value="advanced-service">Advanced Service</option>
+                            <option value="mini-valet">Mini Valet</option>
+                            <option value="full-int-valet">Full Interior Valet</option>
+                            <option value="full-valet">Full Valet</option>
                         </select>
                     </label>
                     <br />
                     <button type="submit">Submit</button>
                 </form>
             </div>
+        </div>
         </div>
     );
 }

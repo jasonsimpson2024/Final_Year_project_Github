@@ -19,6 +19,7 @@ import Salonslot from "./Components/HairSalons/Saloncalendar";
 import Barber from "./Components/Barbers/barber";
 import BookBarber from "./Components/Barbers/bookBarber";
 import BarberCal from "./Components/Barbers/barberCalendar";
+import Confirmation from "./Components/Common/confirm";
 
 function App() {
     const [carIds, setCarIds] = useState([]);
@@ -65,6 +66,8 @@ function App() {
                     <Route exact path='/Barbers' element={<Barber />} />
                     <Route exact path='/barber/:id' element={<BookBarber />} />
                     <Route exact path='/barberslot/:doc1/:documentId' element={<BarberCal />} />
+                    <Route exact path='/confirmation' element={<Confirmation />} />
+                    <Route exact path='/add' element={<Add />} />
                 </Routes>
                 </Layout>
             </Router>

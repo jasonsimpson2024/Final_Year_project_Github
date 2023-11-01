@@ -11,7 +11,7 @@ build:
     - npm run build  # Build the React application
     - mv ./build public  # Rename the 'build' directory to 'public' (required for GitLab Pages)
   only:
-    - main  # Build when changes are pushed to the master branch
+    - main  # Build when changes are pushed to the main branch
 
 # Job for deploying the built application to GitLab Pages
 pages:
@@ -22,4 +22,4 @@ pages:
     paths:
       - public  # This path should match the directory name from the deployment script
   only:
-    - main  # Deploy when changes are pushed to the master branch
+    - main  # Deploy when changes are pushed to the main branch

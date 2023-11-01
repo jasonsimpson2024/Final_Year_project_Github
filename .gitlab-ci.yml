@@ -6,14 +6,15 @@ stages:
 # Job for building the React application
 build:
   stage: build
+  image: node:14  # Use a Node.js image with Node.js 14
   script:
     - npm install  # Install project dependencies
     - npm run build  # Build the React application
     - mv ./build public  # Rename the 'build' directory to 'public' (required for GitLab Pages)
   only:
-    - main  # Build when changes are pushed to the main branch
+    - main
   tags:
-    - docker  # Add the 'docker' runner tag to this job
+    - docker
 
 # Job for deploying the built application to GitLab Pages
 pages:
@@ -24,4 +25,4 @@ pages:
     paths:
       - public  # This path should match the directory name from the deployment script
   only:
-    - main  # Deploy when changes are pushed to the main branch
+    - main

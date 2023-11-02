@@ -1,6 +1,7 @@
 stages:
   - build
   - deploy
+  - mirror  # Added a new stage for mirroring to GitHub
 
 # Specify tags if needed
 variables:
@@ -27,5 +28,14 @@ pages:
   artifacts:
     paths:
       - public  # This path should match the directory name from the deployment script
+  only:
+    - main
+
+# Job for mirroring to GitHub
+mirror_to_github:
+  stage: mirror
+  script:
+    - git remote add github https://github.com/jasonsimpson2024/Final_Year_project_Github.git
+    - git push github HEAD:main
   only:
     - main

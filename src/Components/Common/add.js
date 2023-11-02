@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { db } from '../../firebase.js';
 import { addDoc, collection } from 'firebase/firestore';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function ListBusiness() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const carId = location.pathname.split('/').pop(); // Extract the car ID from the URL
 
     const [formData, setFormData] = useState({
         Name: '',

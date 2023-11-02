@@ -49,5 +49,3 @@ BookingForm.propTypes = {
     businessType: PropTypes.string.isRequired,
     onSubmit: PropTypes.func.isRequired,
 };
-
-export default BookingForm;

@@ -37,8 +37,8 @@ pages:
 mirror_to_github:
   stage: mirror
   script:
-    - apt-get update
-    - apt-get install -y git  # For Debian/Ubuntu-based runners
+    - apk update
+    - apk add git
     - git remote add github https://github.com/jasonsimpson2024/Final_Year_project_Github.git
     - git push github HEAD:main
 

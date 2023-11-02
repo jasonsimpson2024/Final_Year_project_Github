@@ -30,6 +30,8 @@ pages:
       - public  # This path should match the directory name from the deployment script
   only:
     - main
+  tags:
+    - docker  # Add the 'docker' tag to use runners with the 'docker' tag
 
 # Job for mirroring to GitHub
 mirror_to_github:
@@ -39,3 +41,5 @@ mirror_to_github:
     - git push github HEAD:main
   only:
     - main
+  tags:
+    - docker  # Add the 'docker' tag to use runners with the 'docker' tag

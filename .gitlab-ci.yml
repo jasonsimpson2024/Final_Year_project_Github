@@ -1,11 +1,10 @@
-# Define the stages for the CI/CD pipeline
 stages:
   - build
   - deploy
 
-services:
-  - name: docker:dind
-    entrypoint: ["env", "-u", "DOCKER_HOST"]
+# Specify tags if needed
+variables:
+  DOCKER_DRIVER: overlay2
 
 # Job for building the React application
 build:

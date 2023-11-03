@@ -1,3 +1,7 @@
 [submodule "Final_Year_project_Github"]
     path = Final_Year_project_Github
     url = https://github.com/jasonsimpson2024/Final_Year_project_Github.git
+
+[submodule "final-year-project"]
+    path = final-year-project
+    url = https://gitlab.cs.nuim.ie/u210157/final-year-project.git

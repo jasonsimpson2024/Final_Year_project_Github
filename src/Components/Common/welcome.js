@@ -1,7 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 
 function Welcome() {
+    const [user, setUser] = useState(null); // To store the user's authentication status
+
+    useEffect(() => {
+        const auth = getAuth();
+
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser); // Update the user state when authentication state changes
+        });
+
+        // Clean up the observer when the component unmounts
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogout = async () => {
+        const auth = getAuth();
+
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div className="welcome-container">
             <h1>Welcome to BookingLite</h1>
@@ -15,9 +39,6 @@ function Welcome() {
                 </Link>
                 <Link to="/Barbers">
                     <button className="action-button">Barber shops</button>
-                </Link>
-                <Link to="/add">
-                    <button className="action-button">List your business</button>
                 </Link>
             </div>
         </div>

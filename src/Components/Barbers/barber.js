@@ -68,7 +68,7 @@ function Barber() {
                 <div className="car-details-list">
                     {carData.map((hair) => (
                         <div key={hair.id} className="car-details">
-                            <Link to={`/bookingcars/${hair.id}`} className="car-detail">
+                            <Link to={`/barber/${hair.id}`} className="car-detail">
                                 Name: {hair.Name} <br />
                                 Location: {hair.Street} {hair.Town} {hair.County} {hair.Eircode}
                             </Link>

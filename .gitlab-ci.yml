@@ -39,7 +39,7 @@ mirror_to_github:
   script:
     - apk update
     - apk add git
-    - git remote set-url github https://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@github.com/jasonsimpson2024/Final_Year_project_Github.git
+    - git remote set-url github https://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@github.com/jasonsimpson2024/Final_Year_project_Github.git
     - git push github HEAD:main
   only:
     - main

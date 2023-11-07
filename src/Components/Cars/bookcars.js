@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase.js';
-import { addDoc, collection, doc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, query } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import InputMask from 'react-input-mask';
 
@@ -40,7 +40,7 @@ function BookingForm() {
         Nissan: ['Altima', 'Rogue', 'Maxima', 'Murano', 'Pathfinder', 'Sentra', 'Versa', 'Titan'],
         Volkswagen: ['Jetta', 'Passat', 'Golf', 'Tiguan', 'Atlas', 'Arteon', 'Beetle', 'ID.4'],
         BMW: ['3 Series', '5 Series', 'X5', '7 Series', 'X3', 'X7', 'Z4', 'i3'],
-        MercedesBenz: ['C-Class', 'E-Class', 'GLE', 'S-Class', 'GLC', 'A-Class', 'CLS', 'GLB'],
+        'Mercedes-Benz': ['C-Class', 'E-Class', 'GLE', 'S-Class', 'GLC', 'A-Class', 'CLS', 'GLB'],
         Hyundai: ['Sonata', 'Elantra', 'Tucson', 'Santa Fe', 'Kona', 'Veloster', 'Palisade', 'Nexo'],
         Subaru: ['Outback', 'Forester', 'Impreza', 'Crosstrek', 'Legacy', 'WRX', 'BRZ', 'Ascent'],
         Audi: ['A4', 'A6', 'Q5', 'Q7', 'Q3', 'A3', 'S5', 'e-tron'],
@@ -53,7 +53,6 @@ function BookingForm() {
         Dodge: ['Charger', 'Challenger', 'Durango', 'Grand Caravan', 'Neon', 'Journey', 'Caliber', 'Nitro'],
         Tesla: ['Model S', 'Model 3', 'Model X', 'Model Y', 'Cybertruck', 'Roadster'],
         Volvo: ['XC90', 'S60', 'XC60', 'S90', 'V60', 'XC40', 'C40', 'V90'],
-
     };
 
     const years = Array.from({ length: 125 }, (_, index) => (2024 - index).toString());
@@ -66,6 +65,32 @@ function BookingForm() {
         }));
     };
 
+    useEffect(() => {
+        // Fetch job types from the business's 'jobtypes' subcollection
+        const fetchJobTypes = async () => {
+            const businessDocRef = doc(db, 'Automotive', carId);
+            const jobTypesCollectionRef = collection(businessDocRef, 'jobtypes');
+
+            try {
+                const jobTypesQuerySnapshot = await getDocs(query(jobTypesCollectionRef));
+
+                const jobTypes = [];
+                jobTypesQuerySnapshot.forEach((doc) => {
+                    jobTypes.push(doc.data().name);
+                });
+
+                // Update the jobType dropdown options with the fetched job types
+                setFormData((prevState) => ({
+                    ...prevState,
+                    jobTypes,
+                }));
+            } catch (error) {
+                console.error('Error fetching job types:', error);
+            }
+        };
+
+        fetchJobTypes();
+    }, [carId]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -126,187 +151,185 @@ function BookingForm() {
         } catch (error) {
             console.error('Error adding document:', error);
         }
-    }
+    };
 
     return (
-        <div className='form-container'>
-        <div className="booking-form-container">
-            <div className="booking-form">
-                <h2>Book an Appointment</h2>
-                <form onSubmit={handleSubmit}>
-                    {/* Personal Information */}
-                    <h3>Personal Information</h3>
-                    <label>
-                        Name:
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        Email:
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        Phone:
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    {/* Address */}
-                    <h3>Address:</h3>
-                    <label>
-                        Street:
-                        <input
-                            type="text"
-                            name="street"
-                            value={formData.street}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        Town:
-                        <input
-                            type="text"
-                            name="town"
-                            value={formData.town}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        County:
-                        <input
-                            type="text"
-                            name="county"
-                            value={formData.county}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        Eircode:
-                        <input
-                            type="text"
-                            name="eircode"
-                            value={formData.eircode}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    {/* Car Information */}
-                    <h3>Car Information</h3>
-                    <label>
-                        Make:
-                        <select
-                            name="Make"
-                            value={formData.Make}
-                            onChange={handleCarInfoChange}
-                            required
-                        >
-                            <option value="">Select your car's make</option>
-                            {carMakes.map((make) => (
-                                <option key={make} value={make}>
-                                    {make}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                    <label>
-                        Model:
-                        <select
-                            name="model"
-                            value={formData.model}
-                            onChange={handleCarInfoChange}
-                            required
-                        >
-                            <option value="">Select a car model</option>
-                            {formData.Make &&
-                                carModels[formData.Make]?.map((model) => (
-                                    <option key={model} value={model}>
-                                        {model}
+        <div className="form-container">
+            <div className="booking-form-container">
+                <div className="booking-form">
+                    <h2>Book an Appointment</h2>
+                    <form onSubmit={handleSubmit}>
+                        {/* Personal Information */}
+                        <h3>Personal Information</h3>
+                        <label>
+                            Name:
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            Email:
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            Phone:
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        {/* Address */}
+                        <h3>Address:</h3>
+                        <label>
+                            Street:
+                            <input
+                                type="text"
+                                name="street"
+                                value={formData.street}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            Town:
+                            <input
+                                type="text"
+                                name="town"
+                                value={formData.town}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            County:
+                            <input
+                                type="text"
+                                name="county"
+                                value={formData.county}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            Eircode:
+                            <input
+                                type="text"
+                                name="eircode"
+                                value={formData.eircode}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        {/* Car Information */}
+                        <h3>Car Information</h3>
+                        <label>
+                            Make:
+                            <select
+                                name="Make"
+                                value={formData.Make}
+                                onChange={handleCarInfoChange}
+                                required
+                            >
+                                <option value="">Select your car's make</option>
+                                {carMakes.map((make) => (
+                                    <option key={make} value={make}>
+                                        {make}
                                     </option>
                                 ))}
-                        </select>
-                    </label>
-                    <label>
-                        Year:
-                        <select
-                            name="year"
-                            value={formData.year}
-                            onChange={handleCarInfoChange}
-                            required
-                        >
-                            <option value="">Select a year</option>
-                            {years.map((year) => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                    <label>
-                        Transmission:
-                        <select
-                            name="jobType"
-                            value={formData.jobType}
-                            onChange={handleCarInfoChange}
-                            required
-                        >
-                            <option value="">Select a transmission</option>
-                            <option value="basic-service">Petrol</option>
-                            <option value="basic-service">Diesel</option>
-                        </select>
-                    </label>
-                    <label>
-                        Vehicle Reg Number:
-                        <InputMask
-                            maskChar=""
-                            placeholder="e.g., 12-D-12345 or 141-D-1234"
-                            type="text"
-                            name="reg"
-                            value={formData.reg}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        Job Type:
-                        <select
-                            name="jobType"
-                            value={formData.jobType}
-                            onChange={handleCarInfoChange}
-                            required
-                        >
-                            <option value="">Select a job type</option>
-                            <option value="basic-service">Basic Service</option>
-                            <option value="brake-pads">Brake Pads and Shoes</option>
-                            <option value="brake-fluid">Brake Fluid</option>
-                            <option value="tyre-change">Tyre Change</option>
-                            <option value="mini-valet">Mini Valet</option>
-                            <option value="full-int-valet">Full Interior Valet</option>
-                            <option value="full-valet">Full Valet</option>
-                        </select>
-                    </label>
-                    <br />
-                    <button type="submit">Submit</button>
-                </form>
+                            </select>
+                        </label>
+                        <label>
+                            Model:
+                            <select
+                                name="model"
+                                value={formData.model}
+                                onChange={handleCarInfoChange}
+                                required
+                            >
+                                <option value="">Select a car model</option>
+                                {formData.Make &&
+                                    carModels[formData.Make]?.map((model) => (
+                                        <option key={model} value={model}>
+                                            {model}
+                                        </option>
+                                    ))}
+                            </select>
+                        </label>
+                        <label>
+                            Year:
+                            <select
+                                name="year"
+                                value={formData.year}
+                                onChange={handleCarInfoChange}
+                                required
+                            >
+                                <option value="">Select a year</option>
+                                {years.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <label>
+                            Transmission:
+                            <select
+                                name="transmission"
+                                value={formData.transmission}
+                                onChange={handleCarInfoChange}
+                                required
+                            >
+                                <option value="">Select a transmission</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                            </select>
+                        </label>
+                        <label>
+                            Vehicle Reg Number:
+                            <InputMask
+                                maskChar=""
+                                placeholder="e.g., 12-D-12345 or 141-D-1234"
+                                type="text"
+                                name="reg"
+                                value={formData.reg}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            Job Type:
+                            <select
+                                name="jobType"
+                                value={formData.jobType}
+                                onChange={handleCarInfoChange}
+                                required
+                            >
+                                <option value="">Select a job type</option>
+                                {formData.jobTypes && formData.jobTypes.map((jobType) => (
+                                    <option key={jobType} value={jobType}>
+                                        {jobType}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <br />
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
             </div>
-        </div>
         </div>
     );
 }

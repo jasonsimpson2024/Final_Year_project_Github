@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { db } from '../../firebase.js';
-import { addDoc, collection } from 'firebase/firestore';
+import { setDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
 
 function ListBusiness() {
     const navigate = useNavigate();
-
+    const auth = getAuth();
     const [formData, setFormData] = useState({
         Name: '',
         Street: '',
@@ -14,6 +15,8 @@ function ListBusiness() {
         Eircode: '',
         businessModel: '',
     });
+
+    const user = auth.currentUser;
 
     const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
@@ -33,13 +36,14 @@ function ListBusiness() {
                 Town: formData.Town,
                 County: formData.County,
                 Eircode: formData.Eircode,
+                ownerUID: user.uid,
             };
 
             const businessModel = formData.businessModel;
 
-            const businessCollectionRef = collection(db, businessModel);
+            const businessDocRef = doc(db, businessModel, user.uid); // Use the user's UID as the document ID
 
-            await addDoc(businessCollectionRef, businessData);
+            await setDoc(businessDocRef, businessData);
 
             setFormData({
                 Name: '',
@@ -50,7 +54,8 @@ function ListBusiness() {
                 businessModel: '',
             });
 
-            navigate(`/`);
+            navigate(`/add-job-types/${formData.businessModel}/${user.uid}`);
+
         } catch (error) {
             console.error('Error adding document:', error);
         }
@@ -58,83 +63,83 @@ function ListBusiness() {
 
     return (
         <div className="form-container">
-        <div className="booking-form-container">
-            <div className="booking-form">
-                <h2>List your business</h2>
-                <form onSubmit={handleSubmit}>
-                    {/* Personal Information */}
-                    <label>
-                        Name:
-                        <input
-                            type="text"
-                            name="Name" // Use uppercase "N" to match formData key
-                            value={formData.Name}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    {/* Address */}
-                    <h3>Address:</h3>
-                    <label>
-                        Street:
-                        <input
-                            type="text"
-                            name="Street" // Use uppercase "S" to match formData key
-                            value={formData.Street}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        Town:
-                        <input
-                            type="text"
-                            name="Town" // Use uppercase "T" to match formData key
-                            value={formData.Town}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        County:
-                        <input
-                            type="text"
-                            name="County" // Use uppercase "C" to match formData key
-                            value={formData.County}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    <label>
-                        Eircode:
-                        <input
-                            type="text"
-                            name="Eircode" // Use uppercase "E" to match formData key
-                            value={formData.Eircode}
-                            onChange={handleCarInfoChange}
-                            required
-                        />
-                    </label>
-                    {/* Business Model */}
-                    <label>
-                        Business Model:
-                        <select
-                            name="businessModel"
-                            value={formData.businessModel}
-                            onChange={handleCarInfoChange}
-                            required
-                        >
-                            <option value="">Select a business model</option>
-                            <option value="Automotive">Automotive</option>
-                            <option value="Barber">Barber</option>
-                            <option value="HairSalon">Hair Salon</option>
-                        </select>
-                    </label>
-                    <br />
-                    <button type="submit">Submit</button>
-                </form>
+            <div className="booking-form-container">
+                <div className="booking-form">
+                    <h2>List your business</h2>
+                    <form onSubmit={handleSubmit}>
+                        {/* Personal Information */}
+                        <label>
+                            Name:
+                            <input
+                                type="text"
+                                name="Name"
+                                value={formData.Name}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        {/* Address */}
+                        <h3>Address:</h3>
+                        <label>
+                            Street:
+                            <input
+                                type="text"
+                                name="Street"
+                                value={formData.Street}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            Town:
+                            <input
+                                type="text"
+                                name="Town"
+                                value={formData.Town}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            County:
+                            <input
+                                type="text"
+                                name="County"
+                                value={formData.County}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            Eircode:
+                            <input
+                                type="text"
+                                name="Eircode"
+                                value={formData.Eircode}
+                                onChange={handleCarInfoChange}
+                                required
+                            />
+                        </label>
+                        {/* Business Model */}
+                        <label>
+                            Business Model:
+                            <select
+                                name="businessModel"
+                                value={formData.businessModel}
+                                onChange={handleCarInfoChange}
+                                required
+                            >
+                                <option value="">Select a business model</option>
+                                <option value="Automotive">Automotive</option>
+                                <option value="Barber">Barber</option>
+                                <option value="HairSalon">Hair Salon</option>
+                            </select>
+                        </label>
+                        <br />
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
             </div>
-        </div>
         </div>
     );
 }

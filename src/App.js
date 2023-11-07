@@ -16,6 +16,11 @@ import Barber from "./Components/Barbers/barber";
 import BookBarber from "./Components/Barbers/bookBarber";
 import BarberCal from "./Components/Barbers/barberCalendar";
 import Confirmation from "./Components/Common/confirm";
+import Login from "./Components/Common/login";
+import Signup from "./Components/Common/signup";
+import Manage from "./Components/Common/manage";
+import Bookinfo from "./Components/Common/bookinginfo";
+import Jobtype from "./Components/Common/jobtype";
 
 function App() {
     return (
@@ -36,6 +41,12 @@ function App() {
                     <Route exact path='/barberslot/:doc1/:documentId' element={<BarberCal />} />
                     <Route exact path='/confirmation' element={<Confirmation />} />
                     <Route exact path='/add' element={<Add />} />
+                    <Route exact path='/login' element={<Login />} />
+                    <Route exact path='/register' element={<Signup />} />
+                    <Route exact path='/manage' element={<Manage />} />
+                    <Route path="/bookinginfo/:collectionName/:userId/:bookingId" element={<Bookinfo />} />
+                    <Route exact path='/add-job-types/:businessModel/:uid' element={<Jobtype />} />
+
                 </Routes>
                 </Layout>
             </Router>

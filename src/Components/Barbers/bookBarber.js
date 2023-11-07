@@ -89,7 +89,7 @@ function BookingForm() {
                 selectedSlot: null,
             });
 
-            navigate(`/salonslot/${hairId}/${newDocumentId}`);
+            navigate(`/barberslot/${hairId}/${newDocumentId}`);
         } catch (error) {
             console.error('Error adding document:', error);
         }

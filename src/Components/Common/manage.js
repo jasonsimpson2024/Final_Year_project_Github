@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../../firebase.js';
-import { collection, doc, getDocs, query } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { collection, doc, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 function ManageBusiness() {
-    const navigate = useNavigate();
     const auth = getAuth();
     const getUser = auth.currentUser;
     const user = getUser ? getUser.uid : null;

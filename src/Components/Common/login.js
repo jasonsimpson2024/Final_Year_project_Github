@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { auth, getUserEmail } from '../../firebase.js';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {getUserEmail } from '../../firebase.js';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
@@ -10,11 +9,6 @@ export default function Login() {
 
     const login = async () => {
         try {
-            const user = await signInWithEmailAndPassword(
-                auth,
-                loginEmail,
-                loginPassword
-            );
             alert("Log In successful!");
             console.log(getUserEmail()); // Assuming getUserEmail is a function
             navigate("/");

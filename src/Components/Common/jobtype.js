@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { db } from '../../firebase.js';
-import { setDoc, doc, collection, addDoc } from 'firebase/firestore';
+import { doc, collection, addDoc } from 'firebase/firestore';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getAuth } from 'firebase/auth';
+
 
 function AddJobTypes() {
     const navigate = useNavigate();
-    const auth = getAuth();
     const { businessModel, uid } = useParams(); // Get businessModel and UID from URL parameters
 
     const [formData, setFormData] = useState({
@@ -18,7 +17,6 @@ function AddJobTypes() {
         jobType6: '',
     });
 
-    const user = auth.currentUser;
 
     const handleJobTypeChange = (e) => {
         const { name, value } = e.target;

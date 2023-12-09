@@ -36,9 +36,10 @@ pages:
 # Job for mirroring to GitHub
 mirror_to_github:
   stage: mirror
+  image: debian:stable  # Switched to a Debian-based image
   script:
-    - apk update
-    - apk add git
+    - apt-get update -qy
+    - apt-get install -y git  # Install Git using apt-get
     - git remote set-url github https://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/jasonsimpson2024/Final_Year_project_Github.git
     - git push github HEAD:main
   only:

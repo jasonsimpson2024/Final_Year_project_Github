@@ -10,7 +10,7 @@ variables:
 # Job for building the React application
 build:
   stage: build
-  image: node:14  # Use a Node.js image with Node.js 14
+  image: node:14-alpine  # Use an Alpine Linux-based Node.js image
   script:
     - npm install  # Install project dependencies
     - npm run build  # Build the React application
@@ -36,13 +36,10 @@ pages:
 # Job for mirroring to GitHub
 mirror_to_github:
   stage: mirror
-  image: debian:stable  # Switched to a Debian-based image
+  image: alpine:latest  # Switched to an Alpine Linux-based image
   script:
-    - apt-get update -qy
-    - apt-get install -y gnupg  # Install gnupg for GPG key management
-    - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138 112695A0E562B32A
-    - apt-get update -qy
-    - apt-get install -y git  # Install Git using apt-get
+    - apk update
+    - apk add git
     - git remote set-url github https://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/jasonsimpson2024/Final_Year_project_Github.git
     - git push github HEAD:main
   only:

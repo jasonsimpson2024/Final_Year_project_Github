@@ -1,20 +1,22 @@
 stages:
   - build
   - deploy
-  - mirror  # Added a new stage for mirroring to GitHub
+  - mirror
 
 # Specify tags if needed
 variables:
-  DOCKER_DRIVER: overlay2  # Use an environment variable to store your GitHub PAT
+  DOCKER_DRIVER: overlay2
 
 # Job for building the React application
 build:
   stage: build
-  image: node:14  # Use a Node.js image with Node.js 14
+  image: node:14
   script:
-    - npm install  # Install project dependencies
-    - npm run build  # Build the React application
-    - mv ./build public  # Rename the 'build' directory to 'public' (required for GitLab Pages)
+    - apk update
+    - apk add git
+    - npm install
+    - npm run build
+    - mv ./build public
   only:
     - main
   tags:
@@ -27,7 +29,7 @@ pages:
     - echo "Deploying to GitLab Pages"
   artifacts:
     paths:
-      - public  # This path should match the directory name from the deployment script
+      - public
   only:
     - main
   tags:
@@ -39,7 +41,7 @@ mirror_to_github:
   script:
     - apk update
     - apk add git
-    - git remote set-url github https://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/jasonsimpson2024/Final_Year_project_Github.git
+    - git remote set-url github https://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/jasonsimpson2024/Final_Year_project_Github.git
     - git push github HEAD:main
   only:
     - main

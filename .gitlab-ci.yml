@@ -12,8 +12,8 @@ build:
   stage: build
   image: node:14
   script:
-    - apk update
-    - apk add git
+    - apt-get update -qy
+    - apt-get install -y git
     - npm install
     - npm run build
     - mv ./build public
@@ -39,8 +39,8 @@ pages:
 mirror_to_github:
   stage: mirror
   script:
-    - apk update
-    - apk add git
+    - apt-get update -qy
+    - apt-get install -y git
     - git remote set-url github https://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/jasonsimpson2024/Final_Year_project_Github.git
     - git push github HEAD:main
   only:

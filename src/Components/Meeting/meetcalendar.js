@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { db } from '../../firebase.js';
-import { collection, getDocs, doc, updateDoc, query, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { startOfDay, addHours, addMinutes } from 'date-fns';
+import { startOfDay, addMinutes } from 'date-fns';
 
 // ... (existing imports)
 

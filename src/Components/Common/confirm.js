@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 function BookingConfirmation() {
     const location =useLocation();
-    const { name, jobType, selectedSlot } = location.state;
+    const { name, selectedSlot } = location.state;
 
     return (
         <div className="booking-confirmation">

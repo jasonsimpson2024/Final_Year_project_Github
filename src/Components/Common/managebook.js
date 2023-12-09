@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 import { doc, collection, getDoc, getFirestore } from 'firebase/firestore';
 
+
 function Navbar() {
     const [user, setUser] = useState(null);
     const [hasBusiness, setHasBusiness] = useState(false);
@@ -72,16 +73,9 @@ function Navbar() {
     return (
         <nav className="navbar">
             <div className="logo">
-                {/* Render Link or div based on isJobTypesPage */}
-                {isJobTypesPage ? (
-                    <div>
-                        <img src={logoImage} alt="Logo" />
-                    </div>
-                ) : (
-                    <Link to="/">
-                        <img src={logoImage} alt="Logo" />
-                    </Link>
-                )}
+                <Link to="/">
+                    <img src={logoImage} alt="Logo" />
+                </Link>
             </div>
             <ul className="navbar-menu">
                 {dataLoaded && user ? (
@@ -91,14 +85,14 @@ function Navbar() {
                             <>
                                 <li>
                                     {isJobTypesPage ? (
-                                        <div className="navfont">Manage Business</div>
+                                        <div>Manage Business</div>
                                     ) : (
                                         <Link to="/mybusinesses">Manage Business</Link>
                                     )}
                                 </li>
                                 <li>
                                     {isJobTypesPage ? (
-                                        <div className="navfont">Manage Bookings</div>
+                                        <div>Manage Bookings</div>
                                     ) : (
                                         <Link to="/manage">Manage Bookings</Link>
                                     )}
@@ -108,7 +102,7 @@ function Navbar() {
                             // User doesn't have a business, display "List Your Business" link
                             <li>
                                 {isJobTypesPage ? (
-                                    <div className="navfont">List your business</div>
+                                    <div>List your business</div>
                                 ) : (
                                     <Link to="/add">List your business</Link>
                                 )}
@@ -116,7 +110,7 @@ function Navbar() {
                         )}
                         <li>
                             {isJobTypesPage ? (
-                                <div className="navfont">Log out</div>
+                                <div>Log out</div>
                             ) : (
                                 <Link to="/" onClick={handleLogout}>
                                     Log out
@@ -129,14 +123,14 @@ function Navbar() {
                     <>
                         <li>
                             {isJobTypesPage ? (
-                                <div className="navfont">Sign In</div>
+                                <div>Sign In</div>
                             ) : (
                                 <Link to="/login">Sign In</Link>
                             )}
                         </li>
                         <li>
                             {isJobTypesPage ? (
-                                <div className="navfont">Sign Up</div>
+                                <div>Sign Up</div>
                             ) : (
                                 <Link to="/register">Sign Up</Link>
                             )}

@@ -6,12 +6,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
-    const hairId = location.pathname.split('/').pop(); // Extract the car ID from the URL
+    const meetId = location.pathname.split('/').pop(); // Extract the car ID from the URL
 
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
-        phone: '',
         jobType: '',
         selectedSlot: null,
         jobTypes: [], // Store the fetched job types
@@ -28,7 +26,7 @@ function BookingForm() {
     useEffect(() => {
         // Fetch job types from the hair salon's 'jobtypes' subcollection
         const fetchJobTypes = async () => {
-            const hairDocRef = doc(db, 'Barber', hairId);
+            const hairDocRef = doc(db, 'Meeting', meetId);
             const jobTypesCollectionRef = collection(hairDocRef, 'jobtypes');
 
             try {
@@ -50,7 +48,7 @@ function BookingForm() {
         };
 
         fetchJobTypes();
-    }, [hairId]);
+    }, [meetId]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -58,18 +56,16 @@ function BookingForm() {
         try {
             const carData = {
                 name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
                 jobType: formData.jobType,
                 selectedSlot: formData.selectedSlot,
-                businessID: hairId,
+                businessID: meetId,
             };
 
             // Reference the 'cars' collection
-            const carsCollectionRef = collection(db, 'Barber');
+            const carsCollectionRef = collection(db, 'Meeting');
 
             // Reference the 'car' document within the 'cars' collection
-            const carDocRef = doc(carsCollectionRef, hairId);
+            const carDocRef = doc(carsCollectionRef, meetId);
 
             // Reference the 'bookings' subcollection within the 'car' document
             const bookingsCollectionRef = collection(carDocRef, 'booking');
@@ -83,13 +79,11 @@ function BookingForm() {
 
             setFormData({
                 name: '',
-                email: '',
-                phone: '',
                 jobType: '',
                 selectedSlot: null,
             });
 
-            navigate(`/barberslot/${hairId}/${newDocumentId}`);
+            navigate(`/meetingslot/${meetId}/${newDocumentId}`);
         } catch (error) {
             console.error('Error adding document:', error);
         }
@@ -101,7 +95,7 @@ function BookingForm() {
                 <div className="booking-form">
                     <h2>Book an Appointment</h2>
                     <form onSubmit={handleSubmit}>
-
+                        {/* Personal Information */}
                         <label>
                             Name:
                             <input
@@ -113,34 +107,12 @@ function BookingForm() {
                             />
                         </label>
                         <label>
-                            Email:
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleCarInfoChange}
-                                required
-                            />
-                        </label>
-                        <label>
-                            Phone:
-                            <input
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleCarInfoChange}
-                                required
-                            />
-                        </label>
-                        <label>
-                            Job Type:
                             <select
                                 name="jobType"
                                 value={formData.jobType}
                                 onChange={handleCarInfoChange}
                                 required
                             >
-                                <option value="">Select a job type</option>
                                 {formData.jobTypes && formData.jobTypes.map((jobType) => (
                                     <option key={jobType} value={jobType}>
                                         {jobType}

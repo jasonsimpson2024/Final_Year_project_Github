@@ -87,7 +87,6 @@ function ListBusiness() {
                                 name="Street"
                                 value={formData.Street}
                                 onChange={handleCarInfoChange}
-                                required
                             />
                         </label>
                         <label>
@@ -97,7 +96,6 @@ function ListBusiness() {
                                 name="Town"
                                 value={formData.Town}
                                 onChange={handleCarInfoChange}
-                                required
                             />
                         </label>
                         <label>
@@ -107,7 +105,6 @@ function ListBusiness() {
                                 name="County"
                                 value={formData.County}
                                 onChange={handleCarInfoChange}
-                                required
                             />
                         </label>
                         <label>
@@ -117,7 +114,6 @@ function ListBusiness() {
                                 name="Eircode"
                                 value={formData.Eircode}
                                 onChange={handleCarInfoChange}
-                                required
                             />
                         </label>
                         {/* Business Model */}
@@ -133,6 +129,7 @@ function ListBusiness() {
                                 <option value="Automotive">Automotive</option>
                                 <option value="Barber">Barber</option>
                                 <option value="HairSalon">Hair Salon</option>
+                                <option value="Meeting">Meeting</option>
                             </select>
                         </label>
                         <br />

@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { db } from '../../firebase.js';
-import {collection, getDocs, doc, updateDoc, query, getDoc} from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, query, getDoc } from 'firebase/firestore';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { startOfDay, addHours } from 'date-fns';
+import { startOfDay, addHours, addMinutes } from 'date-fns';
+
+// ... (existing imports)
+
+// ... (existing imports)
 
 const localizer = momentLocalizer(moment);
 
@@ -26,11 +30,10 @@ function CalendarSlotSelector() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const automotiveCollection = collection(db, 'HairSalon');
-            const carDoc = doc(automotiveCollection, doc1); // Reference to the car document
+            const automotiveCollection = collection(db, 'Meeting');
+            const carDoc = doc(automotiveCollection, doc1);
 
             try {
-                // Now, access the "booked" subcollection within the car document
                 const bookedCollection = collection(carDoc, 'booking');
                 const querySnapshot = await getDocs(bookedCollection);
 
@@ -39,15 +42,23 @@ function CalendarSlotSelector() {
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     if (data.selectedSlot) {
-                        eventsData.push({
-                            start: data.selectedSlot.toDate(),
-                            end: addHours(data.selectedSlot.toDate(), 1),
-                        });
+                        // Split the hour into 30-minute slots and add separate events for each slot
+                        let startSlot = data.selectedSlot.toDate();
+                        const endSlot = addMinutes(data.selectedSlot.toDate(), 30);
+
+                        while (startSlot < endSlot) {
+                            eventsData.push({
+                                id: doc.id, // Use document ID as the event ID
+                                title: data.name, // Display name in the event title
+                                start: startSlot,
+                                end: addMinutes(startSlot, 30), // 30 minutes duration for each slot
+                            });
+                            startSlot = addMinutes(startSlot, 30);
+                        }
                     }
                 });
 
                 setEvents(eventsData);
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -56,71 +67,43 @@ function CalendarSlotSelector() {
     }, [doc1, documentId]);
 
     const handleSelect = async (slotInfo) => {
-        const automotiveCollection = collection(db, 'HairSalon');
-        const carDoc = doc(automotiveCollection, doc1);
-        const bookedCollection = collection(carDoc, 'booking');
-        console.log('Query Path:', bookedCollection.path);
-        const carsQuery = query(bookedCollection);
+        const selectedSlotStart = slotInfo.start.getTime();
+        const selectedSlotEnd = addMinutes(slotInfo.start, 30).getTime();
 
-        try {
-            const querySnapshot = await getDocs(carsQuery);
+        const slotTaken = events.some(
+            (event) =>
+                (selectedSlotStart >= event.start.getTime() && selectedSlotStart < event.end.getTime()) ||
+                (selectedSlotEnd > event.start.getTime() && selectedSlotEnd <= event.end.getTime()) ||
+                (selectedSlotStart <= event.start.getTime() && selectedSlotEnd >= event.end.getTime())
+        );
 
-            const selectedSlotTimestamp = slotInfo.start.getTime(); // JavaScript timestamp
-            console.log(selectedSlotTimestamp);
+        console.log('Is Slot Taken:', slotTaken);
 
-            const bookedSlots = querySnapshot.docs.map((doc) => {
-                const data = doc.data();
-                console.log('selectedSlot Type: ',typeof data.selectedSlot);
+        setIsSlotAlreadyBooked(slotTaken);
 
-                if (data.selectedSlot) {
-                    // Convert Firestore timestamp to Unix timestamp and directly return
-                    return data.selectedSlot.toMillis();
-                }
-                return null;
-            });
-            console.log('Query Snapshot:', querySnapshot.docs);
-            console.log('Booked Slots (Unix Timestamps):', bookedSlots);
-
-            const slotTaken = bookedSlots.includes(selectedSlotTimestamp);
-
-            console.log('Is Slot Taken:', slotTaken);
-
-            setIsSlotAlreadyBooked(slotTaken);
-
-            if (!slotTaken) {
-                setSelectedSlot(slotInfo.start);
-            }
-        } catch (error) {
-            console.error('Error fetching car data:', error);
+        if (!slotTaken) {
+            setSelectedSlot(slotInfo.start);
         }
     };
-
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId) {
             try {
-                const automotiveCollection = collection(db, 'HairSalon');
+                const automotiveCollection = collection(db, 'Meeting');
                 const carDoc = doc(automotiveCollection, doc1);
-
-                // Reference the 'booked' subcollection within the car document
                 const bookedCollection = collection(carDoc, 'booking');
-
-                // Fetch the document based on the documentId
                 const bookedDoc = doc(bookedCollection, documentId);
 
-                // Get the actual name and jobType values from the Firestore document
                 const docSnapshot = await getDoc(bookedDoc);
 
                 if (docSnapshot.exists()) {
-                    const name = docSnapshot.data().name; // Replace 'name' with the actual field name in the document
-                    const jobType = docSnapshot.data().jobType; // Replace 'jobType' with the actual field name in the document
+                    const name = docSnapshot.data().name;
+                    const jobType = docSnapshot.data().jobType;
 
-                    // Update the 'selectedSlot' field in the first 'booked' document
                     await updateDoc(bookedDoc, {
                         selectedSlot: selectedSlot,
                     });
 
-                    // Redirect to the Booking Confirmation page and pass the data
                     navigate('/confirmation', {
                         state: {
                             name: name,
@@ -143,15 +126,23 @@ function CalendarSlotSelector() {
             <Calendar
                 localizer={localizer}
                 events={events}
-                view="week"
-                views={['week']}
+                view="day"
+                views={['day']}
                 selectable
                 onSelectSlot={handleSelect}
-                step={60}
-                timeslots={1}
-                style={{ height: 550, width: 1200 }}
+                step={30} // 30 min selections
+                timeslots={1} // 1 selection per slot
+                style={{ height: 600, width: 1000 }}
                 min={minTime}
                 max={maxTime}
+                eventPropGetter={(event) => {
+                    return {
+                        style: {
+                            backgroundColor: event.end.getTime() === addMinutes(event.start, 30).getTime() ? 'green' : 'red',
+                        },
+                    };
+                }}
+                tooltipAccessor={(event) => `${event.title} - ${moment(event.start).format('LT')}`}
             />
 
             {selectedSlot && (
@@ -169,3 +160,4 @@ function CalendarSlotSelector() {
 }
 
 export default CalendarSlotSelector;
+

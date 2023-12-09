@@ -101,8 +101,6 @@ function BookingForm() {
                 <div className="booking-form">
                     <h2>Book an Appointment</h2>
                     <form onSubmit={handleSubmit}>
-                        {/* Personal Information */}
-                        <h3>Personal Information</h3>
                         <label>
                             Name:
                             <input

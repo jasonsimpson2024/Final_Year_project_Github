@@ -150,7 +150,7 @@ function CalendarSlotSelector() {
                 onSelectSlot={handleSelect}
                 step={60}
                 timeslots={1}
-                style={{ height: 550, width: 700 }}
+                style={{ height: 550, width: 1200 }}
                 min={minTime}
                 max={maxTime}
             />

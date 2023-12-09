@@ -224,13 +224,12 @@ function BookingForm() {
                             />
                         </label>
                         <label>
-                            Eircode:
+                            Eircode (Optional):
                             <input
                                 type="text"
                                 name="eircode"
                                 value={formData.eircode}
                                 onChange={handleCarInfoChange}
-                                required
                             />
                         </label>
                         {/* Car Information */}
@@ -293,8 +292,8 @@ function BookingForm() {
                                 required
                             >
                                 <option value="">Select a transmission</option>
-                                <option value="Petrol">Petrol</option>
-                                <option value="Diesel">Diesel</option>
+                                <option value="Automatic">Automatic</option>
+                                <option value="Manual">Manual</option>
                             </select>
                         </label>
                         <label>

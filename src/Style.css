@@ -1,6 +1,6 @@
 /* Style for the body */
 body {
-    background-image: url('./Images/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner.jpg');
+    background-image: url('./Images/background.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -8,7 +8,12 @@ body {
     font-family: Verdana, serif;
     height: 100%;
     margin: 0; /* Reset margin to avoid extra space */
+    color: white;
 }
+.navfont{
+    font-weight: 600;
+}
+
 
 /* Style for the page header */
 .page-header {
@@ -65,6 +70,13 @@ h1 {
     transition: all 0.3s ease-in-out; /* Add transitions for smooth effects */
 }
 
+.car-details a {
+    color: black; /* Use the default text color */
+    text-decoration: none; /* Remove underline */
+    cursor: auto; /* Remove hyperlink cursor */
+}
+
+
 .car-details:hover {
     background-color: #f3f3f3; /* Change the background color on hover */
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3); /* Adjust the box-shadow on hover */
@@ -105,7 +117,7 @@ h1 {
 
 /* Style for the navbar */
 .navbar {
-    background-color: #333;
+    background-color: rgba(71, 20, 117, 0);
     color: #fff;
     position: fixed;
     top: 0;
@@ -175,7 +187,7 @@ h1 {
     font-weight: bold;
     margin-bottom: 10px;
     font-size: 14px;
-    color: #333;
+    color: #ffffff;
 }
 
 .form-container input,
@@ -203,83 +215,36 @@ h1 {
     background-color: #0056b3;
 }
 
-
-
-
-/* Style for the Welcome component */
-/* ... Other CSS rules ... */
-
-/* Style for the Welcome component */
-.welcome-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.6);
-    background-size: cover;
-    color: #fff;
-    padding: 20px;
-}
-
-.welcome-container h1 {
-    font-size: 36px;
-    margin: 0;
-    padding: 20px;
-}
-
-.welcome-container .buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.welcome-container .action-button {
-    background-color: #0074D9; /* Original background color */
-    color: #fff; /* Original text color */
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    margin: 10px;
-    border-radius: 5px;
-    text-transform: uppercase;
-}
-
-.welcome-container .action-button:hover {
-    background-color: #0056b3; /* Original hover background color */
-}
-
-/* ... Other CSS rules ... */
-
-
 .rbc-calendar {
-    background-color: #fff; /* Set the background color to white */
-    margin: 0 auto; /* Center the calendar on the page horizontally */
-    max-width: 900px; /* Adjust the max-width as needed */
-    padding: 25px;
+    background-color: #fff;
+    margin: 0 auto;
+    max-width: 2600px !important; /* Add !important to prioritize this rule */
+    color: black;
+    padding: 20px;
 }
 
-.rbc-calendar .rbc-toolbar {
-    background-color: #fff; /* Set the toolbar background to white */
-    border-bottom: 1px solid #ccc; /* Add a subtle border at the bottom */
+.calendar-slot-selector h3{
+    text-align: center;
+    display: block;
+    margin-top:50px;
 }
 
 .rbc-calendar .rbc-event {
-    background-color: #0074D9; /* Set the event background color */
-    color: #fff; /* Set the event text color */
+    width: 120%; /* Adjust the width of the event container */
+    background-color: #0074D9;
+    color: #fff;
 }
 
 .rbc-calendar .rbc-event:hover {
-    background-color: #0056b3; /* Change the event color on hover */
+    background-color: #0056b3;
 }
 
 .rbc-calendar .rbc-row-bg {
-    background-color: #fff; /* Set the row background to white */
+    background-color: #fff;
 }
 
 .rbc-calendar .rbc-header {
-    background-color: #fff; /* Set the header background to white */
+    background-color: #fff;
 }
 
 .slot-confirm{
@@ -302,6 +267,7 @@ h1 {
     border-radius: 10px; /* Add rounded corners to the container */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
     max-width: 500px; /* Set a maximum width for the container */
+    color: black;
 }
 
 
@@ -314,6 +280,7 @@ h1 {
     background-color: #f5f5f5;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    color: black;
 }
 
 .login-container h1 {
@@ -354,6 +321,38 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.my-button {
+    /* Add your existing button styles here */
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Unique styling for the left arrow button */
+.arrow-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.arrow-button::before {
+    content: '\2190'; /* Unicode character for left arrow */
+    font-size: 20px;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+footer{
+    text-align: center;
+}
+
+
+
+
 
 
 

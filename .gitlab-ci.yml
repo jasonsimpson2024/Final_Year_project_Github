@@ -39,6 +39,9 @@ mirror_to_github:
   image: debian:stable  # Switched to a Debian-based image
   script:
     - apt-get update -qy
+    - apt-get install -y gnupg  # Install gnupg for GPG key management
+    - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138 112695A0E562B32A
+    - apt-get update -qy
     - apt-get install -y git  # Install Git using apt-get
     - git remote set-url github https://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/jasonsimpson2024/Final_Year_project_Github.git
     - git push github HEAD:main

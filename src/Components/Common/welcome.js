@@ -22,6 +22,8 @@ function Welcome() {
     return (
         <div>
             <div className="welcome-container">
+                <h2>Welcome to BookingLite</h2>
+                <h3>Booking Made Easy</h3>
                 <div className="buttons">
                     <Link to="/Automotive">
                         <button className="action-button">Automotive Services</button>

@@ -57,8 +57,6 @@ h1 {
     display: block;
     margin-bottom: 20px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    border: 1px solid #ccc;
-    border-top: 2px solid #ccc;
     font-family: Arial, sans-serif;
     font-size: 16px;
     line-height: 1.5;
@@ -73,7 +71,7 @@ h1 {
 }
 
 .car-details:hover {
-    background-color: #f3f3f3;
+    background-color: rgb(196, 191, 191);
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -107,7 +105,7 @@ h1 {
 }
 
 .navbar {
-    background-color: rgba(71, 20, 117, 0);
+    background-color: rgba(71, 20, 117, 0.65);
     color: #fff;
     position: fixed;
     top: 0;
@@ -116,9 +114,9 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px 0;
+    padding: 15px 0;
     z-index: 100;
-    height: 25px;
+    height: 15px;
 }
 
 .navbar .logo {
@@ -136,6 +134,7 @@ h1 {
     list-style-type: none;
     display: flex;
     gap: 20px;
+    margin: 0; /* Add margin: 0; to remove default margin */
 }
 
 .navbar-menu li {
@@ -153,6 +152,7 @@ h1 {
     color: #00bcd4;
 }
 
+
 .booking-form-container {
     display: flex;
     justify-content: center;
@@ -162,6 +162,10 @@ h1 {
     padding: 20px;
     max-width: 400px;
     margin: 0 auto;
+}
+
+.booking-form-container h2 {
+    font-size: 24px; /* Adjust the font size as needed */
 }
 
 .form-container {
@@ -308,6 +312,9 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+button:active{
+    transform: translateY(4px);
+}
 
 .my-button {
     padding: 10px 20px;
@@ -341,39 +348,37 @@ footer {
     text-align: center;
 }
 
-@media screen and (max-width: 768px) {
-    .page-header {
-        min-height: auto;
-    }
-
+@media only screen and (max-width: 667px) {
     .navbar .logo {
-        left: 5%;
+        position: absolute;
+        left: 1px;
+        top: 65%;
+        transform: translateY(-50%);
     }
 
-    .booking-form-container {
-        min-height: auto;
+    .navbar .logo img {
+        width: 140px;
     }
 
-    .form-container {
-        max-width: 100%;
-    }
-
-    .rbc-calendar {
-        max-width: 100% !important;
-    }
-}
-
-@media screen and (max-width: 480px) {
     .navbar-menu {
-        flex-direction: column;
-        align-items: center;
+        list-style-type: none;
+        display: flex;
+        gap: 20px;
+        margin: 0; /* Add margin: 0; to remove default margin */
     }
 
     .navbar-menu li {
-        margin-bottom: 10px;
+        margin: 0;
     }
 
-    .navbar .logo {
-        display: none;
+    .navbar-menu a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+        font-size: 12px;
     }
 }
+
+
+

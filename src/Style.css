@@ -4,7 +4,7 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
     overflow: auto;
-    font-family: Verdana, serif;
+    font-family: Futura;
     height: 100%;
     margin: 0;
     color: white;
@@ -318,11 +318,12 @@ button:active{
 
 .my-button {
     padding: 10px 20px;
-    background-color: #3498db;
-    color: #fff;
+    background-color: rgba(136, 33, 136, 0.79);
+    color: rgb(255, 255, 255);
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    text-decoration: none; /* Remove underline */
 }
 
 .arrow-button {

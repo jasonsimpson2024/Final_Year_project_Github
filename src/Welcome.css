@@ -45,11 +45,12 @@ body .welcome-container {
 .action-button {
     margin: 10px;
     padding: 12px 12px;
-    font-size: 12px;
+    font-size: 20px;
     cursor: pointer;
     margin-top: 140px;
     background-color: purple;
-    border-radius: 15px;
+    border-radius: 30px;
+    width: 300px;
 }
 
 @media only screen and (max-width: 1024px) {

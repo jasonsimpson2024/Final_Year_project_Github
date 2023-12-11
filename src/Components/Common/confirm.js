@@ -11,10 +11,10 @@ function BookingConfirmation() {
                 <h3>Your booking has been confirmed!</h3>
                 <p>Name: {name}</p>
                 <p>Selected Slot: {selectedSlot}</p>
+                <Link to="/">
+                    <button className="confirm-button">Home</button>
+                </Link>
             </div>
-            <Link to="/">
-                <button className="action-button">Home</button>
-            </Link>
         </div>
     );
 }

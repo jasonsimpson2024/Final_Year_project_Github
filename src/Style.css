@@ -1,4 +1,3 @@
-/* Style for the body */
 body {
     background-image: url('./Images/background.jpg');
     background-size: cover;
@@ -7,15 +6,14 @@ body {
     overflow: auto;
     font-family: Verdana, serif;
     height: 100%;
-    margin: 0; /* Reset margin to avoid extra space */
+    margin: 0;
     color: white;
 }
-.navfont{
+
+.navfont {
     font-weight: 600;
 }
 
-
-/* Style for the page header */
 .page-header {
     color: #fff;
     padding: 20px;
@@ -28,7 +26,6 @@ body {
     height: 100vh;
 }
 
-/* Style for the header buttons */
 .header-buttons {
     margin-bottom: 20px;
 }
@@ -53,43 +50,38 @@ h1 {
     background-color: #0056b3;
 }
 
-/* Style for car details container */
 .car-details {
-    padding: 20px; /* Increased padding for more space and better alignment */
+    padding: 20px;
     border-radius: 5px;
     background-color: #fff;
     display: block;
     margin-bottom: 20px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Add a box-shadow for the 3D effect */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     border: 1px solid #ccc;
-    border-top: 2px solid #ccc; /* Create a top border to simulate the 3D effect */
-    font-family: Arial, sans-serif; /* Use a professional font */
+    border-top: 2px solid #ccc;
+    font-family: Arial, sans-serif;
     font-size: 16px;
     line-height: 1.5;
-    text-align: left; /* Adjust text alignment as needed */
-    transition: all 0.3s ease-in-out; /* Add transitions for smooth effects */
+    text-align: left;
+    transition: all 0.3s ease-in-out;
 }
 
 .car-details a {
-    color: black; /* Use the default text color */
-    text-decoration: none; /* Remove underline */
-    cursor: auto; /* Remove hyperlink cursor */
+    color: black;
+    text-decoration: none;
+    cursor: auto;
 }
-
 
 .car-details:hover {
-    background-color: #f3f3f3; /* Change the background color on hover */
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3); /* Adjust the box-shadow on hover */
+    background-color: #f3f3f3;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-
-/* Style for the car detail link */
 .car-detail {
     text-decoration: none;
     color: #333;
 }
 
-/* Style for the pagination buttons */
 .pagination {
     display: flex;
     justify-content: center;
@@ -109,13 +101,11 @@ h1 {
     background-color: #0056b3;
 }
 
-/* Disable the Previous button when on the first page */
 .pagination button:first-child:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
-/* Style for the navbar */
 .navbar {
     background-color: rgba(71, 20, 117, 0);
     color: #fff;
@@ -130,15 +120,16 @@ h1 {
     z-index: 100;
     height: 25px;
 }
+
 .navbar .logo {
     position: absolute;
     left: 1%;
-    top: 65%; /* Adjust to vertically center the logo */
+    top: 65%;
     transform: translateY(-50%);
 }
 
 .navbar .logo img {
-    width: 250px; /* Set your desired width for the logo */
+    width: 250px;
 }
 
 .navbar-menu {
@@ -162,7 +153,6 @@ h1 {
     color: #00bcd4;
 }
 
-/* Style for the booking form container */
 .booking-form-container {
     display: flex;
     justify-content: center;
@@ -174,14 +164,12 @@ h1 {
     margin: 0 auto;
 }
 
-/* Container surrounding form fields */
 .form-container {
-    padding: 20px; /* Add padding to the form container */
-    border: 1px solid #ccc; /* Add a border around the form container */
-    border-radius: 5px; /* Add rounded corners */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-/* Style for form labels and input elements */
 .form-container label {
     display: block;
     font-weight: bold;
@@ -218,19 +206,19 @@ h1 {
 .rbc-calendar {
     background-color: #fff;
     margin: 0 auto;
-    max-width: 2600px !important; /* Add !important to prioritize this rule */
+    max-width: 2600px !important;
     color: black;
     padding: 20px;
 }
 
-.calendar-slot-selector h3{
+.calendar-slot-selector h3 {
     text-align: center;
     display: block;
-    margin-top:50px;
+    margin-top: 50px;
 }
 
 .rbc-calendar .rbc-event {
-    width: 120%; /* Adjust the width of the event container */
+    width: 120%;
     background-color: #0074D9;
     color: #fff;
 }
@@ -247,7 +235,7 @@ h1 {
     background-color: #fff;
 }
 
-.slot-confirm{
+.slot-confirm {
     text-align: center;
 }
 
@@ -256,20 +244,19 @@ h1 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh; /* Centers vertically in the viewport */
-    text-align: center; /* Center text horizontally */
+    height: 100vh;
+    text-align: center;
 }
 
 .booking-container {
     padding: 20px;
-    background-color: #fff; /* White background color for the container */
-    border: 1px solid #ccc; /* Add a border for the container */
-    border-radius: 10px; /* Add rounded corners to the container */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
-    max-width: 500px; /* Set a maximum width for the container */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
     color: black;
 }
-
 
 .login-container {
     max-width: 300px;
@@ -323,7 +310,6 @@ button:hover {
 }
 
 .my-button {
-    /* Add your existing button styles here */
     padding: 10px 20px;
     background-color: #3498db;
     color: #fff;
@@ -332,28 +318,62 @@ button:hover {
     cursor: pointer;
 }
 
-/* Unique styling for the left arrow button */
 .arrow-button {
     position: relative;
     overflow: hidden;
 }
 
 .arrow-button::before {
-    content: '\2190'; /* Unicode character for left arrow */
+    content: '\2190';
     font-size: 20px;
     position: absolute;
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
 }
-footer{
-    text-align: center;
+
+.confirm-button{
+    background-color: purple;
 }
 
 
+footer {
+    text-align: center;
+}
 
+@media screen and (max-width: 768px) {
+    .page-header {
+        min-height: auto;
+    }
 
+    .navbar .logo {
+        left: 5%;
+    }
 
+    .booking-form-container {
+        min-height: auto;
+    }
 
+    .form-container {
+        max-width: 100%;
+    }
 
+    .rbc-calendar {
+        max-width: 100% !important;
+    }
+}
 
+@media screen and (max-width: 480px) {
+    .navbar-menu {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar-menu li {
+        margin-bottom: 10px;
+    }
+
+    .navbar .logo {
+        display: none;
+    }
+}

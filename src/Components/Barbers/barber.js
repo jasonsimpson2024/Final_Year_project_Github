@@ -4,24 +4,30 @@ import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase
 import { Link } from 'react-router-dom';
 
 function Barber() {
-    const [carData, setCarData] = useState([]);
+    const [barberData, setBarberData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(1);
-    const carsPerPage = 5;
+    const barbersPerPage = 5;
     const [lastDocumentName, setLastDocumentName] = useState(null);
+    const [hasMoreBarbers, setHasMoreBarbers] = useState(true);
+    const [selectedCounty, setSelectedCounty] = useState('');
+
+    // List of counties in Ireland
+    const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
 
     useEffect(() => {
         const fetchData = async (pageNumber) => {
             try {
-                const carsCollection = collection(db, 'Barber');
-                let q = query(carsCollection, orderBy('Name'), limit(carsPerPage));
+                const barbersCollection = collection(db, 'Barber');
+                let q = query(barbersCollection, orderBy('Name'), limit(barbersPerPage));
 
                 if (pageNumber > 1 && lastDocumentName) {
-                    q = query(carsCollection, orderBy('Name'), startAfter(lastDocumentName), limit(carsPerPage));
+                    q = query(barbersCollection, orderBy('Name'), startAfter(lastDocumentName), limit(barbersPerPage));
                 }
 
                 const snapshot = await getDocs(q);
 
-                const newCarData = snapshot.docs.map((doc) => ({
+                const newBarberData = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     Name: doc.data().Name,
                     Street: doc.data().Street,
@@ -30,25 +36,34 @@ function Barber() {
                     Eircode: doc.data().Eircode,
                 }));
 
-                if (newCarData.length > 0) {
-                    const lastCar = newCarData[newCarData.length - 1];
-                    setLastDocumentName(lastCar.Name);
+                setBarberData(newBarberData);
+
+                if (newBarberData.length > 0) {
+                    const lastBarber = newBarberData[newBarberData.length - 1];
+                    setLastDocumentName(lastBarber.Name);
+                    setHasMoreBarbers(newBarberData.length === barbersPerPage);
+                } else {
+                    setHasMoreBarbers(false);
                 }
 
-                setCarData(newCarData);
-                console.log("data updated:", newCarData);
+                // Filter data based on selected county
+                const filtered = newBarberData.filter(barber =>
+                    barber.County.toLowerCase().includes(selectedCounty.toLowerCase())
+                );
+                setFilteredData(filtered);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setHasMoreBarbers(false);
             }
         };
 
         fetchData(page);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page]); // Disable the rule for 'lastDocumentName'
-
+    }, [page, selectedCounty]);
 
     const nextPage = () => {
-        setPage(page + 1);
+        if (hasMoreBarbers) {
+            setPage(page + 1);
+        }
     };
 
     const prevPage = () => {
@@ -60,24 +75,35 @@ function Barber() {
         }
     };
 
+    const handleCountyChange = (e) => {
+        setSelectedCounty(e.target.value);
+    };
+
     return (
         <div>
             <div className='page-header'>
                 <div className="header-buttons">
+                    <p>Sort By</p>
+                    <select onChange={handleCountyChange}>
+                        <option value="">Select a County</option>
+                        {counties.map(county => (
+                            <option key={county} value={county}>{county}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="car-details-list">
-                    {carData.map((hair) => (
-                        <div key={hair.id} className="car-details">
-                            <Link to={`/barber/${hair.id}`} className="car-detail">
-                                Name: {hair.Name} <br />
-                                Location: {hair.Street} {hair.Town} {hair.County} {hair.Eircode}
+                    {filteredData.map((barber) => (
+                        <div key={barber.id} className="car-details">
+                            <Link to={`/barber/${barber.id}`} className="car-detail">
+                                Name: {barber.Name} <br />
+                                Location: {barber.Street} {barber.Town} {barber.County} {barber.Eircode}
                             </Link>
                         </div>
                     ))}
                 </div>
                 <div className="pagination">
                     <button onClick={prevPage} disabled={page === 1}>Previous</button>
-                    <button onClick={nextPage}>Next</button>
+                    <button onClick={nextPage} disabled={!hasMoreBarbers}>Next</button>
                 </div>
             </div>
         </div>

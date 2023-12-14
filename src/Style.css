@@ -62,6 +62,7 @@ h1 {
     line-height: 1.5;
     text-align: left;
     transition: all 0.3s ease-in-out;
+    color: black;
 }
 
 .car-details a {
@@ -379,6 +380,40 @@ footer {
         transition: color 0.3s ease;
         font-size: 12px;
     }
+
+    .rbc-calendar {
+        background-color: #fff;
+        margin: 0 auto;
+        max-height: 500px;
+        max-width: 1200px !important;
+        color: #000000;
+
+    }
+
+    .calendar-slot-selector h3 {
+        text-align: center;
+        display: block;
+        margin-top: 50px;
+    }
+
+    .rbc-calendar .rbc-event {
+        width: 120%;
+        background-color: #0074D9;
+        color: #fff;
+    }
+
+    .rbc-calendar .rbc-event:hover {
+        background-color: #0056b3;
+    }
+
+    .rbc-calendar .rbc-row-bg {
+        background-color: #fff;
+    }
+
+    .rbc-calendar .rbc-header {
+        background-color: #fff;
+    }
+
 }
 
 

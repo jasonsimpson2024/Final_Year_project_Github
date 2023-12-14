@@ -41,7 +41,7 @@ function BookingInfo() {
                 const bookingDocRef = doc(db, collectionName, userId, 'booking', bookingId);
                 await deleteDoc(bookingDocRef);
                 alert('Booking Cancelled');
-                navigate("/");
+                navigate("/manage");
                 // You may also redirect the user to a different page or perform any other action after deletion.
             } catch (error) {
                 console.error('Error deleting booking:', error);

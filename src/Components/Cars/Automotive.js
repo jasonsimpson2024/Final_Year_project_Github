@@ -5,9 +5,15 @@ import { Link } from 'react-router-dom';
 
 function Automotive() {
     const [carData, setCarData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(1);
     const carsPerPage = 5;
     const [lastDocumentName, setLastDocumentName] = useState(null);
+    const [hasMoreCars, setHasMoreCars] = useState(true);
+    const [selectedCounty, setSelectedCounty] = useState('');
+
+    // List of counties in Ireland
+    const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
 
     useEffect(() => {
         const fetchData = async (pageNumber) => {
@@ -30,25 +36,34 @@ function Automotive() {
                     Eircode: doc.data().Eircode,
                 }));
 
+                setCarData(newCarData);
+
                 if (newCarData.length > 0) {
                     const lastCar = newCarData[newCarData.length - 1];
                     setLastDocumentName(lastCar.Name);
+                    setHasMoreCars(newCarData.length === carsPerPage);
+                } else {
+                    setHasMoreCars(false);
                 }
 
-                setCarData(newCarData);
-                console.log("Car data updated:", newCarData);
+                // Filter data based on selected county
+                const filtered = newCarData.filter(car =>
+                    car.County.toLowerCase().includes(selectedCounty.toLowerCase())
+                );
+                setFilteredData(filtered);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setHasMoreCars(false);
             }
         };
 
         fetchData(page);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page]); // Disable the rule for 'lastDocumentName'
-
+    }, [page, selectedCounty]);
 
     const nextPage = () => {
-        setPage(page + 1);
+        if (hasMoreCars) {
+            setPage(page + 1);
+        }
     };
 
     const prevPage = () => {
@@ -60,13 +75,24 @@ function Automotive() {
         }
     };
 
+    const handleCountyChange = (e) => {
+        setSelectedCounty(e.target.value);
+    };
+
     return (
         <div>
             <div className='page-header'>
                 <div className="header-buttons">
+                    <p>Sort By</p>
+                    <select onChange={handleCountyChange}>
+                        <option value="">Select a County</option>
+                        {counties.map(county => (
+                            <option key={county} value={county}>{county}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="car-details-list">
-                    {carData.map((car) => (
+                    {filteredData.map((car) => (
                         <div key={car.id} className="car-details">
                             <Link to={`/bookingcars/${car.id}`} className="car-detail">
                                 Name: {car.Name} <br />
@@ -77,7 +103,7 @@ function Automotive() {
                 </div>
                 <div className="pagination">
                     <button onClick={prevPage} disabled={page === 1}>Previous</button>
-                    <button onClick={nextPage}>Next</button>
+                    <button onClick={nextPage} disabled={!hasMoreCars}>Next</button>
                 </div>
             </div>
         </div>

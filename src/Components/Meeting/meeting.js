@@ -3,25 +3,26 @@ import { db } from '../../firebase.js';
 import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 
-function Barber() {
-    const [carData, setCarData] = useState([]);
+function Meeting() {
+    const [meetingData, setMeetingData] = useState([]);
     const [page, setPage] = useState(1);
-    const carsPerPage = 5;
+    const meetingsPerPage = 5;
     const [lastDocumentName, setLastDocumentName] = useState(null);
+    const [hasMoreMeetings, setHasMoreMeetings] = useState(true);
 
     useEffect(() => {
         const fetchData = async (pageNumber) => {
             try {
-                const carsCollection = collection(db, 'Meeting');
-                let q = query(carsCollection, orderBy('Name'), limit(carsPerPage));
+                const meetingsCollection = collection(db, 'Meeting');
+                let q = query(meetingsCollection, orderBy('Name'), limit(meetingsPerPage));
 
                 if (pageNumber > 1 && lastDocumentName) {
-                    q = query(carsCollection, orderBy('Name'), startAfter(lastDocumentName), limit(carsPerPage));
+                    q = query(meetingsCollection, orderBy('Name'), startAfter(lastDocumentName), limit(meetingsPerPage));
                 }
 
                 const snapshot = await getDocs(q);
 
-                const newCarData = snapshot.docs.map((doc) => ({
+                const newMeetingData = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     Name: doc.data().Name,
                     Street: doc.data().Street,
@@ -30,25 +31,29 @@ function Barber() {
                     Eircode: doc.data().Eircode,
                 }));
 
-                if (newCarData.length > 0) {
-                    const lastCar = newCarData[newCarData.length - 1];
-                    setLastDocumentName(lastCar.Name);
+                if (newMeetingData.length > 0) {
+                    const lastMeeting = newMeetingData[newMeetingData.length - 1];
+                    setLastDocumentName(lastMeeting.Name);
+                    setHasMoreMeetings(newMeetingData.length === meetingsPerPage);
+                } else {
+                    setHasMoreMeetings(false);
                 }
 
-                setCarData(newCarData);
-                console.log("data updated:", newCarData);
+                setMeetingData(newMeetingData);
+                console.log("data updated:", newMeetingData);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setHasMoreMeetings(false);
             }
         };
 
         fetchData(page);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page]); // Disable the rule for 'lastDocumentName'
-
+    }, [page]);
 
     const nextPage = () => {
-        setPage(page + 1);
+        if (hasMoreMeetings) {
+            setPage(page + 1);
+        }
     };
 
     const prevPage = () => {
@@ -67,7 +72,7 @@ function Barber() {
                 <div className="header-buttons">
                 </div>
                 <div className="car-details-list">
-                    {carData.map((meet) => (
+                    {meetingData.map((meet) => (
                         <div key={meet.id} className="car-details">
                             <Link to={`/meeting/${meet.id}`} className="car-detail">
                                 Name: {meet.Name} <br />
@@ -78,11 +83,11 @@ function Barber() {
                 </div>
                 <div className="pagination">
                     <button onClick={prevPage} disabled={page === 1}>Previous</button>
-                    <button onClick={nextPage}>Next</button>
+                    <button onClick={nextPage} disabled={!hasMoreMeetings}>Next</button>
                 </div>
             </div>
         </div>
     );
 }
 
-export default Barber;
+export default Meeting;

@@ -1,145 +1,143 @@
-import React, { useEffect, useState } from 'react';
-import logoImage from '../../Images/BookingLITELogo.png';
-import { Link, useLocation } from 'react-router-dom';
-import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, collection, getDoc, getFirestore } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { db } from '../../firebase.js';
+import { collection, doc, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
-
-function Navbar() {
-    const [user, setUser] = useState(null);
-    const [hasBusiness, setHasBusiness] = useState(false);
-    const [dataLoaded, setDataLoaded] = useState(false);
-    const location = useLocation();
-
-    useEffect(() => {
-        const auth = getAuth();
-
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-            setUser(currentUser);
-
-            // Check if the user has a business
-            if (currentUser) {
-                await checkBusinessListing(currentUser);
-            }
-
-            // Mark that data has been loaded
-            setDataLoaded(true);
-        });
-
-        // Clean up the observer when the component unmounts
-        return () => unsubscribe();
-    }, []);
+function ManageBusiness() {
+    const auth = getAuth();
+    const getUser = auth.currentUser;
+    const user = getUser ? getUser.uid : null;
+    console.log('user: ', user);
+    const [bookings, setBookings] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const bookingsPerPage = 3;
 
     useEffect(() => {
-        // Check the user's business status when the location changes
-        if (user && dataLoaded) {
-            checkBusinessListing(user);
-        }
-    }, [user, dataLoaded, location]);
-
-    const checkBusinessListing = async (currentUser) => {
-        const db = getFirestore();
-        const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'Meeting'];
-
-        for (const collectionName of topLevelCollections) {
-            const userDocRef = doc(collection(db, collectionName), currentUser.uid);
-            const businessDocSnapshot = await getDoc(userDocRef);
-
-            if (businessDocSnapshot.exists()) {
-                setHasBusiness(true);
-                return; // Exit the loop if a document is found
+        const loadBookingsFromLocalStorage = () => {
+            const storedBookings = localStorage.getItem('bookings');
+            if (storedBookings) {
+                setBookings(JSON.parse(storedBookings));
             }
+        };
+
+        loadBookingsFromLocalStorage();
+
+        if (user) {
+            const topLevelCollections = ['Automotive', 'HairSalon', 'Barber'];
+
+            const fetchAllBookings = async () => {
+                const bookingData = [];
+
+                for (const collectionName of topLevelCollections) {
+                    const userDocRef = doc(collection(db, collectionName), user);
+                    const bookingCollectionRef = collection(userDocRef, 'booking');
+
+                    const bookingQuerySnapshot = await getDocs(bookingCollectionRef);
+
+                    bookingQuerySnapshot.forEach((doc) => {
+                        if (doc.exists()) {
+                            const data = doc.data();
+                            const selectedSlot = data.selectedSlot ? data.selectedSlot.toMillis() : 0;
+                            const currentTimestamp = new Date().getTime();
+                            console.log('Selected Slot:', selectedSlot);
+                            console.log('Current Timestamp:', currentTimestamp);
+                            console.log('Comparison Result:', selectedSlot > currentTimestamp);
+
+                            // Only include future bookings
+                            if (selectedSlot > currentTimestamp) {
+                                bookingData.push({
+                                    id: doc.id,
+                                    collectionName, // Add collectionName to distinguish the collection
+                                    name: data.name,
+                                    jobType: data.jobType,
+                                    selectedSlot: data.selectedSlot,
+                                });
+                            }
+                        }
+                    });
+                }
+
+                // Sort the bookingData array based on timestamp proximity to the current time
+                const currentTimestamp = new Date().getTime();
+                bookingData.sort((a, b) => {
+                    const timestampA = a.selectedSlot ? a.selectedSlot.toMillis() : 0;
+                    const timestampB = b.selectedSlot ? b.selectedSlot.toMillis() : 0;
+
+                    return Math.abs(timestampA - currentTimestamp) - Math.abs(timestampB - currentTimestamp);
+                });
+
+                // Save data to localStorage
+                localStorage.setItem('bookings', JSON.stringify(bookingData));
+
+                console.log('All Booking data:', bookingData);
+                setBookings(bookingData);
+            };
+
+            fetchAllBookings();
         }
+    }, [user]);
 
-        // If no document is found in any collection
-        setHasBusiness(false);
-    };
+    console.log('Rendered with bookings:', bookings);
 
-    // Check if the user is on the jobtypes page
-    const isJobTypesPage = location.pathname.includes('/add-job-types');
-
-    const handleLogout = async () => {
-        if (!isJobTypesPage) {
-            const auth = getAuth();
-
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    };
+    // Calculate the index of the last booking on the current page
+    const indexOfLastBooking = currentPage * bookingsPerPage;
+    // Calculate the index of the first booking on the current page
+    const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+    // Get the current page's bookings
+    const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
 
     return (
-        <nav className="navbar">
-            <div className="logo">
-                <Link to="/">
-                    <img src={logoImage} alt="Logo" />
-                </Link>
+        <div>
+            <div className='booking-confirmation'>
+                <h2>Your bookings:</h2>
+                <div>
+                    {currentBookings.map((booking) => (
+                        <div key={booking.id} className="car-details">
+                            <Link
+                                to={`/bookinginfo/${booking.collectionName}/${user}/${booking.id}`}
+                            >
+                                <p>
+                                    <strong>Name:</strong> {booking.name}
+                                </p>
+                                <p>
+                                    <strong>Job Type:</strong> {booking.jobType}
+                                </p>
+                                <p>
+                                    <strong>Booking date and time:</strong>{' '}
+                                    {booking.selectedSlot
+                                        ? (() => {
+                                            const timestamp = booking.selectedSlot.seconds * 1000; // Convert seconds to milliseconds
+                                            const formattedDate = new Date(timestamp).toLocaleString();
+
+                                            return formattedDate !== 'Invalid Date'
+                                                ? formattedDate
+                                                : 'N/A';
+                                        })()
+                                        : 'N/A'}
+                                </p>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+                <div>
+                    {/* Pagination buttons */}
+                    <button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={indexOfLastBooking >= bookings.length}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
-            <ul className="navbar-menu">
-                {dataLoaded && user ? (
-                    <>
-                        {hasBusiness ? (
-                            // User has a business, display "Manage Business" link
-                            <>
-                                <li>
-                                    {isJobTypesPage ? (
-                                        <div>Manage Business</div>
-                                    ) : (
-                                        <Link to="/mybusinesses">Manage Business</Link>
-                                    )}
-                                </li>
-                                <li>
-                                    {isJobTypesPage ? (
-                                        <div>Manage Bookings</div>
-                                    ) : (
-                                        <Link to="/manage">Manage Bookings</Link>
-                                    )}
-                                </li>
-                            </>
-                        ) : (
-                            // User doesn't have a business, display "List Your Business" link
-                            <li>
-                                {isJobTypesPage ? (
-                                    <div>List your business</div>
-                                ) : (
-                                    <Link to="/add">List your business</Link>
-                                )}
-                            </li>
-                        )}
-                        <li>
-                            {isJobTypesPage ? (
-                                <div>Log out</div>
-                            ) : (
-                                <Link to="/" onClick={handleLogout}>
-                                    Log out
-                                </Link>
-                            )}
-                        </li>
-                    </>
-                ) : (
-                    // User is not signed in or data is still loading
-                    <>
-                        <li>
-                            {isJobTypesPage ? (
-                                <div>Sign In</div>
-                            ) : (
-                                <Link to="/login">Sign In</Link>
-                            )}
-                        </li>
-                        <li>
-                            {isJobTypesPage ? (
-                                <div>Sign Up</div>
-                            ) : (
-                                <Link to="/register">Sign Up</Link>
-                            )}
-                        </li>
-                    </>
-                )}
-            </ul>
-        </nav>
+        </div>
     );
 }
 
-export default Navbar;
+export default ManageBusiness;

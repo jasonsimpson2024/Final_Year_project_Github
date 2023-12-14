@@ -57,7 +57,7 @@ function BookingInfo() {
 
         return (
             <div className='booking-confirmation'>
-                <div className='car-details'>
+                <div className='container-details'>
                     <h2>Booking Information</h2>
                     {fieldOrder.map((field) => (
                         <div key={field}>

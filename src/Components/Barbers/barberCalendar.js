@@ -2,12 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { db } from '../../firebase.js';
-import {collection, getDocs, doc, updateDoc, query, getDoc} from 'firebase/firestore';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { startOfDay, addHours } from 'date-fns';
-
-const localizer = momentLocalizer(moment);
+import { collection, getDocs, doc, updateDoc, query, getDoc } from 'firebase/firestore';
 
 function CalendarSlotSelector() {
     const [events, setEvents] = useState([]);
@@ -19,147 +14,112 @@ function CalendarSlotSelector() {
     // Define the start and end hours for slot selection
     const startHour = 9; // Start at 9 AM
     const endHour = 18; // End at 6 PM
-
-    // Calculate the minimum and maximum times for slot selection
-    const minTime = startOfDay(new Date()).setHours(startHour, 0, 0, 0);
-    const maxTime = startOfDay(new Date()).setHours(endHour, 0, 0, 0);
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
 
     useEffect(() => {
         const fetchData = async () => {
             const automotiveCollection = collection(db, 'Barber');
-            const carDoc = doc(automotiveCollection, doc1); // Reference to the car document
+            const carDoc = doc(automotiveCollection, doc1);
 
             try {
-                // Now, access the "booked" subcollection within the car document
                 const bookedCollection = collection(carDoc, 'booking');
                 const querySnapshot = await getDocs(bookedCollection);
 
-                const eventsData = [];
-
-                querySnapshot.forEach((doc) => {
+                const eventsData = querySnapshot.docs.map(doc => {
                     const data = doc.data();
                     if (data.selectedSlot) {
-                        eventsData.push({
+                        return {
                             start: data.selectedSlot.toDate(),
-                            end: addHours(data.selectedSlot.toDate(), 1),
-                        });
+                            end: moment(data.selectedSlot.toDate()).add(1, 'hours').toDate(),
+                        };
                     }
-                });
+                    return null;
+                }).filter(event => event != null);
 
                 setEvents(eventsData);
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
+
         fetchData();
     }, [doc1, documentId]);
 
-    const handleSelect = async (slotInfo) => {
-        const automotiveCollection = collection(db, 'Barber');
-        const carDoc = doc(automotiveCollection, doc1);
-        const bookedCollection = collection(carDoc, 'booking');
-        console.log('Query Path:', bookedCollection.path);
-        const carsQuery = query(bookedCollection);
+    const handleSlotSelect = async (day, hour) => {
+        const slotTime = moment().day(day).hour(hour).minute(0).second(0);
 
-        try {
-            const querySnapshot = await getDocs(carsQuery);
+        const selectedSlotTimestamp = slotTime.valueOf();
+        const slotTaken = events.some(event => {
+            const eventStart = moment(event.start).valueOf();
+            return eventStart === selectedSlotTimestamp;
+        });
 
-            const selectedSlotTimestamp = slotInfo.start.getTime(); // JavaScript timestamp
-            console.log(selectedSlotTimestamp);
+        setIsSlotAlreadyBooked(slotTaken);
 
-            const bookedSlots = querySnapshot.docs.map((doc) => {
-                const data = doc.data();
-                console.log('selectedSlot Type: ',typeof data.selectedSlot);
-
-                if (data.selectedSlot) {
-                    // Convert Firestore timestamp to Unix timestamp and directly return
-                    return data.selectedSlot.toMillis();
-                }
-                return null;
-            });
-            console.log('Query Snapshot:', querySnapshot.docs);
-            console.log('Booked Slots (Unix Timestamps):', bookedSlots);
-
-            const slotTaken = bookedSlots.includes(selectedSlotTimestamp);
-
-            console.log('Is Slot Taken:', slotTaken);
-
-            setIsSlotAlreadyBooked(slotTaken);
-
-            if (!slotTaken) {
-                setSelectedSlot(slotInfo.start);
-            }
-        } catch (error) {
-            console.error('Error fetching car data:', error);
+        if (!slotTaken) {
+            setSelectedSlot(slotTime.toDate());
         }
     };
 
-
     const handleConfirmBooking = async () => {
-        if (selectedSlot && documentId) {
+        if (selectedSlot && documentId && !isSlotAlreadyBooked) {
+            const automotiveCollection = collection(db, 'Barber');
+            const carDoc = doc(automotiveCollection, doc1);
+            const bookedDoc = doc(carDoc, 'booking', documentId);
+
             try {
-                const automotiveCollection = collection(db, 'Barber');
-                const carDoc = doc(automotiveCollection, doc1);
+                await updateDoc(bookedDoc, {
+                    selectedSlot: selectedSlot,
+                });
 
-                // Reference the 'booked' subcollection within the car document
-                const bookedCollection = collection(carDoc, 'booking');
-
-                // Fetch the document based on the documentId
-                const bookedDoc = doc(bookedCollection, documentId);
-
-                // Get the actual name and jobType values from the Firestore document
-                const docSnapshot = await getDoc(bookedDoc);
-
-                if (docSnapshot.exists()) {
-                    const name = docSnapshot.data().name; // Replace 'name' with the actual field name in the document
-                    const jobType = docSnapshot.data().jobType; // Replace 'jobType' with the actual field name in the document
-
-                    // Update the 'selectedSlot' field in the first 'booked' document
-                    await updateDoc(bookedDoc, {
-                        selectedSlot: selectedSlot,
-                    });
-
-                    // Redirect to the Booking Confirmation page and pass the data
-                    navigate('/confirmation', {
-                        state: {
-                            name: name,
-                            jobType: jobType,
-                            selectedSlot: moment(selectedSlot).format('LLL'),
-                        },
-                    });
-                } else {
-                    console.error('Document not found');
-                }
+                navigate('/confirmation', {
+                    state: {
+                        selectedSlot: moment(selectedSlot).format('LLL'),
+                    },
+                });
             } catch (error) {
                 console.error('Error updating booking document:', error);
             }
         }
     };
 
-
     return (
         <div className="calendar-slot-selector">
             <h3>Select a Time Slot</h3>
-            <Calendar
-                localizer={localizer}
-                events={events}
-                view="week"
-                views={['week']}
-                selectable
-                onSelectSlot={handleSelect}
-                step={60}
-                timeslots={1}
-                style={{ height: 550, width: 1200 }}
-                min={minTime}
-                max={maxTime}
-            />
+            <div className="custom-calendar">
+                <div className="days-header">
+                    {daysOfWeek.map(day => (
+                        <div key={day} className="day-header">{day}</div>
+                    ))}
+                </div>
+                <div className="slots">
+                    {daysOfWeek.map(day => (
+                        <div key={day} className="day-column">
+                            {hours.map(hour => {
+                                const slotTime = moment().day(day).hour(hour).minute(0).second(0).toDate();
+                                const isBooked = events.some(event => moment(event.start).isSame(slotTime, 'minute'));
 
+                                return (
+                                    <div
+                                        key={hour}
+                                        className={`time-slot ${selectedSlot && moment(selectedSlot).isSame(slotTime, 'minute') ? 'selected' : ''} ${isBooked ? 'booked' : ''}`}
+                                        onClick={() => !isBooked && handleSlotSelect(day, hour)}
+                                        disabled={isBooked}
+                                    >
+                                        {hour}:00
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+            </div>
             {selectedSlot && (
                 <div className='slot-confirm'>
                     <p>Selected Slot: {moment(selectedSlot).format('LLL')}</p>
                     {isSlotAlreadyBooked ? (
-                        <p>Selected slot is outside the allowed time frame or already booked.</p>
+                        <p>This slot is already booked. Please select another time.</p>
                     ) : (
                         <button onClick={handleConfirmBooking}>Confirm Booking</button>
                     )}

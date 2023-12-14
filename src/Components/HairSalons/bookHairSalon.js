@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase.js';
-import { addDoc, collection, doc, getDocs, query } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, query, setDoc } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getAuth  } from 'firebase/auth';
 
 function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
-    const hairId = location.pathname.split('/').pop(); // Extract the car ID from the URL
+    const hairId = location.pathname.split('/').pop(); // Extract the hair salon ID from the URL
+    const { currentUser } = getAuth(); // Get the logged-in user's info
 
     const [formData, setFormData] = useState({
         name: '',
@@ -14,7 +16,7 @@ function BookingForm() {
         phone: '',
         jobType: '',
         selectedSlot: null,
-        jobTypes: [], // Store the fetched job types
+        jobTypes: [] // Store the fetched job types
     });
 
     const handleCarInfoChange = (e) => {
@@ -55,45 +57,46 @@ function BookingForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const carData = {
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                jobType: formData.jobType,
-                selectedSlot: formData.selectedSlot,
-                businessID: hairId,
-            };
+        const bookingData = {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            jobType: formData.jobType,
+            selectedSlot: formData.selectedSlot,
+            businessID: hairId,
+        };
 
-            // Reference the 'cars' collection
-            const carsCollectionRef = collection(db, 'HairSalon');
+        // Reference the 'HairSalon' collection
+        const hairSalonsCollectionRef = collection(db, 'HairSalon');
 
-            // Reference the 'car' document within the 'cars' collection
-            const carDocRef = doc(carsCollectionRef, hairId);
+        // Reference the 'hair salon' document within the 'HairSalon' collection
+        const hairSalonDocRef = doc(hairSalonsCollectionRef, hairId);
 
-            // Reference the 'bookings' subcollection within the 'car' document
-            const bookingsCollectionRef = collection(carDocRef, 'booking');
+        let bookingDocRef;
 
-            // Add data to the 'bookings' subcollection and get the document reference
-            const bookingDocRef = await addDoc(bookingsCollectionRef, carData);
-
-            // Get the document ID from the reference
-            const newDocumentId = bookingDocRef.id;
-            console.log('Document added successfully with ID:', newDocumentId);
-
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                jobType: '',
-                selectedSlot: null,
-            });
-
-            navigate(`/salonslot/${hairId}/${newDocumentId}`);
-        } catch (error) {
-            console.error('Error adding document:', error);
+        if (currentUser) {
+            // If user is logged in, use UID as document ID
+            bookingDocRef = doc(hairSalonDocRef, 'booking', currentUser.uid);
+            await setDoc(bookingDocRef, bookingData);
+        } else {
+            // If user is not logged in, let Firestore generate a random ID
+            const bookingsCollectionRef = collection(hairSalonDocRef, 'booking');
+            bookingDocRef = await addDoc(bookingsCollectionRef, bookingData);
         }
-    }
+
+        console.log('Document added successfully with ID:', bookingDocRef.id);
+
+        setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            jobType: '',
+            selectedSlot: null,
+            jobTypes: []
+        });
+
+        navigate(`/salonslot/${hairId}/${bookingDocRef.id}`);
+    };
 
     return (
         <div className='form-container'>

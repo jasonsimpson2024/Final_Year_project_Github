@@ -25,6 +25,7 @@ import BookMeet from "./Components/Meeting/bookmeeting";
 import MeetSlot from "./Components/Meeting/meetcalendar";
 import ManageBus from "./Components/Common/managebusiness";
 import YourBus from "./Components/Common/YourBusiness";
+import Myappointments from "./Components/Common/myappointments";
 
 function App() {
     return (
@@ -53,7 +54,8 @@ function App() {
                     <Route exact path='/meeting/:id' element={<BookMeet />} />
                     <Route exact path='/meetingslot/:doc1/:documentId' element={<MeetSlot />} />
                     <Route exact path='/managebusiness/:collectionName/:documentId' element={<ManageBus />} />
-                    <Route exact path='/mybusinesses/' element={<YourBus />} />
+                    <Route exact path='/mybusinesses' element={<YourBus />} />
+                    <Route exact path='/Myappointments' element={<Myappointments />} />
                 </Routes>
                 </Layout>
             </Router>

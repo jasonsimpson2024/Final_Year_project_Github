@@ -2,16 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { db } from '../../firebase.js';
-import { collection, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { startOfDay, addMinutes } from 'date-fns';
-
-// ... (existing imports)
-
-// ... (existing imports)
-
-const localizer = momentLocalizer(moment);
+import { collection, getDocs, doc, updateDoc, query, getDoc } from 'firebase/firestore';
 
 function CalendarSlotSelector() {
     const [events, setEvents] = useState([]);
@@ -23,10 +14,8 @@ function CalendarSlotSelector() {
     // Define the start and end hours for slot selection
     const startHour = 9; // Start at 9 AM
     const endHour = 18; // End at 6 PM
-
-    // Calculate the minimum and maximum times for slot selection
-    const minTime = startOfDay(new Date()).setHours(startHour, 0, 0, 0);
-    const maxTime = startOfDay(new Date()).setHours(endHour, 0, 0, 0);
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,83 +26,58 @@ function CalendarSlotSelector() {
                 const bookedCollection = collection(carDoc, 'booking');
                 const querySnapshot = await getDocs(bookedCollection);
 
-                const eventsData = [];
-
-                querySnapshot.forEach((doc) => {
+                const eventsData = querySnapshot.docs.map(doc => {
                     const data = doc.data();
                     if (data.selectedSlot) {
-                        // Split the hour into 30-minute slots and add separate events for each slot
-                        let startSlot = data.selectedSlot.toDate();
-                        const endSlot = addMinutes(data.selectedSlot.toDate(), 30);
-
-                        while (startSlot < endSlot) {
-                            eventsData.push({
-                                id: doc.id, // Use document ID as the event ID
-                                title: data.name, // Display name in the event title
-                                start: startSlot,
-                                end: addMinutes(startSlot, 30), // 30 minutes duration for each slot
-                            });
-                            startSlot = addMinutes(startSlot, 30);
-                        }
+                        return {
+                            start: data.selectedSlot.toDate(),
+                            end: moment(data.selectedSlot.toDate()).add(1, 'hours').toDate(),
+                        };
                     }
-                });
+                    return null;
+                }).filter(event => event != null);
 
                 setEvents(eventsData);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
+
         fetchData();
     }, [doc1, documentId]);
 
-    const handleSelect = async (slotInfo) => {
-        const selectedSlotStart = slotInfo.start.getTime();
-        const selectedSlotEnd = addMinutes(slotInfo.start, 30).getTime();
+    const handleSlotSelect = async (day, hour) => {
+        const slotTime = moment().day(day).hour(hour).minute(0).second(0);
 
-        const slotTaken = events.some(
-            (event) =>
-                (selectedSlotStart >= event.start.getTime() && selectedSlotStart < event.end.getTime()) ||
-                (selectedSlotEnd > event.start.getTime() && selectedSlotEnd <= event.end.getTime()) ||
-                (selectedSlotStart <= event.start.getTime() && selectedSlotEnd >= event.end.getTime())
-        );
-
-        console.log('Is Slot Taken:', slotTaken);
+        const selectedSlotTimestamp = slotTime.valueOf();
+        const slotTaken = events.some(event => {
+            const eventStart = moment(event.start).valueOf();
+            return eventStart === selectedSlotTimestamp;
+        });
 
         setIsSlotAlreadyBooked(slotTaken);
 
         if (!slotTaken) {
-            setSelectedSlot(slotInfo.start);
+            setSelectedSlot(slotTime.toDate());
         }
     };
 
     const handleConfirmBooking = async () => {
-        if (selectedSlot && documentId) {
+        if (selectedSlot && documentId && !isSlotAlreadyBooked) {
+            const automotiveCollection = collection(db, 'Meeting');
+            const carDoc = doc(automotiveCollection, doc1);
+            const bookedDoc = doc(carDoc, 'booking', documentId);
+
             try {
-                const automotiveCollection = collection(db, 'Meeting');
-                const carDoc = doc(automotiveCollection, doc1);
-                const bookedCollection = collection(carDoc, 'booking');
-                const bookedDoc = doc(bookedCollection, documentId);
+                await updateDoc(bookedDoc, {
+                    selectedSlot: selectedSlot,
+                });
 
-                const docSnapshot = await getDoc(bookedDoc);
-
-                if (docSnapshot.exists()) {
-                    const name = docSnapshot.data().name;
-                    const jobType = docSnapshot.data().jobType;
-
-                    await updateDoc(bookedDoc, {
-                        selectedSlot: selectedSlot,
-                    });
-
-                    navigate('/confirmation', {
-                        state: {
-                            name: name,
-                            jobType: jobType,
-                            selectedSlot: moment(selectedSlot).format('LLL'),
-                        },
-                    });
-                } else {
-                    console.error('Document not found');
-                }
+                navigate('/confirmation', {
+                    state: {
+                        selectedSlot: moment(selectedSlot).format('LLL'),
+                    },
+                });
             } catch (error) {
                 console.error('Error updating booking document:', error);
             }
@@ -123,33 +87,39 @@ function CalendarSlotSelector() {
     return (
         <div className="calendar-slot-selector">
             <h3>Select a Time Slot</h3>
-            <Calendar
-                localizer={localizer}
-                events={events}
-                view="day"
-                views={['day']}
-                selectable
-                onSelectSlot={handleSelect}
-                step={30} // 30 min selections
-                timeslots={1} // 1 selection per slot
-                style={{ height: 600, width: 1000 }}
-                min={minTime}
-                max={maxTime}
-                eventPropGetter={(event) => {
-                    return {
-                        style: {
-                            backgroundColor: event.end.getTime() === addMinutes(event.start, 30).getTime() ? 'green' : 'red',
-                        },
-                    };
-                }}
-                tooltipAccessor={(event) => `${event.title} - ${moment(event.start).format('LT')}`}
-            />
+            <div className="custom-calendar">
+                <div className="days-header">
+                    {daysOfWeek.map(day => (
+                        <div key={day} className="day-header">{day}</div>
+                    ))}
+                </div>
+                <div className="slots">
+                    {daysOfWeek.map(day => (
+                        <div key={day} className="day-column">
+                            {hours.map(hour => {
+                                const slotTime = moment().day(day).hour(hour).minute(0).second(0).toDate();
+                                const isBooked = events.some(event => moment(event.start).isSame(slotTime, 'minute'));
 
+                                return (
+                                    <div
+                                        key={hour}
+                                        className={`time-slot ${selectedSlot && moment(selectedSlot).isSame(slotTime, 'minute') ? 'selected' : ''} ${isBooked ? 'booked' : ''}`}
+                                        onClick={() => !isBooked && handleSlotSelect(day, hour)}
+                                        disabled={isBooked}
+                                    >
+                                        {hour}:00
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+            </div>
             {selectedSlot && (
                 <div className='slot-confirm'>
                     <p>Selected Slot: {moment(selectedSlot).format('LLL')}</p>
                     {isSlotAlreadyBooked ? (
-                        <p>Selected slot is outside the allowed time frame or already booked.</p>
+                        <p>This slot is already booked. Please select another time.</p>
                     ) : (
                         <button onClick={handleConfirmBooking}>Confirm Booking</button>
                     )}
@@ -160,4 +130,3 @@ function CalendarSlotSelector() {
 }
 
 export default CalendarSlotSelector;
-

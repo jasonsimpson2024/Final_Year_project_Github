@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase.js';
-import { addDoc, collection, doc, getDocs, query } from 'firebase/firestore';
+import { db, auth } from '../../firebase.js';
+import { addDoc, doc, setDoc, collection, getDocs, query } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getAuth  } from 'firebase/auth';
 
 function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
-    const hairId = location.pathname.split('/').pop(); // Extract the car ID from the URL
+    const hairId = location.pathname.split('/').pop(); // Extract the hair salon ID from the URL
+    const { currentUser } = getAuth(); // Get the logged-in user's info
 
     const [formData, setFormData] = useState({
         name: '',
@@ -17,6 +19,7 @@ function BookingForm() {
         jobTypes: [], // Store the fetched job types
     });
 
+    // Function to handle form field changes
     const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevState) => ({
@@ -25,8 +28,8 @@ function BookingForm() {
         }));
     };
 
+    // Fetch job types from the hair salon's 'jobtypes' subcollection
     useEffect(() => {
-        // Fetch job types from the hair salon's 'jobtypes' subcollection
         const fetchJobTypes = async () => {
             const hairDocRef = doc(db, 'Barber', hairId);
             const jobTypesCollectionRef = collection(hairDocRef, 'jobtypes');
@@ -52,6 +55,7 @@ function BookingForm() {
         fetchJobTypes();
     }, [hairId]);
 
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -72,14 +76,18 @@ function BookingForm() {
             const carDocRef = doc(carsCollectionRef, hairId);
 
             // Reference the 'bookings' subcollection within the 'car' document
-            const bookingsCollectionRef = collection(carDocRef, 'booking');
+            let bookingDocRef;
+            if (currentUser) {
+                // If user is logged in, use UID as document ID
+                bookingDocRef = doc(carDocRef, 'booking', currentUser.uid);
+                await setDoc(bookingDocRef, carData);
+            } else {
+                // If user is not logged in, let Firestore generate a random ID
+                const bookingsCollectionRef = collection(carDocRef, 'booking');
+                bookingDocRef = await addDoc(bookingsCollectionRef, carData);
+            }
 
-            // Add data to the 'bookings' subcollection and get the document reference
-            const bookingDocRef = await addDoc(bookingsCollectionRef, carData);
-
-            // Get the document ID from the reference
-            const newDocumentId = bookingDocRef.id;
-            console.log('Document added successfully with ID:', newDocumentId);
+            console.log('Document added successfully with ID:', bookingDocRef.id);
 
             setFormData({
                 name: '',
@@ -89,7 +97,7 @@ function BookingForm() {
                 selectedSlot: null,
             });
 
-            navigate(`/barberslot/${hairId}/${newDocumentId}`);
+            navigate(`/barberslot/${hairId}/${bookingDocRef.id}`);
         } catch (error) {
             console.error('Error adding document:', error);
         }
@@ -101,7 +109,6 @@ function BookingForm() {
                 <div className="booking-form">
                     <h2>Book an Appointment</h2>
                     <form onSubmit={handleSubmit}>
-
                         <label>
                             Name:
                             <input
@@ -141,8 +148,8 @@ function BookingForm() {
                                 required
                             >
                                 <option value="">Select a job type</option>
-                                {formData.jobTypes && formData.jobTypes.map((jobType) => (
-                                    <option key={jobType} value={jobType}>
+                                {formData.jobTypes.map((jobType, index) => (
+                                    <option key={index} value={jobType}>
                                         {jobType}
                                     </option>
                                 ))}

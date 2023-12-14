@@ -69,6 +69,9 @@ function UserDocuments() {
                             </Link>
                         </div>
                     ))}
+                    <Link to="/manage">
+                        <button className="manage-button">Manage Bookings</button>
+                    </Link>
                 </div>
             </div>
         </div>

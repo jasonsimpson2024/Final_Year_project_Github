@@ -100,7 +100,7 @@ function Navbar() {
                                     {isJobTypesPage ? (
                                         <div className="navfont">Manage Bookings</div>
                                     ) : (
-                                        <Link to="/manage">Manage Bookings</Link>
+                                        <Link to="/Myappointments">My Appointments</Link>
                                     )}
                                 </li>
                             </>

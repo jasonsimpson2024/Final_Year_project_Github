@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase.js';
-import { addDoc, collection, doc, getDocs, query } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, query, setDoc } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import InputMask from 'react-input-mask';
+import { getAuth  } from 'firebase/auth';
 
 function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const carId = location.pathname.split('/').pop(); // Extract the car ID from the URL
+    const { currentUser } = getAuth(); // Get the logged-in user's info
 
+    // Define state for form data
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -24,6 +27,7 @@ function BookingForm() {
         reg: '',
         jobType: '',
         selectedSlot: null,
+        jobTypes: []
     });
 
     const carMakes = [
@@ -40,7 +44,7 @@ function BookingForm() {
         Nissan: ['Altima', 'Rogue', 'Maxima', 'Murano', 'Pathfinder', 'Sentra', 'Versa', 'Titan'],
         Volkswagen: ['Jetta', 'Passat', 'Golf', 'Tiguan', 'Atlas', 'Arteon', 'Beetle', 'ID.4'],
         BMW: ['3 Series', '5 Series', 'X5', '7 Series', 'X3', 'X7', 'Z4', 'i3'],
-        'Mercedes-Benz': ['C-Class', 'E-Class', 'GLE', 'S-Class', 'GLC', 'A-Class', 'CLS', 'GLB'],
+        Mercedes: ['C-Class', 'E-Class', 'GLE', 'S-Class', 'GLC', 'A-Class', 'CLS', 'GLB'],
         Hyundai: ['Sonata', 'Elantra', 'Tucson', 'Santa Fe', 'Kona', 'Veloster', 'Palisade', 'Nexo'],
         Subaru: ['Outback', 'Forester', 'Impreza', 'Crosstrek', 'Legacy', 'WRX', 'BRZ', 'Ascent'],
         Audi: ['A4', 'A6', 'Q5', 'Q7', 'Q3', 'A3', 'S5', 'e-tron'],
@@ -57,6 +61,8 @@ function BookingForm() {
 
     const years = Array.from({ length: 125 }, (_, index) => (2024 - index).toString());
 
+
+    // Function to handle form changes
     const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevState) => ({
@@ -65,8 +71,8 @@ function BookingForm() {
         }));
     };
 
+    // Fetch job types from the business's 'jobtypes' subcollection
     useEffect(() => {
-        // Fetch job types from the business's 'jobtypes' subcollection
         const fetchJobTypes = async () => {
             const businessDocRef = doc(db, 'Automotive', carId);
             const jobTypesCollectionRef = collection(businessDocRef, 'jobtypes');
@@ -79,7 +85,7 @@ function BookingForm() {
                     jobTypes.push(doc.data().name);
                 });
 
-                // Update the jobType dropdown options with the fetched job types
+                // Update state with fetched job types
                 setFormData((prevState) => ({
                     ...prevState,
                     jobTypes,
@@ -92,66 +98,70 @@ function BookingForm() {
         fetchJobTypes();
     }, [carId]);
 
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const carData = {
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                street: formData.street,
-                town: formData.town,
-                county: formData.county,
-                eircode: formData.eircode,
-                Make: formData.Make,
-                model: formData.model,
-                year: formData.year,
-                transmission: formData.transmission,
-                reg: formData.reg,
-                jobType: formData.jobType,
-                selectedSlot: formData.selectedSlot,
-                businessID: carId,
-            };
+        const carData = {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            street: formData.street,
+            town: formData.town,
+            county: formData.county,
+            eircode: formData.eircode,
+            Make: formData.Make,
+            model: formData.model,
+            year: formData.year,
+            transmission: formData.transmission,
+            reg: formData.reg,
+            jobType: formData.jobType,
+            selectedSlot: formData.selectedSlot,
+            businessID: carId,
+        };
 
-            // Reference the 'cars' collection
-            const carsCollectionRef = collection(db, 'Automotive');
+        // Reference the 'cars' collection
+        const carsCollectionRef = collection(db, 'Automotive');
 
-            // Reference the 'car' document within the 'cars' collection
-            const carDocRef = doc(carsCollectionRef, carId);
+        // Reference the 'car' document within the 'cars' collection
+        const carDocRef = doc(carsCollectionRef, carId);
 
-            // Reference the 'bookings' subcollection within the 'car' document
+        let bookingDocRef;
+
+        if (currentUser) {
+            // If user is logged in, use UID as document ID
+            bookingDocRef = doc(carDocRef, 'booking', currentUser.uid);
+            await setDoc(bookingDocRef, carData);
+        } else {
+            // If user is not logged in, let Firestore generate a random ID
             const bookingsCollectionRef = collection(carDocRef, 'booking');
-
-            // Add data to the 'bookings' subcollection and get the document reference
-            const bookingDocRef = await addDoc(bookingsCollectionRef, carData);
-
-            // Get the document ID from the reference
-            const newDocumentId = bookingDocRef.id;
-            console.log('Document added successfully with ID:', newDocumentId);
-
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                street: '',
-                town: '',
-                county: '',
-                eircode: '',
-                Make: '',
-                model: '',
-                year: '',
-                transmission: '',
-                reg: '',
-                jobType: '',
-                selectedSlot: null,
-            });
-
-            navigate(`/carslot/${carId}/${newDocumentId}`);
-        } catch (error) {
-            console.error('Error adding document:', error);
+            bookingDocRef = await addDoc(bookingsCollectionRef, carData);
         }
+
+        console.log('Document added successfully with ID:', bookingDocRef.id);
+
+        // Reset form data and navigate
+        setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            street: '',
+            town: '',
+            county: '',
+            eircode: '',
+            Make: '',
+            model: '',
+            year: '',
+            transmission: '',
+            reg: '',
+            jobType: '',
+            selectedSlot: null,
+            jobTypes: []
+        });
+
+        navigate(`/carslot/${carId}/${bookingDocRef.id}`);
     };
+
 
     return (
         <div className="form-container">

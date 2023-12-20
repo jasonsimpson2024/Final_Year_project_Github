@@ -9,6 +9,20 @@ function Navbar() {
     const [hasBusiness, setHasBusiness] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const location = useLocation();
+    const [scrollPosition, setScrollPosition] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const position = window.pageYOffset;
+            setScrollPosition(position);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     useEffect(() => {
         const auth = getAuth();
@@ -70,7 +84,7 @@ function Navbar() {
     };
 
     return (
-        <nav className="navbar">
+        <nav className={`navbar ${scrollPosition > 100 ? 'less-transparent' : ''}`}>
             <div className="logo">
                 {/* Render Link or div based on isJobTypesPage */}
                 {isJobTypesPage ? (
@@ -87,7 +101,6 @@ function Navbar() {
                 {dataLoaded && user ? (
                     <>
                         {hasBusiness ? (
-                            // User has a business, display "Manage Business" link
                             <>
                                 <li>
                                     {isJobTypesPage ? (
@@ -105,7 +118,6 @@ function Navbar() {
                                 </li>
                             </>
                         ) : (
-                            // User doesn't have a business, display "List Your Business" link
                             <li>
                                 {isJobTypesPage ? (
                                     <div className="navfont">List your business</div>
@@ -125,7 +137,6 @@ function Navbar() {
                         </li>
                     </>
                 ) : (
-                    // User is not signed in or data is still loading
                     <>
                         <li>
                             {isJobTypesPage ? (

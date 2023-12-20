@@ -86,7 +86,6 @@ function CalendarSlotSelector() {
 
     return (
         <div className="calendar-slot-selector">
-            <h3>Select a Time Slot</h3>
             <div className="custom-calendar">
                 <div className="days-header">
                     {daysOfWeek.map(day => (

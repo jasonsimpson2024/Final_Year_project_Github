@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../../firebase.js';
-import { collection, doc, getDocs } from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-function MyBookings() {
+function ManageBusiness() {
     const auth = getAuth();
-    const getUser = auth.currentUser;
-    const user = getUser ? getUser.uid : null;
-    console.log('user: ', user);
+    const user = auth.currentUser ? auth.currentUser.uid : null;
     const [bookings, setBookings] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const bookingsPerPage = 3;
@@ -25,57 +23,52 @@ function MyBookings() {
 
         if (user) {
             const topLevelCollections = ['Automotive', 'HairSalon', 'Barber'];
+            const currentTimestamp = new Date().getTime();
 
-            const fetchUserBookings = async () => {
+            const fetchAllBookings = async () => {
                 const bookingData = [];
 
                 for (const collectionName of topLevelCollections) {
-                    const userDocRef = doc(collection(db, collectionName), user);
-                    const bookingCollectionRef = collection(userDocRef, 'booking');
+                    const businessCollectionRef = collection(db, collectionName);
+                    const businessQuerySnapshot = await getDocs(businessCollectionRef);
 
-                    const bookingQuerySnapshot = await getDocs(bookingCollectionRef);
+                    for (const businessDoc of businessQuerySnapshot.docs) {
+                        const bookingDocRef = doc(businessDoc.ref, 'booking', user);
 
-                    bookingQuerySnapshot.forEach((doc) => {
-                        if (doc.exists()) {
-                            const data = doc.data();
-                            const selectedSlot = data.selectedSlot ? data.selectedSlot.toMillis() : 0;
-                            const currentTimestamp = new Date().getTime();
-
-                            // Only include future bookings
-                            if (selectedSlot > currentTimestamp) {
-                                bookingData.push({
-                                    id: doc.id,
-                                    collectionName, // Add collectionName to distinguish the collection
-                                    name: data.name,
-                                    jobType: data.jobType,
-                                    selectedSlot: data.selectedSlot,
-                                });
+                        try {
+                            const bookingDocSnapshot = await getDoc(bookingDocRef);
+                            if (bookingDocSnapshot.exists()) {
+                                const data = bookingDocSnapshot.data();
+                                const selectedSlot = data.selectedSlot ? data.selectedSlot.toMillis() : 0;
+                                if (selectedSlot > currentTimestamp) {
+                                    bookingData.push({
+                                        id: bookingDocSnapshot.id,
+                                        collectionName,
+                                        name: data.name,
+                                        jobType: data.jobType,
+                                        selectedSlot: data.selectedSlot,
+                                    });
+                                }
                             }
+                        } catch (error) {
+                            console.error("Error fetching booking:", error);
                         }
-                    });
+                    }
                 }
 
-                // Sort the bookingData array based on timestamp proximity to the current time
-                const currentTimestamp = new Date().getTime();
                 bookingData.sort((a, b) => {
                     const timestampA = a.selectedSlot ? a.selectedSlot.toMillis() : 0;
                     const timestampB = b.selectedSlot ? b.selectedSlot.toMillis() : 0;
-
                     return Math.abs(timestampA - currentTimestamp) - Math.abs(timestampB - currentTimestamp);
                 });
 
-                // Save data to localStorage for this specific user
-                localStorage.setItem(`bookings_${user}`, JSON.stringify(bookingData));
-
-                console.log('User Booking data:', bookingData);
+                localStorage.setItem('bookings', JSON.stringify(bookingData));
                 setBookings(bookingData);
             };
 
-            fetchUserBookings();
+            fetchAllBookings();
         }
     }, [user]);
-
-    console.log('Rendered with bookings:', bookings);
 
     // Calculate the index of the last booking on the current page
     const indexOfLastBooking = currentPage * bookingsPerPage;
@@ -137,4 +130,4 @@ function MyBookings() {
     );
 }
 
-export default MyBookings;
+export default ManageBusiness;

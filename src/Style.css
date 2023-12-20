@@ -1,5 +1,5 @@
 body {
-    background-image: url('./Images/background.jpg');
+    background-image: url('./Images/5ASVq9.jpeg');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -106,7 +106,7 @@ h1 {
 }
 
 .navbar {
-    background-color: rgba(71, 20, 117, 0.65);
+    background-color: rgba(0, 195, 255, 0);
     color: #fff;
     position: fixed;
     top: 0;
@@ -118,6 +118,7 @@ h1 {
     padding: 15px 0;
     z-index: 100;
     height: 15px;
+    transition: background-color 0.3s;
 }
 
 .navbar .logo {
@@ -143,14 +144,18 @@ h1 {
 }
 
 .navbar-menu a {
-    color: #fff;
+    color: #e7e7e7;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .navbar-menu a:hover {
-    color: #00bcd4;
+    color: #003dff;
+}
+
+.navbar.less-transparent {
+    background-color: rgba(8, 79, 100, 0.8); /* Less transparent */
 }
 
 
@@ -287,7 +292,7 @@ button:active{
 
 .my-button {
     padding: 10px 20px;
-    background-color: rgba(136, 33, 136, 0.79);
+    background-color: rgba(0, 255, 255, 0.37);
     color: rgb(255, 255, 255);
     border: none;
     border-radius: 5px;
@@ -310,7 +315,10 @@ button:active{
 }
 
 .confirm-button{
-    background-color: purple;
+    background-color: rgb(0, 140, 140);
+}
+.confirm-button:hover{
+    background-color: rgb(0, 178, 178);
 }
 
 
@@ -389,10 +397,11 @@ footer {
     font-family: Arial, sans-serif;
     width: 100%;
     max-width: 1200px;
-    margin: auto;
+    margin: 200px auto 0 auto; /* Adjust the top margin (200px in this example) */
     color: black;
     background-color: white;
 }
+
 
 .days-header {
     display: flex;
@@ -464,11 +473,12 @@ footer {
 }
 
 .manage-button{
-    background-color: purple;
+    background-color: rgba(0, 255, 255, 0.37);
 }
 
 .manage-button:hover{
-    background-color: rgba(128, 0, 128, 0.55);
+    background-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
 

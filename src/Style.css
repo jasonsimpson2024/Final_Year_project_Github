@@ -87,7 +87,7 @@ h1 {
 }
 
 .pagination button {
-    background-color: #0074D9;
+    background-color: rgb(3, 171, 171);
     color: #fff;
     padding: 10px 20px;
     border: none;
@@ -97,7 +97,7 @@ h1 {
 }
 
 .pagination button:hover {
-    background-color: #0056b3;
+    background-color: rgb(0, 192, 192);
 }
 
 .pagination button:first-child:disabled {
@@ -315,10 +315,10 @@ button:active{
 }
 
 .confirm-button{
-    background-color: rgb(0, 140, 140);
+    background-color: rgb(3, 171, 171);
 }
 .confirm-button:hover{
-    background-color: rgb(0, 178, 178);
+    background-color: rgb(0, 192, 192);
 }
 
 
@@ -473,12 +473,11 @@ footer {
 }
 
 .manage-button{
-    background-color: rgba(0, 255, 255, 0.37);
+    background-color: rgb(3, 171, 171);
 }
 
 .manage-button:hover{
-    background-color: rgba(0, 255, 255, 0.6);
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    background-color: rgb(0, 192, 192);
 }
 
 

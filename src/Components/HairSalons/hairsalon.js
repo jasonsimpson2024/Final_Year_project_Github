@@ -94,7 +94,7 @@ function HairSalon() {
                 <div className="car-details-list">
                     {filteredData.map((hair) => (
                         <div key={hair.id} className="car-details">
-                            <Link to={`/bookhairsalon/${hair.id}`} className="car-detail">
+                            <Link to={`/saloninfo/${hair.id}`} className="car-detail">
                                 Name: {hair.Name} <br />
                                 Location: {hair.Street} {hair.Town} {hair.County} {hair.Eircode}
                             </Link>

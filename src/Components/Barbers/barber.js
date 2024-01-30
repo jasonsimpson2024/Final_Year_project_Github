@@ -93,7 +93,7 @@ function Barber() {
                 <div className="car-details-list">
                     {filteredData.map((barber) => (
                         <div key={barber.id} className="car-details">
-                            <Link to={`/barber/${barber.id}`} className="car-detail">
+                            <Link to={`/barberinfo/${barber.id}`} className="car-detail">
                                 Name: {barber.Name} <br />
                                 Location: {barber.Street} {barber.Town} {barber.County} {barber.Eircode}
                             </Link>

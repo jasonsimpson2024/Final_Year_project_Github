@@ -106,14 +106,8 @@ function Navbar() {
                                     {isJobTypesPage ? (
                                         <div className="navfont">Manage Business</div>
                                     ) : (
+
                                         <Link to="/mybusinesses">Manage Business</Link>
-                                    )}
-                                </li>
-                                <li>
-                                    {isJobTypesPage ? (
-                                        <div className="navfont">Manage Bookings</div>
-                                    ) : (
-                                        <Link to="/Myappointments">My Appointments</Link>
                                     )}
                                 </li>
                             </>
@@ -128,6 +122,14 @@ function Navbar() {
                         )}
                         <li>
                             {isJobTypesPage ? (
+                                <div className="navfont">Manage Bookings</div>
+                            ) : (
+                                <Link to="/Myappointments">My Appointments</Link>
+                            )}
+                        </li>
+
+                        <li>
+                            {isJobTypesPage ? (
                                 <div className="navfont">Log out</div>
                             ) : (
                                 <Link to="/" onClick={handleLogout}>
@@ -140,16 +142,22 @@ function Navbar() {
                     <>
                         <li>
                             {isJobTypesPage ? (
+
                                 <div className="navfont">Sign In</div>
                             ) : (
+                                <div className="signinfont">
                                 <Link to="/login">Sign In</Link>
+                                </div>
+
                             )}
                         </li>
                         <li>
                             {isJobTypesPage ? (
                                 <div className="navfont">Sign Up</div>
                             ) : (
+                                <div className="signinfont">
                                 <Link to="/register">Sign Up</Link>
+                                </div>
                             )}
                         </li>
                     </>

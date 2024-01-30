@@ -356,10 +356,26 @@ footer {
         transition: color 0.3s ease;
         font-size: 12px;
     }
-
 }
 
-@media only screen and (max-width: 412px) {
+.normal-container{
+    padding: 20px; /* Increased padding for more space and better alignment */
+    border-radius: 5px;
+    background-color: #fff;
+    display: block;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Add a box-shadow for the 3D effect */
+    border-top: 2px solid #ccc; /* Create a top border to simulate the 3D effect */
+    font-family: Arial, sans-serif; /* Use a professional font */
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: left; /* Adjust text alignment as needed */
+    transition: all 0.3s ease-in-out;
+    width: 280px;
+    color: black;
+}
+
+@media only screen and (max-width: 390px) {
     .navbar .logo {
         position: absolute;
         left: 1px;
@@ -385,11 +401,52 @@ footer {
     .navbar-menu a {
         color: #fff;
         text-decoration: none;
+        font-weight: 500 !important;
+        transition: color 0.3s ease;
+        font-size: 8px !important;
+    }
+}
+
+@media only screen and (max-width: 430px) {
+    .navbar .logo {
+        position: absolute;
+        left: 1px;
+        top: 63%;
+        transform: translateY(-50%);
+    }
+
+    .navbar .logo img {
+        width: 120px;
+    }
+
+
+    .navbar-menu {
+        list-style-type: none;
+        display: flex;
+        gap: 20px;
+        margin: 0; /* Add margin: 0; to remove default margin */
+    }
+
+    .navbar-menu li {
+        margin: 0;
+    }
+
+    .navbar-menu a {
+        color: #fff;
+        text-decoration: none;
         font-weight: 500;
         transition: color 0.3s ease;
         font-size: 10px;
     }
 
+    .navbar-menu li .signinfont a {
+        top:65%;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        font-size: 15px;
+    }
 
 }
 

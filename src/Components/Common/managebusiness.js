@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase.js';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function ManageBusiness() {
     const { collectionName, id } = useParams();
+    const navigate = useNavigate();
     const [businessData, setBusinessData] = useState({
         Name: '',
         Street: '',
         Town: '',
         County: '',
         Eircode: '',
+        Description: '',
     });
 
     useEffect(() => {
@@ -31,6 +33,7 @@ function ManageBusiness() {
                             Town: docData.Town,
                             County: docData.County,
                             Eircode: docData.Eircode,
+                            Description: docData.Description,
                         });
                     }
                 } else {
@@ -52,6 +55,7 @@ function ManageBusiness() {
                 const documentRef = doc(db, collectionName, user.uid);
                 await updateDoc(documentRef, businessData);
                 console.log('Document updated successfully!');
+                navigate("/");
             } else {
                 console.log('No user is currently authenticated.');
             }
@@ -85,6 +89,17 @@ function ManageBusiness() {
                 <br />
                 <label>Eircode:</label>
                 <input type="text" name="Eircode" value={businessData.Eircode} onChange={handleChange} />
+                <label>
+                    Description (max 400 characters):
+                    <textarea
+                        name="Description"
+                        value={businessData.Description}
+                        onChange={handleChange}
+                        maxLength={400}
+                        rows={4}
+                        style={{ width: '400px', resize: 'none' }} // Set the desired width and disable resizing
+                    />
+                </label>
                 <br />
                 <button type="button" onClick={handleUpdate}>
                     Update

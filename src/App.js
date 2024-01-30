@@ -26,6 +26,8 @@ import MeetSlot from "./Components/Meeting/meetcalendar";
 import ManageBus from "./Components/Common/managebusiness";
 import YourBus from "./Components/Common/YourBusiness";
 import Myappointments from "./Components/Common/myappointments";
+import BarberDetails from "./Components/Barbers/barberinfo";
+import SalonDetails from "./Components/HairSalons/salonInfo";
 
 function App() {
     return (
@@ -39,9 +41,11 @@ function App() {
                     <Route exact path='/carslot/:doc1/:documentId' element={<Carslot />} />
                     <Route exact path='/Hairsalon' element={<Hairsalon />} />
                     <Route exact path='/bookhairsalon/:id' element={<Booksalon />} />
+                    <Route exact path='/saloninfo/:id' element={<SalonDetails />} />
                     <Route exact path='/salonslot/:doc1/:documentId' element={<Salonslot />} />
                     <Route exact path='/Barbers' element={<Barber />} />
                     <Route exact path='/barber/:id' element={<BookBarber />} />
+                    <Route exact path='/barberinfo/:id' element={<BarberDetails />} />
                     <Route exact path='/barberslot/:doc1/:documentId' element={<BarberCal />} />
                     <Route exact path='/confirmation' element={<Confirmation />} />
                     <Route exact path='/add' element={<Add />} />

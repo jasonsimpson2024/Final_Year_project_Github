@@ -14,6 +14,7 @@ function ListBusiness() {
         County: '',
         Eircode: '',
         businessModel: '',
+        Description: '',
     });
 
     const user = auth.currentUser;
@@ -36,6 +37,7 @@ function ListBusiness() {
                 Town: formData.Town,
                 County: formData.County,
                 Eircode: formData.Eircode,
+                Description: formData.Description,
                 ownerUID: user.uid,
             };
 
@@ -52,6 +54,7 @@ function ListBusiness() {
                 County: '',
                 Eircode: '',
                 businessModel: '',
+                Description: '',
             });
 
             navigate(`/add-job-types/${formData.businessModel}/${user.uid}`);
@@ -129,8 +132,19 @@ function ListBusiness() {
                                 <option value="Automotive">Automotive</option>
                                 <option value="Barber">Barber</option>
                                 <option value="HairSalon">Hair Salon</option>
-                                <option value="Meeting">Meeting</option>
                             </select>
+                        </label>
+
+                        <label>
+                            Description (max 400 characters):
+                            <textarea
+                                name="Description"
+                                value={formData.Description}
+                                onChange={handleCarInfoChange}
+                                maxLength={400}
+                                rows={4}
+                                style={{ width: '400px', resize: 'none' }} // Set the desired width and disable resizing
+                            />
                         </label>
                         <br />
                         <button type="submit">Submit</button>

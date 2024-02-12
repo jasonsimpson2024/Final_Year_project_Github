@@ -15,8 +15,11 @@ function CalendarSlotSelector() {
     const endHour = 18; // End at 6 PM
     const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
 
-    // Generate days of the week starting from today
-    const daysOfWeek = Array.from({ length: 7 }, (_, i) => moment().add(i, 'days').format('ddd'));
+    // Generate days of the week starting from today with both day and date
+    const daysOfWeek = Array.from({ length: 7 }, (_, i) => ({
+        day: moment().add(i, 'days').format('ddd'),
+        date: moment().add(i, 'days').format('(DD/MM/YY)')
+    }));
 
     useEffect(() => {
         const fetchData = async () => {
@@ -89,12 +92,12 @@ function CalendarSlotSelector() {
         <div className="calendar-slot-selector">
             <div className="custom-calendar">
                 <div className="days-header">
-                    {daysOfWeek.map((day, index) => (
-                        <div key={index} className="day-header">{day}</div>
+                    {daysOfWeek.map((dayObj, index) => (
+                        <div key={index} className="day-header">{dayObj.day} {dayObj.date}</div>
                     ))}
                 </div>
                 <div className="slots">
-                    {daysOfWeek.map((day, dayIndex) => (
+                    {daysOfWeek.map((dayObj, dayIndex) => (
                         <div key={dayIndex} className="day-column">
                             {hours.map(hour => {
                                 const slotTime = moment().add(dayIndex, 'days').hour(hour).minute(0).second(0).toDate();
@@ -105,7 +108,6 @@ function CalendarSlotSelector() {
                                         key={hour}
                                         className={`time-slot ${selectedSlot && moment(selectedSlot).isSame(slotTime, 'minute') ? 'selected' : ''} ${isBooked ? 'booked' : ''}`}
                                         onClick={() => !isBooked && handleSlotSelect(dayIndex, hour)}
-                                        disabled={isBooked}
                                     >
                                         {hour}:00
                                     </div>
@@ -119,7 +121,7 @@ function CalendarSlotSelector() {
                 <div className='slot-confirm'>
                     <p>Selected Slot: {moment(selectedSlot).format('LLL')}</p>
                     {isSlotAlreadyBooked ? (
-                        <p>This slot is already booked. Please select another time.</p>
+                        <p>This slot is already booked. Please select another.</p>
                     ) : (
                         <button onClick={handleConfirmBooking}>Confirm Booking</button>
                     )}

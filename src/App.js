@@ -28,6 +28,7 @@ import YourBus from "./Components/Common/YourBusiness";
 import Myappointments from "./Components/Common/myappointments";
 import BarberDetails from "./Components/Barbers/barberinfo";
 import SalonDetails from "./Components/HairSalons/salonInfo";
+import AutoDetails from "./Components/Cars/autoInfo";
 
 function App() {
     return (
@@ -38,6 +39,7 @@ function App() {
                     <Route exact path='/' element={<WelcomePage />} />
                     <Route exact path='/Automotive' element={<Automotive />} />
                     <Route exact path='/bookingcars/:id' element={<BookCar />} />
+                    <Route exact path='/autoinfo/:id' element={<AutoDetails />} />
                     <Route exact path='/carslot/:doc1/:documentId' element={<Carslot />} />
                     <Route exact path='/Hairsalon' element={<Hairsalon />} />
                     <Route exact path='/bookhairsalon/:id' element={<Booksalon />} />

@@ -94,7 +94,7 @@ function Automotive() {
                 <div className="car-details-list">
                     {filteredData.map((car) => (
                         <div key={car.id} className="car-details">
-                            <Link to={`/bookingcars/${car.id}`} className="car-detail">
+                            <Link to={`/autoinfo/${car.id}`} className="car-detail">
                                 Name: {car.Name} <br />
                                 Location: {car.Street} {car.Town} {car.County} {car.Eircode}
                             </Link>

@@ -44,7 +44,7 @@ function BookingForm() {
         Nissan: ['Altima', 'Rogue', 'Maxima', 'Murano', 'Pathfinder', 'Sentra', 'Versa', 'Titan'],
         Volkswagen: ['Jetta', 'Passat', 'Golf', 'Tiguan', 'Atlas', 'Arteon', 'Beetle', 'ID.4'],
         BMW: ['3 Series', '5 Series', 'X5', '7 Series', 'X3', 'X7', 'Z4', 'i3'],
-        Mercedes: ['C-Class', 'E-Class', 'GLE', 'S-Class', 'GLC', 'A-Class', 'CLS', 'GLB'],
+        MercedesBenz: ['C-Class', 'E-Class', 'GLE', 'S-Class', 'GLC', 'A-Class', 'CLS', 'GLB'],
         Hyundai: ['Sonata', 'Elantra', 'Tucson', 'Santa Fe', 'Kona', 'Veloster', 'Palisade', 'Nexo'],
         Subaru: ['Outback', 'Forester', 'Impreza', 'Crosstrek', 'Legacy', 'WRX', 'BRZ', 'Ascent'],
         Audi: ['A4', 'A6', 'Q5', 'Q7', 'Q3', 'A3', 'S5', 'e-tron'],

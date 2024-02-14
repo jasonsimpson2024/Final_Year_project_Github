@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { db } from '../../firebase.js';
+import { db, auth } from '../../firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
 
 function BarberDetails() {
+    const user = auth.currentUser;
+    const uid = user ? user.uid : null;
     const [barber, setBarber] = React.useState(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const location = useLocation();
@@ -32,7 +34,12 @@ function BarberDetails() {
     }, [barberId]);
 
     const handleAppointmentBooking = () => {
-        navigate(`/barber/${barber.id}`);
+        // Check if uid is not null and equal to barberId
+        if(uid !== null && barberId == uid){
+            alert("You may not book an appointment with your own business.");
+        } else {
+            navigate(`/barber/${barber.id}`);
+        }
     };
 
     if (isLoading) {

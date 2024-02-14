@@ -1,21 +1,21 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { db, auth} from '../../firebase.js';
+import { db,auth} from '../../firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
 
-function AutoDetails() {
+function BeautyDetails() {
     const user=auth.currentUser;
     const uid = user ? user.uid : null;
-    const [car, setCar] = React.useState(null);
+    const [hair, setHair] = React.useState(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const location = useLocation();
-    const carId = location.pathname.split('/').pop();
+    const hairId = location.pathname.split('/').pop();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBarberData = async () => {
             try {
-                const docRef = doc(db, 'Automotive', carId);
+                const docRef = doc(db, 'BeautySalon', hairId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -23,7 +23,7 @@ function AutoDetails() {
                         id: docSnap.id, // Explicitly include the document ID
                         ...docSnap.data()
                     };
-                    setCar(hairData);
+                    setHair(hairData);
                 } else {
                     console.log("No such document!");
                 }
@@ -35,15 +35,15 @@ function AutoDetails() {
         };
 
         fetchBarberData();
-    }, [carId]);
+    }, [hairId]);
 
 
     const handleAppointmentBooking = () => {
-        if(carId==uid){
+        if(hairId==uid){
             alert("You may not book an appointment with your own business.");
         }
         else{
-            navigate(`/bookingcars/${car.id}`);
+            navigate(`/bookbeautysalon/${hair.id}`);
         }
     };
 
@@ -51,7 +51,7 @@ function AutoDetails() {
         return <p>Loading...</p>;
     }
 
-    if (!car) {
+    if (!hair) {
         return <p>No barber found.</p>;
     }
 
@@ -59,15 +59,15 @@ function AutoDetails() {
         <div>
             <div className='page-header'>
                 <div className='normal-container'>
-                    <h2>{car.Name}</h2>
+                    <h2>{hair.Name}</h2>
                     <p>
                         Location:
-                        {car.Street && ` ${car.Street}`}
-                        {car.Town && `, ${car.Town}`}
-                        {car.County && `, ${car.County}`}
-                        {car.Eircode && ` - Eircode: ${car.Eircode}`}
+                        {hair.Street && ` ${hair.Street}`}
+                        {hair.Town && `, ${hair.Town}`}
+                        {hair.County && `, ${hair.County}`}
+                        {hair.Eircode && ` - Eircode: ${hair.Eircode}`}
                     </p>
-                    {car.Description && <p>Description: {car.Description}</p>}
+                    {hair.Description && <p>Description: {hair.Description}</p>}
                     <button onClick={handleAppointmentBooking}>Book an Appointment</button>
                 </div>
             </div>
@@ -76,4 +76,4 @@ function AutoDetails() {
     );
 }
 
-export default AutoDetails;
+export default BeautyDetails;

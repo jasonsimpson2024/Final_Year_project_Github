@@ -10,6 +10,7 @@ function HairSalon() {
     const carsPerPage = 5;
     const [lastDocumentName, setLastDocumentName] = useState(null);
     const [hasMoreCars, setHasMoreCars] = useState(true);
+    const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
 
     // List of counties in Ireland
@@ -46,10 +47,19 @@ function HairSalon() {
                     setHasMoreCars(false);
                 }
 
-                // Filter data based on selected county
-                const filtered = newCarData.filter(hair =>
-                    hair.County.toLowerCase().includes(selectedCounty.toLowerCase())
-                );
+                // Apply filters based on search criteria and selected county
+                const filtered = newCarData.filter((hair) => {
+                    const searchLower = searchInput.toLowerCase();
+                    return (
+                        (hair.Name.toLowerCase().includes(searchLower) ||
+                            hair.Street.toLowerCase().includes(searchLower) ||
+                            hair.Town.toLowerCase().includes(searchLower) ||
+                            hair.County.toLowerCase().includes(searchLower) ||
+                            hair.Eircode.toLowerCase().includes(searchLower)) &&
+                        hair.County.toLowerCase().includes(selectedCounty.toLowerCase())
+                    );
+                });
+
                 setFilteredData(filtered);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -58,7 +68,7 @@ function HairSalon() {
         };
 
         fetchData(page);
-    }, [page, selectedCounty]);
+    }, [page, searchInput, selectedCounty]);
 
     const nextPage = () => {
         if (hasMoreCars) {
@@ -83,13 +93,22 @@ function HairSalon() {
         <div>
             <div className='page-header'>
                 <div className="header-buttons">
-                    <p>Sort By</p>
-                    <select onChange={handleCountyChange}>
-                        <option value="">Select a County</option>
-                        {counties.map(county => (
-                            <option key={county} value={county}>{county}</option>
-                        ))}
-                    </select>
+                    <div className='search-bar'>
+                        <input
+                            type="text"
+                            placeholder="Browse beauty salons"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
+                    </div>
+                    <div className='dropdown-menu'>
+                        <select onChange={handleCountyChange} value={selectedCounty}>
+                            <option value="">Filter by County</option>
+                            {counties.map(county => (
+                                <option key={county} value={county}>{county}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 <div className="car-details-list">
                     {filteredData.map((hair) => (

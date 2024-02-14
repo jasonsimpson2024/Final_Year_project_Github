@@ -34,6 +34,9 @@ function Welcome() {
                     <Link to="/Barbers">
                         <button className="action-button">Barber shops</button>
                     </Link>
+                    <Link to="/Beautysalon">
+                        <button className="action-button">Beauty Salons</button>
+                    </Link>
                 </div>
             </div>
             <footer>Jason Simpson FYP 2023/24</footer>

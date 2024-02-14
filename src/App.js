@@ -29,6 +29,10 @@ import Myappointments from "./Components/Common/myappointments";
 import BarberDetails from "./Components/Barbers/barberinfo";
 import SalonDetails from "./Components/HairSalons/salonInfo";
 import AutoDetails from "./Components/Cars/autoInfo";
+import BeautySalon from "./Components/BeautySalon/beautysalon";
+import BeautyDetails from "./Components/BeautySalon/beautyInfo";
+import BookBeauty from  "./Components/BeautySalon/bookBeautySalon";
+import BeautySlot from "./Components/BeautySalon/beautyCalendar";
 
 function App() {
     return (
@@ -62,6 +66,10 @@ function App() {
                     <Route exact path='/managebusiness/:collectionName/:documentId' element={<ManageBus />} />
                     <Route exact path='/mybusinesses' element={<YourBus />} />
                     <Route exact path='/Myappointments' element={<Myappointments />} />
+                    <Route exact path='/Beautysalon' element={<BeautySalon />} />
+                    <Route exact path='/beautyinfo/:id' element={<BeautyDetails />} />
+                    <Route exact path='/bookbeautysalon/:id' element={<BookBeauty />} />
+                    <Route exact path='/beautyslot/:doc1/:documentId' element={<BeautySlot />} />
                 </Routes>
                 </Layout>
             </Router>

@@ -52,7 +52,7 @@ function Navbar() {
 
     const checkBusinessListing = async (currentUser) => {
         const db = getFirestore();
-        const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'Meeting'];
+        const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon'];
 
         for (const collectionName of topLevelCollections) {
             const userDocRef = doc(collection(db, collectionName), currentUser.uid);
@@ -120,6 +120,7 @@ function Navbar() {
                                 )}
                             </li>
                         )}
+
                         <li>
                             {isJobTypesPage ? (
                                 <div className="navfont">Manage Bookings</div>
@@ -127,7 +128,6 @@ function Navbar() {
                                 <Link to="/Myappointments">My Appointments</Link>
                             )}
                         </li>
-
                         <li>
                             {isJobTypesPage ? (
                                 <div className="navfont">Log out</div>

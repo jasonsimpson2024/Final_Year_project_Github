@@ -3,13 +3,13 @@ import { db } from '../../firebase.js';
 import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 
-function Automotive() {
-    const [carData, setCarData] = useState([]);
+function BeautySalon() {
+    const [beautyData, setBeautyData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(1);
-    const carsPerPage = 5;
+    const salonsPerPage = 5;
     const [lastDocumentName, setLastDocumentName] = useState(null);
-    const [hasMoreCars, setHasMoreCars] = useState(true);
+    const [hasMoreSalons, setHasMoreSalons] = useState(true);
     const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
 
@@ -19,16 +19,16 @@ function Automotive() {
     useEffect(() => {
         const fetchData = async (pageNumber) => {
             try {
-                const carsCollection = collection(db, 'Automotive');
-                let q = query(carsCollection, orderBy('Name'), limit(carsPerPage));
+                const beautyCollection = collection(db, 'BeautySalon');
+                let q = query(beautyCollection, orderBy('Name'), limit(salonsPerPage));
 
                 if (pageNumber > 1 && lastDocumentName) {
-                    q = query(carsCollection, orderBy('Name'), startAfter(lastDocumentName), limit(carsPerPage));
+                    q = query(beautyCollection, orderBy('Name'), startAfter(lastDocumentName), limit(salonsPerPage));
                 }
 
                 const snapshot = await getDocs(q);
 
-                const newCarData = snapshot.docs.map((doc) => ({
+                const newBeautyData = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     Name: doc.data().Name,
                     Street: doc.data().Street,
@@ -37,29 +37,32 @@ function Automotive() {
                     Eircode: doc.data().Eircode,
                 }));
 
-                setCarData(newCarData);
+                setBeautyData(newBeautyData);
 
-                if (newCarData.length > 0) {
-                    const lastCar = newCarData[newCarData.length - 1];
-                    setLastDocumentName(lastCar.Name);
-                    setHasMoreCars(newCarData.length === carsPerPage);
+                if (newBeautyData.length > 0) {
+                    const lastSalon = newBeautyData[newBeautyData.length - 1];
+                    setLastDocumentName(lastSalon.Name);
+                    setHasMoreSalons(newBeautyData.length === salonsPerPage);
                 } else {
-                    setHasMoreCars(false);
+                    setHasMoreSalons(false);
                 }
 
                 // Filter data based on search input and selected county
-                const searchLower = searchInput.toLowerCase();
-                const filtered = newCarData.filter(car =>
-                    car.County.toLowerCase().includes(selectedCounty.toLowerCase()) &&
-                    (car.Name.toLowerCase().includes(searchLower) ||
-                        car.Street.toLowerCase().includes(searchLower) ||
-                        car.Town.toLowerCase().includes(searchLower) ||
-                        car.Eircode.toLowerCase().includes(searchLower))
-                );
+                const filtered = newBeautyData.filter((salon) => {
+                    const searchLower = searchInput.toLowerCase();
+                    return (
+                        salon.County.toLowerCase().includes(selectedCounty.toLowerCase()) &&
+                        (salon.Name.toLowerCase().includes(searchLower) ||
+                            salon.Street.toLowerCase().includes(searchLower) ||
+                            salon.Town.toLowerCase().includes(searchLower) ||
+                            salon.Eircode.toLowerCase().includes(searchLower))
+                    );
+                });
+
                 setFilteredData(filtered);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                setHasMoreCars(false);
+                setHasMoreSalons(false);
             }
         };
 
@@ -67,7 +70,7 @@ function Automotive() {
     }, [page, searchInput, selectedCounty]);
 
     const nextPage = () => {
-        if (hasMoreCars) {
+        if (hasMoreSalons) {
             setPage(page + 1);
         }
     };
@@ -90,39 +93,39 @@ function Automotive() {
             <div className='page-header'>
                 <div className="header-buttons">
                     <div className='search-bar'>
-                        <input
-                            type="text"
-                            placeholder="Browse services"
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                        />
+                    <input
+                        type="text"
+                        placeholder="Browse beauty salons"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                    />
                     </div>
                     <div className='dropdown-menu'>
-                        <select onChange={handleCountyChange} value={selectedCounty}>
-                            <option value="">Filter by County</option>
-                            {counties.map(county => (
-                                <option key={county} value={county}>{county}</option>
-                            ))}
-                        </select>
+                    <select onChange={handleCountyChange} value={selectedCounty}>
+                        <option value="">Filter by County</option>
+                        {counties.map(county => (
+                            <option key={county} value={county}>{county}</option>
+                        ))}
+                    </select>
                     </div>
                 </div>
                 <div className="car-details-list">
-                    {filteredData.map((car) => (
-                        <div key={car.id} className="car-details">
-                            <Link to={`/autoinfo/${car.id}`} className="car-detail">
-                                Name: {car.Name} <br />
-                                Location: {car.Street} {car.Town} {car.County} {car.Eircode}
+                    {filteredData.map((salon) => (
+                        <div key={salon.id} className="car-details">
+                            <Link to={`/beautyinfo/${salon.id}`} className="car-detail">
+                                Name: {salon.Name} <br />
+                                Location: {salon.Street} {salon.Town} {salon.County} {salon.Eircode}
                             </Link>
                         </div>
                     ))}
                 </div>
                 <div className="pagination">
                     <button onClick={prevPage} disabled={page === 1}>Previous</button>
-                    <button onClick={nextPage} disabled={!hasMoreCars}>Next</button>
+                    <button onClick={nextPage} disabled={!hasMoreSalons}>Next</button>
                 </div>
             </div>
         </div>
     );
 }
 
-export default Automotive;
+export default BeautySalon;

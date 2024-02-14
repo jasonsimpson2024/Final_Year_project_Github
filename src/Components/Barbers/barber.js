@@ -10,6 +10,7 @@ function Barber() {
     const barbersPerPage = 5;
     const [lastDocumentName, setLastDocumentName] = useState(null);
     const [hasMoreBarbers, setHasMoreBarbers] = useState(true);
+    const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
 
     const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
@@ -45,10 +46,18 @@ function Barber() {
                     setHasMoreBarbers(false);
                 }
 
-                // Filter data based on selected county
-                const filtered = newBarberData.filter(barber =>
-                    barber.County.toLowerCase().includes(selectedCounty.toLowerCase())
-                );
+                // Filter data based on search input and selected county
+                const filtered = newBarberData.filter((barber) => {
+                    const searchLower = searchInput.toLowerCase();
+                    return (
+                        barber.County.toLowerCase().includes(selectedCounty.toLowerCase()) &&
+                        (barber.Name.toLowerCase().includes(searchLower) ||
+                            barber.Street.toLowerCase().includes(searchLower) ||
+                            barber.Town.toLowerCase().includes(searchLower) ||
+                            barber.Eircode.toLowerCase().includes(searchLower))
+                    );
+                });
+
                 setFilteredData(filtered);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -57,7 +66,7 @@ function Barber() {
         };
 
         fetchData(page);
-    }, [page, selectedCounty]);
+    }, [page, searchInput, selectedCounty]);
 
     const nextPage = () => {
         if (hasMoreBarbers) {
@@ -82,13 +91,22 @@ function Barber() {
         <div>
             <div className='page-header'>
                 <div className="header-buttons">
-                    <p>Sort By</p>
-                    <select onChange={handleCountyChange}>
-                        <option value="">Select a County</option>
-                        {counties.map(county => (
-                            <option key={county} value={county}>{county}</option>
-                        ))}
-                    </select>
+                    <div className='search-bar'>
+                        <input
+                            type="text"
+                            placeholder="Browse barber shops"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
+                    </div>
+                    <div className='dropdown-menu'>
+                        <select onChange={handleCountyChange} value={selectedCounty}>
+                            <option value="">Filter by County</option>
+                            {counties.map(county => (
+                                <option key={county} value={county}>{county}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 <div className="car-details-list">
                     {filteredData.map((barber) => (

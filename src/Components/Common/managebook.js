@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { db } from '../../firebase.js';
 import { collection, doc, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import BeautySalon from "../BeautySalon/beautysalon";
 
 function ManageBusiness() {
     const auth = getAuth();
@@ -24,7 +25,7 @@ function ManageBusiness() {
         loadBookingsFromLocalStorage();
 
         if (user) {
-            const topLevelCollections = ['Automotive', 'HairSalon', 'Barber'];
+            const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon'];
 
             const fetchAllBookings = async () => {
                 const bookingData = [];

@@ -49,10 +49,10 @@ body .welcome-container {
     font-size: 20px;
     cursor: pointer;
     margin-top: 140px;
-    background-color: rgba(20, 168, 227, 0);
+    background-color: rgba(33, 171, 227, 0.93);
     border-radius: 18px;
     width: 300px;
-    border: 2px solid rgba(255, 255, 255, 0.99);;
+    border: 2px solid rgba(0, 0, 0, 0.99);
 }
 
 
@@ -93,6 +93,7 @@ body .welcome-container {
         font-size: 20px;
         background-color: rgba(27, 147, 147, 0.79);
         border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.99);
     }
 }
 

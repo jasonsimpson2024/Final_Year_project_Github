@@ -66,8 +66,9 @@ function AutoDetails() {
                         {car.Town && `, ${car.Town}`}
                         {car.County && `, ${car.County}`}
                         {car.Eircode && ` - Eircode: ${car.Eircode}`}
+                        {car.Description && <p>{car.Description}</p>}
                     </p>
-                    {car.Description && <p>Description: {car.Description}</p>}
+
                     <button onClick={handleAppointmentBooking}>Book an Appointment</button>
                 </div>
             </div>

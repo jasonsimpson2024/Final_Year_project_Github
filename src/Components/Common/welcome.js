@@ -1,29 +1,91 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../../firebase.js';
+import { collection, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import '../../Welcome.css';
+import "../../Welcome.css";
+import { debounce } from 'lodash'; // Import debounce from lodash
 
 function Welcome() {
-    const [user, setUser] = useState(null); // To store the user's authentication status
+    const [searchInput, setSearchInput] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const searchCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon'];
+
+    const handleSearch = async () => {
+        if (!searchInput.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
+        setIsLoading(true);
+        const results = [];
+        const searchLower = searchInput.toLowerCase();
+
+        try {
+            for (const collectionName of searchCollections) {
+                const collRef = collection(db, collectionName);
+                const snapshot = await getDocs(collRef);
+                snapshot.docs.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.Name.toLowerCase().includes(searchLower) ||
+                        data.Street.toLowerCase().includes(searchLower) ||
+                        data.County.toLowerCase().includes(searchLower) ||
+                        data.Town.toLowerCase().includes(searchLower) ||
+                        data.Eircode.toLowerCase().includes(searchLower)) {
+                        const path = collectionName === 'Automotive' ? `/autoinfo/${doc.id}` :
+                            collectionName === 'HairSalon' ? `/saloninfo/${doc.id}` :
+                                collectionName === 'Barber' ? `/barberinfo/${doc.id}` :
+                                    `/beautyinfo/${doc.id}`;
+                        results.push({ ...data, id: doc.id, path });
+                    }
+                });
+            }
+            setSearchResults(results);
+        } catch (error) {
+            console.error("Error searching documents:", error);
+        }
+        setIsLoading(false);
+    };
+
+    // Debounce the handleSearch function
+    const debouncedSearch = debounce(() => {
+        handleSearch();
+    }, 300); // 300ms delay
 
     useEffect(() => {
-        const auth = getAuth();
+        debouncedSearch();
 
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser); // Update the user state when authentication state changes
-            console.log(user);
-        });
-
-        // Clean up the observer when the component unmounts
-        return () => unsubscribe();
-    });
-
+        // Cleanup
+        return () => {
+            debouncedSearch.cancel();
+        };
+    }, [searchInput]); // Effect dependencies
 
     return (
-        <div>
-            <div className="welcome-container">
-                <h2>Welcome to BookingLite</h2>
+        <div className="welcome-container">
+            <div className="welcome-box">
+                <h2>Welcome to BookingLITE</h2>
                 <h3>Booking Made Easy</h3>
+                <div className="search-bar-dropdown">
+                    <input
+                        type="text"
+                        placeholder="Search for businesses..."
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                    />
+                    <div className="search-results-dropdown">
+                        {isLoading ? (
+                            <div>Loading...</div>
+                        ) : (
+                            searchResults.map((result) => (
+                                <Link key={result.id} to={result.path} className="search-result-link">
+                                    {result.Name} - {result.Street} {result.Town} {result.County} {result.Eircode}
+                                </Link>
+                            ))
+                        )}
+                    </div>
+                </div>
                 <div className="buttons">
                     <Link to="/Automotive">
                         <button className="action-button">Automotive Services</button>
@@ -37,12 +99,22 @@ function Welcome() {
                     <Link to="/Beautysalon">
                         <button className="action-button">Beauty Salons</button>
                     </Link>
+                    <Link to="/spa">
+                        <button className="action-button">Spa & Massage</button>
+                    </Link>
+                    <Link to="/">
+                        <button className="action-button">Gym & Fitness</button>
+                    </Link>
+                    <Link to="/">
+                        <button className="action-button">Psychotherapy</button>
+                    </Link>
+                    <Link to="/">
+                        <button className="action-button">Other</button>
+                    </Link>
                 </div>
             </div>
-            <footer>Jason Simpson FYP 2023/24</footer>
         </div>
     );
-
 }
 
 export default Welcome;

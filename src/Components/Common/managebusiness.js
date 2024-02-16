@@ -91,13 +91,13 @@ function ManageBusiness() {
                 <input type="text" name="Eircode" value={businessData.Eircode} onChange={handleChange} />
                 <label>
                     Description (max 400 characters):
-                    <textarea
+                    <textarea className="textbox"
                         name="Description"
                         value={businessData.Description}
                         onChange={handleChange}
                         maxLength={400}
                         rows={4}
-                        style={{ width: '400px', resize: 'none' }} // Set the desired width and disable resizing
+                        style={{ width: '400px', resize: 'none'}} // Set the desired width and disable resizing
                     />
                 </label>
                 <br />

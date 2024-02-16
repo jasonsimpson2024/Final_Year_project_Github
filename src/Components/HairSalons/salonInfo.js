@@ -66,8 +66,8 @@ function SalonDetails() {
                         {hair.Town && `, ${hair.Town}`}
                         {hair.County && `, ${hair.County}`}
                         {hair.Eircode && ` - Eircode: ${hair.Eircode}`}
+                        {hair.Description && <p>{hair.Description}</p>}
                     </p>
-                    {hair.Description && <p>Description: {hair.Description}</p>}
                     <button onClick={handleAppointmentBooking}>Book an Appointment</button>
                 </div>
             </div>

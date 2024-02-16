@@ -1,25 +1,29 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { db, auth } from '../../firebase.js';
+import { db, auth} from '../../firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
 
-function BarberDetails() {
+function SpaDetails() {
     const user = auth.currentUser;
     const uid = user ? user.uid : null;
-    const [barber, setBarber] = React.useState(null);
+    const [hair, setHair] = React.useState(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const location = useLocation();
-    const barberId = location.pathname.split('/').pop();
+    const hairId = location.pathname.split('/').pop();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBarberData = async () => {
             try {
-                const docRef = doc(db, 'Barber', barberId);
+                const docRef = doc(db, 'SPA', hairId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    setBarber(docSnap.data());
+                    const hairData = {
+                        id: docSnap.id, // Explicitly include the document ID
+                        ...docSnap.data()
+                    };
+                    setHair(hairData);
                 } else {
                     console.log("No such document!");
                 }
@@ -31,14 +35,15 @@ function BarberDetails() {
         };
 
         fetchBarberData();
-    }, [barberId]);
+    }, [hairId]);
+
 
     const handleAppointmentBooking = () => {
-        // Check if uid is not null and equal to barberId
-        if(uid !== null && barberId == uid){
+        if(hairId==uid){
             alert("You may not book an appointment with your own business.");
-        } else {
-            navigate(`/barber/${barber.id}`);
+        }
+        else{
+            navigate(`/bookspa/${hair.id}`);
         }
     };
 
@@ -46,7 +51,7 @@ function BarberDetails() {
         return <p>Loading...</p>;
     }
 
-    if (!barber) {
+    if (!hair) {
         return <p>No barber found.</p>;
     }
 
@@ -54,14 +59,14 @@ function BarberDetails() {
         <div>
             <div className='page-header'>
                 <div className='normal-container'>
-                    <h2>{barber.Name}</h2>
+                    <h2>{hair.Name}</h2>
                     <p>
                         Location:
-                        {barber.Street && ` ${barber.Street}`}
-                        {barber.Town && `, ${barber.Town}`}
-                        {barber.County && `, ${barber.County}`}
-                        {barber.Eircode && ` - Eircode: ${barber.Eircode}`}
-                        {barber.Description && <p>{barber.Description}</p>}
+                        {hair.Street && ` ${hair.Street}`}
+                        {hair.Town && `, ${hair.Town}`}
+                        {hair.County && `, ${hair.County}`}
+                        {hair.Eircode && ` - Eircode: ${hair.Eircode}`}
+                        {hair.Description && <p>{hair.Description}</p>}
                     </p>
 
                     <button onClick={handleAppointmentBooking}>Book an Appointment</button>
@@ -72,4 +77,4 @@ function BarberDetails() {
     );
 }
 
-export default BarberDetails;
+export default SpaDetails;

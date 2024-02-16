@@ -33,6 +33,10 @@ import BeautySalon from "./Components/BeautySalon/beautysalon";
 import BeautyDetails from "./Components/BeautySalon/beautyInfo";
 import BookBeauty from  "./Components/BeautySalon/bookBeautySalon";
 import BeautySlot from "./Components/BeautySalon/beautyCalendar";
+import Spa from "./Components/SPA/spa.js";
+import SpaDetails from "./Components/SPA/spainfo";
+import Bookspa from "./Components/SPA/bookspa";
+import Spacalendar from "./Components/SPA/spacalendar";
 
 function App() {
     return (
@@ -70,6 +74,10 @@ function App() {
                     <Route exact path='/beautyinfo/:id' element={<BeautyDetails />} />
                     <Route exact path='/bookbeautysalon/:id' element={<BookBeauty />} />
                     <Route exact path='/beautyslot/:doc1/:documentId' element={<BeautySlot />} />
+                    <Route exact path='/spa' element={<Spa />} />
+                    <Route exact path='/spainfo/:id' element={<SpaDetails />} />
+                    <Route exact path='/bookspa/:id' element={<Bookspa />} />
+                    <Route exact path='/spaslot/:doc1/:documentId' element={<Spacalendar />} />
                 </Routes>
                 </Layout>
             </Router>

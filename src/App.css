@@ -1,0 +1,100 @@
+body .welcome-container {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: url('./Images/bookinglitewelcome.jpg') center/cover no-repeat;
+}
+
+.welcome-container h2 {
+    display: none;
+} .welcome-container h3 {
+      display: none;
+  }
+
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    background-size: cover;
+    color: #fff;
+    padding: 20px;
+}
+
+.welcome-container .buttons {
+    display: block;
+    flex-direction: row;
+    align-items: center;
+}
+
+.welcome-container .action-button:hover {
+    background-color: rgba(33, 171, 227, 0.38);
+    border: 2px solid black;
+
+}
+
+.action-button:active{
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+.action-button {
+    margin: 10px;
+    padding: 12px 12px;
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: 140px;
+    background-color: rgba(33, 171, 227, 0.93);
+    border-radius: 18px;
+    width: 300px;
+    border: 2px solid rgba(0, 0, 0, 0.99);
+}
+
+
+
+@media only screen and (max-width: 1024px) {
+
+    .welcome-container h2 {
+        font-family: Futura;
+        display: block;
+        font-size: 24px;
+    }
+    .welcome-container h3 {
+        font-family: Futura;
+        display: block;
+        font-size: 20px;
+    }
+
+    body .welcome-container {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: url('./Images/5ASVq9.jpeg') center/cover no-repeat;
+    }
+    .welcome-container .buttons {
+        display: grid;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .action-button {
+        margin: 1px;
+        margin-top: 20px;
+        width: 300px;
+        padding: 20px 20px;
+        font-size: 20px;
+        background-color: rgba(27, 147, 147, 0.79);
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.99);
+    }
+}
+
+

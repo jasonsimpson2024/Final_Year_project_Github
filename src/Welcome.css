@@ -2,45 +2,97 @@ body .welcome-container {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden;
+    overflow: visible; /* Ensure dropdown visibility */
     display: flex;
     flex-direction: column;
-    background: url('./Images/bookinglitewelcome.jpg') center/cover no-repeat;
-}
-
- .welcome-container h2 {
-    display: none;
-} .welcome-container h3 {
-    display: none;
-}
-
-.welcome-container {
-    display: flex;
-    flex-direction: column;
+    background-image: url('./Images/5ASVq9.jpeg');
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
     text-align: center;
     background-size: cover;
     color: #fff;
-    padding: 20px;
+}
+
+.welcome-container .welcome-box {
+    background-color: rgba(255, 255, 255, 0.65);
+    padding: 100px 10px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    margin-top: 100px;
+    color: #000; /* Enhanced text readability */
+    overflow: visible !important;
+    width: 70%;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.welcome-container h2, .welcome-container h3 {
+    font-family: 'Poppins', sans-serif;
+    color: #2a2a2a;
+    text-align: center;
+    margin-top: 0;
+    padding: 10px 0;
+}
+
+.welcome-container h2 {
+    font-size: 48px;
+    font-weight: 600;
+    background: -webkit-linear-gradient(left, #007bff, #6610f2); /* Gradient text color */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; /* Use this to apply the gradient color to the text */
+    text-align: center; /* Center the title if it fits your design */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2), 0px 0px 20px rgba(255, 255, 255, 0.7); /* Enhanced shadow for glowing effect */
+    margin-bottom: 20px; /* Adjusted margin */
+    padding: 10px 0;
+    font-family: 'Poppins', sans-serif; /* Optional: Change to a more elegant font */
+    transition: all 0.3s ease-in-out; /* Smooth transition for any hover effects you might want to add */
+}
+
+.welcome-container h2:hover {
+    text-shadow: 0 0 10px rgb(182, 0, 255), 2px 2px 5px rgba(0, 255, 165, 0.48); /* Change or add hover effects */
+}
+
+
+.welcome-container h3 {
+    font-size: 36px;
+    font-weight: 400;
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    background: -webkit-linear-gradient(45deg, #007bff, #881798);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    transform: rotate(-2deg);
+    display: inline-block; /* Ensures proper display */
 }
 
 .welcome-container .buttons {
-    display: block;
+    display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px; /* Adjust this value as needed to manage space between buttons */
+    padding: 10px; /* Add some padding to ensure there's space around the edges */
 }
+
 
 .welcome-container .action-button:hover {
-    background-color: rgba(33, 171, 227, 0.38);
-    border: 2px solid black;
-
+    background-color: #21abe3; /* Brighter shade for hover */
+    border: 2px solid #00ffd0; /* More pronounced border color */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Add shadow for depth */
+    transform: scale(1.05); /* Slightly increase size */
 }
 
-.action-button:active{
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
+.action-button:active {
+    transform: translateY(4px) scale(1.02); /* Add scale effect to active state for a pressed effect */
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); /* Less pronounced shadow for a "pressed" effect */
 }
 
 .action-button {
@@ -48,16 +100,82 @@ body .welcome-container {
     padding: 12px 12px;
     font-size: 20px;
     cursor: pointer;
-    margin-top: 140px;
-    background-color: rgba(33, 171, 227, 0.93);
+    background: linear-gradient(145deg, rgba(33, 171, 227, 0.93), rgba(0, 255, 236, 0.9)); /* Gradient background */
     border-radius: 18px;
     width: 300px;
-    border: 2px solid rgba(0, 0, 0, 0.99);
+    border: 2px solid rgba(0, 255, 236, 0.22);
+    color: #fff; /* White text color for better readability */
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; /* Smooth transitions for effects */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Text shadow for better readability */
+}
+.search-bar-dropdown {
+    position: relative;
+    display: flex;
+    width: 50%;
+    margin: 20px 0;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 24px;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background-color: #fff;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.search-result-link {
+    padding: 10px;
+    text-decoration: none;
+    color: #2a2a2a;
+    display: block;
+}
+
+.search-result-link:hover {
+    background-color: #f1f1f1;
 }
 
 
 
+
 @media only screen and (max-width: 1024px) {
+
+    .welcome-container .welcome-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+        margin-top: 100px;
+        color: #000; /* Enhanced text readability */
+        overflow: visible !important;
+        width: 90%
+    }
+
+    .search-bar-dropdown {
+        position: relative;
+        display: flex;
+        width: 90%;
+        margin: 20px 0;
+    }
 
     .welcome-container h2 {
         font-family: Futura;
@@ -88,7 +206,7 @@ body .welcome-container {
     .action-button {
         margin: 1px;
         margin-top: 20px;
-        width: 300px;
+        width: 280px;
         padding: 20px 20px;
         font-size: 20px;
         background-color: rgba(27, 147, 147, 0.79);

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import logoImage from '../../Images/BookingLITELogo.png';
 import { Link, useLocation } from 'react-router-dom';
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, collection, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
 
 function Navbar() {
     const [user, setUser] = useState(null);
     const [hasBusiness, setHasBusiness] = useState(false);
+    const [isCustomer, setIsCustomer] = useState(false); // State to manage if the user is a customer
     const [dataLoaded, setDataLoaded] = useState(false);
     const location = useLocation();
     const [scrollPosition, setScrollPosition] = useState(0);
@@ -30,21 +31,18 @@ function Navbar() {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
 
-            // Check if the user has a business
             if (currentUser) {
                 await checkBusinessListing(currentUser);
+                await checkCustomerStatus(currentUser.uid); // Check if the user is a customer
             }
 
-            // Mark that data has been loaded
             setDataLoaded(true);
         });
 
-        // Clean up the observer when the component unmounts
         return () => unsubscribe();
     }, []);
 
     useEffect(() => {
-        // Check the user's business status when the location changes
         if (user && dataLoaded) {
             checkBusinessListing(user);
         }
@@ -55,7 +53,7 @@ function Navbar() {
         const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon'];
 
         for (const collectionName of topLevelCollections) {
-            const userDocRef = doc(collection(db, collectionName), currentUser.uid);
+            const userDocRef = doc(db, collectionName, currentUser.uid);
             const businessDocSnapshot = await getDoc(userDocRef);
 
             if (businessDocSnapshot.exists()) {
@@ -64,29 +62,32 @@ function Navbar() {
             }
         }
 
-        // If no document is found in any collection
         setHasBusiness(false);
     };
 
-    // Check if the user is on the jobtypes page
-    const isJobTypesPage = location.pathname.includes('/add-job-types');
+    const checkCustomerStatus = async (uid) => {
+        const db = getFirestore();
+        const docRef = doc(db, "Customers", uid);
+        const docSnap = await getDoc(docRef);
+
+        setIsCustomer(docSnap.exists()); // Set true if user is a customer
+    };
 
     const handleLogout = async () => {
-        if (!isJobTypesPage) {
-            const auth = getAuth();
+        const auth = getAuth();
 
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error(error);
-            }
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error(error);
         }
     };
+
+    const isJobTypesPage = location.pathname.includes('/add-job-types');
 
     return (
         <nav className={`navbar ${scrollPosition > 100 ? 'less-transparent' : ''}`}>
             <div className="logo">
-                {/* Render Link or div based on isJobTypesPage */}
                 {isJobTypesPage ? (
                     <div>
                         <img src={logoImage} alt="Logo" />
@@ -100,18 +101,18 @@ function Navbar() {
             <ul className="navbar-menu">
                 {dataLoaded && user ? (
                     <>
-                        {hasBusiness ? (
+                        {hasBusiness && !isCustomer ? ( // Adjusted to include !isCustomer check
                             <>
                                 <li>
                                     {isJobTypesPage ? (
                                         <div className="navfont">Manage Business</div>
                                     ) : (
-
                                         <Link to="/mybusinesses">Manage Business</Link>
                                     )}
                                 </li>
                             </>
-                        ) : (
+                        ) : null}
+                        {!hasBusiness && !isCustomer ? (
                             <li>
                                 {isJobTypesPage ? (
                                     <div className="navfont">List your business</div>
@@ -119,46 +120,27 @@ function Navbar() {
                                     <Link to="/add">List your business</Link>
                                 )}
                             </li>
-                        )}
-
+                        ) : null}
+                        {isCustomer ? ( // Show for customers
+                            <>
+                                <li>
+                                    <Link to="/Myappointments">My Appointments</Link>
+                                </li>
+                            </>
+                        ) : null}
                         <li>
-                            {isJobTypesPage ? (
-                                <div className="navfont">Manage Bookings</div>
-                            ) : (
-                                <Link to="/Myappointments">My Appointments</Link>
-                            )}
-                        </li>
-                        <li>
-                            {isJobTypesPage ? (
-                                <div className="navfont">Log out</div>
-                            ) : (
-                                <Link to="/" onClick={handleLogout}>
-                                    Log out
-                                </Link>
-                            )}
+                            <Link to="/" onClick={handleLogout}>
+                                Log out
+                            </Link>
                         </li>
                     </>
                 ) : (
                     <>
                         <li>
-                            {isJobTypesPage ? (
-
-                                <div className="navfont">Sign In</div>
-                            ) : (
-                                <div className="signinfont">
-                                <Link to="/login">Sign In</Link>
-                                </div>
-
-                            )}
+                            <Link to="/login">Sign In</Link>
                         </li>
                         <li>
-                            {isJobTypesPage ? (
-                                <div className="navfont">Sign Up</div>
-                            ) : (
-                                <div className="signinfont">
-                                <Link to="/register">Sign Up</Link>
-                                </div>
-                            )}
+                            <Link to="/register">Sign Up</Link>
                         </li>
                     </>
                 )}

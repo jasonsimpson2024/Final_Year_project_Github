@@ -2,6 +2,7 @@ import React from 'react';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './Style.css';
+import "./Navbar.css";
 import Automotive from './Components/Cars/Automotive.js';
 import Add from './Components/Common/add.js'
 import Layout from "./Components/Common/NavLayout.js";

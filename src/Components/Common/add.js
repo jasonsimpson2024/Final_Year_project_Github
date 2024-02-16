@@ -145,12 +145,13 @@ function ListBusiness() {
                                 <option value="Barber">Barber</option>
                                 <option value="HairSalon">Hair Salon</option>
                                 <option value="BeautySalon">Beauty Salon</option>
+                                <option value="SPA">Spa & Massage</option>
                             </select>
                         </label>
 
                         <label>
                             Description (max 400 characters):
-                            <textarea
+                            <textarea className='textbox'
                                 name="Description"
                                 value={formData.Description}
                                 onChange={handleCarInfoChange}

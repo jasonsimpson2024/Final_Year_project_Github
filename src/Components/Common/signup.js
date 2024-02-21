@@ -1,39 +1,34 @@
 import React, { useState } from 'react';
-import { auth } from '../../firebase.js'; // Assuming this contains your Firebase config and initialization
+import { auth, db } from '../../firebase.js'; // Assuming these are correctly set up
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc } from 'firebase/firestore'; // Import functions to interact with Firestore
-import { db } from '../../firebase.js'; // Import your Firestore database instance
 
 export default function SignUp() {
     const [signupEmail, setSignupEmail] = useState("");
     const [signupPassword, setSignupPassword] = useState("");
-    const [isCustomer, setIsCustomer] = useState(false); // State to manage the checkbox
+    const [userType, setUserType] = useState(""); // New state for the dropdown selection
     const navigate = useNavigate();
 
     const signup = async () => {
-        try {
-            // Create user account
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                signupEmail,
-                signupPassword
-            );
+        if (!userType) {
+            alert("Please select an account type.");
+            return;
+        }
 
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
             const user = userCredential.user;
             await sendEmailVerification(user);
 
-            // Check if the user is marked as a customer
-            if (isCustomer) {
-                // Save the email to the "Customers" collection with the user's UID as the document ID
-                await setDoc(doc(db, "Customers", user.uid), {
-                    email: signupEmail
-                });
-            }
+            // Store the email in the selected collection based on userType
+            await setDoc(doc(db, userType, user.uid), {
+                email: signupEmail
+            });
 
             alert("Sign Up successful! Please verify your email.");
             await auth.signOut();
-            navigate("/login"); // Redirect to the login page after sign-up
+            navigate("/login");
         } catch (error) {
             alert("Error signing up. Please try again.");
             console.log(error);
@@ -64,13 +59,16 @@ export default function SignUp() {
                 />
             </div>
             <div className="form-group">
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={isCustomer}
-                        onChange={(e) => setIsCustomer(e.target.checked)}
-                    /> Customer
-                </label>
+                <select
+                    value={userType}
+                    onChange={(e) => setUserType(e.target.value)}
+                    className="userTypeSelect"
+                    required
+                >
+                    <option value="">Choose Account Type...</option>
+                    <option value="Customers">Personal</option>
+                    <option value="Business">Business</option>
+                </select>
             </div>
             <button type="button" onClick={signup}>Sign Up</button>
         </div>

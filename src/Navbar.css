@@ -45,7 +45,7 @@
 }
 
 .navbar-menu a:hover {
-    color: #003dff;
+    color: rgb(0, 128, 128);
 }
 
 .navbar.less-transparent {

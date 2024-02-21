@@ -2,20 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { db } from '../../firebase.js';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 function CalendarSlotSelector() {
     const [events, setEvents] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [isSlotAlreadyBooked, setIsSlotAlreadyBooked] = useState(false);
+    const [slotDuration, setSlotDuration] = useState(60); // Default slot duration in minutes
+    const [businessHours, setBusinessHours] = useState({ startHour: 9, endHour: 17 }); // Default business hours in 24-hour format
     const navigate = useNavigate();
     const { doc1, documentId } = useParams();
 
-    const startHour = 9; // Start at 9 AM
-    const endHour = 18; // End at 6 PM
-    const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
-
-    // Generate days of the week starting from today with both day and date
     const daysOfWeek = Array.from({ length: 7 }, (_, i) => ({
         day: moment().add(i, 'days').format('ddd'),
         date: moment().add(i, 'days').format('(DD/MM/YY)')
@@ -23,10 +20,20 @@ function CalendarSlotSelector() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const automotiveCollection = collection(db, 'Automotive');
+            const automotiveCollection = collection(db, 'Automotive'); // Adjust collection name as needed
             const carDoc = doc(automotiveCollection, doc1);
 
             try {
+                const businessDoc = await getDoc(carDoc);
+                if (businessDoc.exists()) {
+                    const { slotDuration: sd, startHour: sh, endHour: eh } = businessDoc.data();
+                    setSlotDuration(sd || 60);
+                    setBusinessHours({
+                        startHour: convertTimeTo24HourFormat(sh || '9 AM'),
+                        endHour: convertTimeTo24HourFormat(eh || '5 PM')
+                    });
+                }
+
                 const bookedCollection = collection(carDoc, 'booking');
                 const querySnapshot = await getDocs(bookedCollection);
 
@@ -35,7 +42,7 @@ function CalendarSlotSelector() {
                     if (data.selectedSlot) {
                         return {
                             start: data.selectedSlot.toDate(),
-                            end: moment(data.selectedSlot.toDate()).add(1, 'hours').toDate(),
+                            end: moment(data.selectedSlot.toDate()).add(slotDuration, 'minutes').toDate(),
                         };
                     }
                     return null;
@@ -48,10 +55,38 @@ function CalendarSlotSelector() {
         };
 
         fetchData();
-    }, [doc1, documentId]);
+    }, [doc1, documentId, slotDuration]);
 
-    const handleSlotSelect = async (dayIndex, hour) => {
-        const slotTime = moment().add(dayIndex, 'days').hour(hour).minute(0).second(0);
+
+    const convertTimeTo24HourFormat = (time) => {
+        const [hour, amPm] = time.split(' ');
+        let hourConverted = parseInt(hour, 10);
+        if (amPm === 'PM' && hourConverted !== 12) hourConverted += 12;
+        if (amPm === 'AM' && hourConverted === 12) hourConverted = 0;
+        return hourConverted;
+    };
+
+    const generateTimeSlots = () => {
+        const slots = [];
+        const start = businessHours.startHour;
+        const end = businessHours.endHour;
+        const duration = slotDuration; // Duration in minutes
+
+        let currentTime = moment({hour: start, minute: 0, second: 0}); // Start of business hours
+        const endTime = moment({hour: end, minute: 0, second: 0}); // End of business hours
+
+        while (currentTime.isBefore(endTime)) {
+            slots.push(currentTime.format('HH:mm'));
+            currentTime = currentTime.clone().add(duration, 'minutes'); // Move to next slot
+        }
+
+        return slots;
+    };
+
+
+    const handleSlotSelect = async (dayIndex, time) => {
+        const [hour, minute] = time.split(':').map(Number);
+        const slotTime = moment().add(dayIndex, 'days').hour(hour).minute(minute).second(0);
 
         const selectedSlotTimestamp = slotTime.valueOf();
         const slotTaken = events.some(event => {
@@ -68,7 +103,7 @@ function CalendarSlotSelector() {
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId && !isSlotAlreadyBooked) {
-            const automotiveCollection = collection(db, 'Automotive');
+            const automotiveCollection = collection(db, 'Automotive'); // Adjust collection name as needed
             const carDoc = doc(automotiveCollection, doc1);
             const bookedDoc = doc(carDoc, 'booking', documentId);
 
@@ -88,6 +123,8 @@ function CalendarSlotSelector() {
         }
     };
 
+    const hours = generateTimeSlots(); // Use the dynamically generated slots
+
     return (
         <div className="calendar-slot-selector">
             <div className="custom-calendar">
@@ -99,17 +136,17 @@ function CalendarSlotSelector() {
                 <div className="slots">
                     {daysOfWeek.map((dayObj, dayIndex) => (
                         <div key={dayIndex} className="day-column">
-                            {hours.map(hour => {
-                                const slotTime = moment().add(dayIndex, 'days').hour(hour).minute(0).second(0).toDate();
+                            {hours.map((time, timeIndex) => {
+                                const slotTime = moment().add(dayIndex, 'days').startOf('day').add(moment.duration(time)).toDate();
                                 const isBooked = events.some(event => moment(event.start).isSame(slotTime, 'minute'));
 
                                 return (
                                     <div
-                                        key={hour}
+                                        key={`${dayIndex}-${timeIndex}`}
                                         className={`time-slot ${selectedSlot && moment(selectedSlot).isSame(slotTime, 'minute') ? 'selected' : ''} ${isBooked ? 'booked' : ''}`}
-                                        onClick={() => !isBooked && handleSlotSelect(dayIndex, hour)}
+                                        onClick={() => !isBooked && handleSlotSelect(dayIndex, time)}
                                     >
-                                        {hour}:00
+                                        {time}
                                     </div>
                                 );
                             })}
@@ -129,6 +166,7 @@ function CalendarSlotSelector() {
             )}
         </div>
     );
+
 }
 
 export default CalendarSlotSelector;

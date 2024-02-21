@@ -68,7 +68,6 @@ body .welcome-container {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    transform: rotate(-2deg);
     display: inline-block; /* Ensures proper display */
 }
 

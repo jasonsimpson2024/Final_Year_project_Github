@@ -10,6 +10,9 @@ function BookingForm() {
     const hairId = location.pathname.split('/').pop(); // Extract the hair salon ID from the URL
     const { currentUser } = getAuth(); // Get the logged-in user's info
 
+    console.log("Current pathname:", location.pathname);
+    console.log("Extracted hairId:", location.pathname.split('/').pop());
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',

@@ -8,30 +8,30 @@ function CalendarSlotSelector() {
     const [events, setEvents] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [isSlotAlreadyBooked, setIsSlotAlreadyBooked] = useState(false);
-    const [slotDuration, setSlotDuration] = useState(60); // Default slot duration in minutes
-    const [businessHours, setBusinessHours] = useState({ startHour: 9, endHour: 17 }); // Default business hours in 24-hour format
+    const [slotDuration, setSlotDuration] = useState(60);
+    const [businessHours, setBusinessHours] = useState({ startHour: 9, endHour: 17 });
+    const [excludedDays, setExcludedDays] = useState([]);
+    const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('week'));
     const navigate = useNavigate();
     const { doc1, documentId } = useParams();
 
-    const daysOfWeek = Array.from({ length: 7 }, (_, i) => ({
-        day: moment().add(i, 'days').format('ddd'),
-        date: moment().add(i, 'days').format('(DD/MM/YY)')
-    }));
+
 
     useEffect(() => {
         const fetchData = async () => {
-            const automotiveCollection = collection(db, 'Barber'); // Adjust collection name as needed
+            const automotiveCollection = collection(db, 'Barber'); // Adjust this to your collection name
             const carDoc = doc(automotiveCollection, doc1);
 
             try {
                 const businessDoc = await getDoc(carDoc);
                 if (businessDoc.exists()) {
-                    const { slotDuration: sd, startHour: sh, endHour: eh } = businessDoc.data();
+                    const { slotDuration: sd, startHour: sh, endHour: eh, excludedDays: ed } = businessDoc.data();
                     setSlotDuration(sd || 60);
                     setBusinessHours({
                         startHour: convertTimeTo24HourFormat(sh || '9 AM'),
                         endHour: convertTimeTo24HourFormat(eh || '5 PM')
                     });
+                    setExcludedDays(ed || []);
                 }
 
                 const bookedCollection = collection(carDoc, 'booking');
@@ -55,8 +55,22 @@ function CalendarSlotSelector() {
         };
 
         fetchData();
+
     }, [doc1, documentId, slotDuration]);
 
+    const isCurrentWeek = () => {
+        return currentWeekStart.isSame(moment().startOf('week'), 'day');
+    };
+
+    const nextWeek = () => {
+        setCurrentWeekStart(prev => prev.clone().add(7, 'days'));
+    };
+
+    const previousWeek = () => {
+        if (!isCurrentWeek()) {
+            setCurrentWeekStart(prev => prev.clone().subtract(7, 'days'));
+        }
+    };
 
     const convertTimeTo24HourFormat = (time) => {
         const [hour, amPm] = time.split(' ');
@@ -70,23 +84,27 @@ function CalendarSlotSelector() {
         const slots = [];
         const start = businessHours.startHour;
         const end = businessHours.endHour;
-        const duration = slotDuration; // Duration in minutes
+        let currentTime = moment().hour(start).minute(0).second(0);
 
-        let currentTime = moment({hour: start, minute: 0, second: 0}); // Start of business hours
-        const endTime = moment({hour: end, minute: 0, second: 0}); // End of business hours
-
-        while (currentTime.isBefore(endTime)) {
+        while (currentTime.hour() < end) {
             slots.push(currentTime.format('HH:mm'));
-            currentTime = currentTime.clone().add(duration, 'minutes'); // Move to next slot
+            currentTime.add(slotDuration, 'minutes');
         }
 
         return slots;
     };
 
+    const daysOfWeek = Array.from({ length: 7 }, (_, i) => currentWeekStart.clone().add(i, 'days'))
+        .filter(day => !excludedDays.includes(day.format('dddd')))
+        .map(day => ({
+            day,
+            label: day.format('ddd (DD/MM/YY)')
+        }));
 
     const handleSlotSelect = async (dayIndex, time) => {
+        const day = daysOfWeek[dayIndex].day;
         const [hour, minute] = time.split(':').map(Number);
-        const slotTime = moment().add(dayIndex, 'days').hour(hour).minute(minute).second(0);
+        const slotTime = day.clone().hour(hour).minute(minute);
 
         const selectedSlotTimestamp = slotTime.valueOf();
         const slotTaken = events.some(event => {
@@ -103,9 +121,7 @@ function CalendarSlotSelector() {
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId && !isSlotAlreadyBooked) {
-            const automotiveCollection = collection(db, 'Barber'); // Adjust collection name as needed
-            const carDoc = doc(automotiveCollection, doc1);
-            const bookedDoc = doc(carDoc, 'booking', documentId);
+            const bookedDoc = doc(db, 'Barber', doc1, 'booking', documentId); // Adjust path as necessary
 
             try {
                 await updateDoc(bookedDoc, {
@@ -123,21 +139,25 @@ function CalendarSlotSelector() {
         }
     };
 
-    const hours = generateTimeSlots(); // Use the dynamically generated slots
+
 
     return (
         <div className="calendar-slot-selector">
             <div className="custom-calendar">
+                <div className="navigation">
+                    <button onClick={previousWeek} disabled={isCurrentWeek()}>Previous Week</button>
+                    <button onClick={nextWeek}>Next Week</button>
+                </div>
                 <div className="days-header">
-                    {daysOfWeek.map((dayObj, index) => (
-                        <div key={index} className="day-header">{dayObj.day} {dayObj.date}</div>
+                    {daysOfWeek.map(({ label }, index) => (
+                        <div key={index} className="day-header">{label}</div>
                     ))}
                 </div>
                 <div className="slots">
-                    {daysOfWeek.map((dayObj, dayIndex) => (
-                        <div key={dayIndex} className="day-column">
-                            {hours.map((time, timeIndex) => {
-                                const slotTime = moment().add(dayIndex, 'days').startOf('day').add(moment.duration(time)).toDate();
+                    {daysOfWeek.map(({ day }, dayIndex) => (
+                        <div key={day.format('YYYY-MM-DD')} className="day-column">
+                            {generateTimeSlots().map((time, timeIndex) => {
+                                const slotTime = day.clone().startOf('day').add(moment.duration(time));
                                 const isBooked = events.some(event => moment(event.start).isSame(slotTime, 'minute'));
 
                                 return (
@@ -151,8 +171,10 @@ function CalendarSlotSelector() {
                                 );
                             })}
                         </div>
+
                     ))}
                 </div>
+
             </div>
             {selectedSlot && (
                 <div className='slot-confirm'>
@@ -166,7 +188,6 @@ function CalendarSlotSelector() {
             )}
         </div>
     );
-
 }
 
 export default CalendarSlotSelector;

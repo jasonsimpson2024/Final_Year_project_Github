@@ -12,7 +12,7 @@ function UserDocuments() {
                 const user = auth.currentUser;
 
                 if (user) {
-                    const collections = ['Automotive', 'Barber', 'HairSalon', 'BeautySalon'];
+                    const collections = ['Automotive', 'Barber', 'HairSalon', 'BeautySalon', 'SPA'];
                     const allUserDocs = [];
 
                     for (const collectionName of collections) {

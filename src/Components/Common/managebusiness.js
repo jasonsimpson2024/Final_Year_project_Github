@@ -14,9 +14,10 @@ function ManageBusiness() {
         Eircode: '',
         Description: '',
         slotDuration: '60',
-        startHour: '9 AM', // Default start hour as string in AM/PM format
-        endHour: '5 PM', // Default end hour as string in AM/PM format
+        startHour: '9 AM',
+        endHour: '5 PM',
     });
+    const [excludedDays, setExcludedDays] = useState([]); // New state for tracking excluded days
     const [endHourOptions, setEndHourOptions] = useState([]);
 
     useEffect(() => {
@@ -35,6 +36,10 @@ function ManageBusiness() {
                             startHour: docData.startHour?.toString() || '9 AM',
                             endHour: docData.endHour?.toString() || '5 PM',
                         }));
+                        // Update excludedDays from the fetched data if available
+                        if (docData.excludedDays) {
+                            setExcludedDays(docData.excludedDays);
+                        }
                     }
                 } else {
                     console.log('No user is currently authenticated.');
@@ -61,6 +66,7 @@ function ManageBusiness() {
                     slotDuration: parseInt(businessData.slotDuration, 10),
                     startHour: businessData.startHour,
                     endHour: businessData.endHour,
+                    excludedDays, // Include excludedDays in the update
                 });
                 console.log('Document updated successfully!');
                 navigate("/");
@@ -78,6 +84,14 @@ function ManageBusiness() {
         if (name === 'startHour') {
             updateEndHourOptions(value);
         }
+    };
+
+    const toggleDayExclusion = (day) => {
+        setExcludedDays((currentDays) =>
+            currentDays.includes(day)
+                ? currentDays.filter((d) => d !== day)
+                : [...currentDays, day]
+        );
     };
 
     const generateHourOptions = () => {
@@ -160,6 +174,21 @@ function ManageBusiness() {
                         <select name="endHour" value={businessData.endHour} onChange={handleChange} required>
                             {endHourOptions.length > 0 ? endHourOptions : generateHourOptions()}
                         </select>
+                        <label>Exclude Days:</label>
+                        <div className="exclude-days-container">
+                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
+                                <div key={day}>
+                                    <input
+                                        type="checkbox"
+                                        id={`day-${day}`}
+                                        name={day}
+                                        checked={excludedDays.includes(day)}
+                                        onChange={() => toggleDayExclusion(day)}
+                                    />
+                                    <label htmlFor={`day-${day}`}>{day}</label>
+                                </div>
+                            ))}
+                        </div>
                         <br />
                         <button type="button" onClick={handleUpdate}>Update</button>
                     </form>

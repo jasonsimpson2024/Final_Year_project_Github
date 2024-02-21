@@ -50,7 +50,7 @@ function Navbar() {
 
     const checkBusinessListing = async (currentUser) => {
         const db = getFirestore();
-        const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon'];
+        const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon', 'SPA'];
 
         for (const collectionName of topLevelCollections) {
             const userDocRef = doc(db, collectionName, currentUser.uid);

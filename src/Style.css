@@ -76,7 +76,7 @@ h1 {
 
 .car-details:hover {
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.87);
-    background-color: rgba(0, 0, 0, 0.47);
+    background-color: rgba(255, 255, 255, 0.25);
 }
 
 .car-detail {
@@ -208,6 +208,31 @@ h1 {
 .textbox{
     font-family: Arial;
 }
+
+.exclude-days-container {
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the space between checkboxes as needed */
+    align-items: center; /* Align items vertically in the center */
+    justify-content: center; /* Align items to the start of the container */
+}
+
+.exclude-days-container div {
+    display: flex;
+    align-items: center; /* Align the checkbox and label text vertically */
+}
+
+/* Optional: Style adjustments for the label to improve spacing and interaction */
+.exclude-days-container label {
+    margin-left: 5px; /* Space between the checkbox and its label */
+    cursor: pointer; /* Changes the cursor to a pointer when hovering over the label */
+}
+
 
 .login-container {
     max-width: 500px;
@@ -351,7 +376,7 @@ footer {
     max-width: 1200px;
     margin: 200px auto 0 auto;
     color: black;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0);
 }
 
 .days-header {
@@ -401,6 +426,22 @@ footer {
     background-color: red;
     cursor: not-allowed;
 }
+
+.navigation{
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.navigation button {
+    background-color: rgb(0, 138, 138);
+    margin-right: 10px; /* Adds a gap to the right of each button */
+}
+
+.navigation button:hover {
+    background-color: rgb(0, 192, 192);
+}
+
 
 .container-details {
     padding: 20px;

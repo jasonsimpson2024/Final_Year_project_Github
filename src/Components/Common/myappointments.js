@@ -22,7 +22,7 @@ function ManageBusiness() {
         loadBookingsFromLocalStorage();
 
         if (user) {
-            const topLevelCollections = ['Automotive', 'HairSalon', 'Barber'];
+            const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon', 'SPA'];
             const currentTimestamp = new Date().getTime();
 
             const fetchAllBookings = async () => {
@@ -33,7 +33,9 @@ function ManageBusiness() {
                     const businessQuerySnapshot = await getDocs(businessCollectionRef);
 
                     for (const businessDoc of businessQuerySnapshot.docs) {
-                        const bookingDocRef = doc(businessDoc.ref, 'booking', user);
+                        const businessDocId = businessDoc.id; // This stores the business document ID
+
+                        const bookingDocRef = doc(db, collectionName, businessDocId, 'booking', user);
 
                         try {
                             const bookingDocSnapshot = await getDoc(bookingDocRef);
@@ -42,7 +44,7 @@ function ManageBusiness() {
                                 const selectedSlot = data.selectedSlot ? data.selectedSlot.toMillis() : 0;
                                 if (selectedSlot > currentTimestamp) {
                                     bookingData.push({
-                                        id: bookingDocSnapshot.id,
+                                        businessDocId, // Use this ID for the link
                                         collectionName,
                                         name: data.name,
                                         jobType: data.jobType,
@@ -83,10 +85,9 @@ function ManageBusiness() {
                 <h2>Your bookings:</h2>
                 <div>
                     {currentBookings.map((booking) => (
-                        <div key={booking.id} className="car-details">
-                            <Link
-                                to={`/bookinginfo/${booking.collectionName}/${user}/${booking.id}`}
-                            >
+                        <div key={booking.businessDocId} className="car-details">
+                            {/* Use businessDocId in the link */}
+                            <Link to={`/appointinfo/${booking.collectionName}/${booking.businessDocId}/${user}`}>
                                 <p>
                                     <strong>Name:</strong> {booking.name}
                                 </p>

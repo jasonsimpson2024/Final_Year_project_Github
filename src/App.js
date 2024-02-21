@@ -38,6 +38,7 @@ import Spa from "./Components/SPA/spa.js";
 import SpaDetails from "./Components/SPA/spainfo";
 import Bookspa from "./Components/SPA/bookspa";
 import Spacalendar from "./Components/SPA/spacalendar";
+import AppointInfo from "./Components/Common/appointmentinfo";
 
 function App() {
     return (
@@ -64,6 +65,7 @@ function App() {
                     <Route exact path='/register' element={<Signup />} />
                     <Route exact path='/manage' element={<Manage />} />
                     <Route path="/bookinginfo/:collectionName/:userId/:bookingId" element={<Bookinfo />} />
+                    <Route path="/appointinfo/:collectionName/:userId/:bookingId" element={<AppointInfo />} />
                     <Route exact path='/add-job-types/:businessModel/:uid' element={<Jobtype />} />
                     <Route exact path='/meet' element={<Meet />} />
                     <Route exact path='/meeting/:id' element={<BookMeet />} />

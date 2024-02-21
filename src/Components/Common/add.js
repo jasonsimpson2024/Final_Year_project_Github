@@ -22,18 +22,18 @@ function ListBusiness() {
         Eircode: '',
         businessModel: '',
         Description: '',
-        slotDuration: '60', // Default slot duration 60 minutes
-        startHour: '9 AM', // Default start hour 9 AM
-        endHour: '5 PM', // Default end hour 5 PM
+        slotDuration: '60',
+        startHour: '9 AM',
+        endHour: '5 PM',
+        excludedDays: [],
     });
     const [endHourOptions, setEndHourOptions] = useState([]);
 
     const user = auth.currentUser;
 
     useEffect(() => {
-        // Initialize end hour options based on the default or initial start hour
         updateEndHourOptions(formData.startHour);
-    }, []); // Empty dependency array means this effect runs once on mount
+    }, []);
 
     const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
@@ -46,6 +46,15 @@ function ListBusiness() {
         }
     };
 
+    const handleExcludedDaysChange = (day) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            excludedDays: prevState.excludedDays.includes(day)
+                ? prevState.excludedDays.filter(d => d !== day)
+                : [...prevState.excludedDays, day],
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -53,16 +62,14 @@ function ListBusiness() {
             const businessData = {
                 ...formData,
                 ownerUID: user.uid,
-                startHour: convertTo24HourFormat(formData.startHour), // Convert to 24-hour numeric format for storage
-                endHour: convertTo24HourFormat(formData.endHour), // Convert to 24-hour numeric format for storage
                 slotDuration: Number(formData.slotDuration),
+                // No conversion for startHour and endHour; they're submitted as is
             };
 
             const businessModel = formData.businessModel;
-            const businessDocRef = doc(db, businessModel, user.uid); // Use the user's UID as the document ID
+            const businessDocRef = doc(db, businessModel, user.uid);
             await setDoc(businessDocRef, businessData);
 
-            // Navigate to the next page or show success message
             navigate(`/add-job-types/${formData.businessModel}/${user.uid}`);
         } catch (error) {
             console.error('Error adding document:', error);
@@ -74,22 +81,19 @@ function ListBusiness() {
         for (let i = 0; i < 24; i++) {
             const hour = i % 12 === 0 ? 12 : i % 12;
             const amPm = i < 12 ? 'AM' : 'PM';
-            const value = `${hour} ${amPm}`;
-            options.push({ label: value, value: i }); // Store both label for display and value for comparison and storage
+            options.push({ label: `${hour} ${amPm}`, value: `${hour} ${amPm}` });
         }
         return options;
     };
 
     const updateEndHourOptions = (startHour) => {
         const startHourIndex = convertTo24HourFormat(startHour);
-        const options = generateHourOptions().filter(option => option.value > startHourIndex);
+        const options = generateHourOptions().filter(option => convertTo24HourFormat(option.label) > startHourIndex);
         setEndHourOptions(options.map(option => <option key={option.value} value={option.label}>{option.label}</option>));
 
-        // Check and update endHour if it's now an invalid choice
         const currentEndHourIndex = convertTo24HourFormat(formData.endHour);
         if (currentEndHourIndex <= startHourIndex) {
-            const newEndHour = options[0]?.label;
-            setFormData(prevState => ({ ...prevState, endHour: newEndHour }));
+            setFormData(prevState => ({ ...prevState, endHour: options[0]?.label }));
         }
     };
 
@@ -98,7 +102,7 @@ function ListBusiness() {
         let hourConverted = parseInt(hour, 10);
         hourConverted += amPm === 'PM' && hourConverted !== 12 ? 12 : 0;
         hourConverted -= amPm === 'AM' && hourConverted === 12 ? 12 : 0;
-        return hourConverted; // Return as number for storage
+        return hourConverted % 24; // Ensure hour is within 0-23 range
     };
 
     return (
@@ -209,13 +213,28 @@ function ListBusiness() {
                             </select>
                         </label>
                         <br />
-                        {/* End Hour Dropdown */}
                         <label>
                             End Hour:
                             <select name="endHour" value={formData.endHour} onChange={handleCarInfoChange} required>
                                 {endHourOptions.length > 0 ? endHourOptions : <option key="default" value={formData.endHour}>{formData.endHour}</option>}
                             </select>
                         </label>
+
+                        <label>Exclude Days:</label>
+                        <div className="exclude-days-container">
+                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
+                                <div key={day}>
+                                    <input
+                                        type="checkbox"
+                                        id={`exclude-day-${day}`}
+                                        name={`excludeDay${day}`}
+                                        checked={formData.excludedDays.includes(day)}
+                                        onChange={() => handleExcludedDaysChange(day)}
+                                    />
+                                    <label htmlFor={`exclude-day-${day}`}>{day}</label>
+                                </div>
+                            ))}
+                        </div>
 
                         <br />
                         <button type="submit">Submit</button>

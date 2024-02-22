@@ -1,5 +1,5 @@
 .navbar {
-    background-color: rgba(0, 195, 255, 0);
+    background-color: rgba(0, 193, 255, 0);
     color: #fff;
     position: fixed;
     top: 0;
@@ -8,7 +8,7 @@
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center;
-    padding: 15px 0;
+    padding: 18px;
     z-index: 100;
     height: 15px;
     transition: background-color 0.3s;
@@ -116,7 +116,7 @@
         text-decoration: none;
         font-weight: 500 !important;
         transition: color 0.3s ease;
-        font-size: 8px !important;
+        font-size: 14px !important;
     }
 }
 
@@ -163,10 +163,19 @@
 
 @media (max-width: 1024px) {
 
+    .navbar-menu li .signinfont a {
+        top: 65%;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        font-size: 15px;
+    }
+
     .navbar .logo {
         position: absolute;
         left: -7px;
-        top: 73%;
+        top: 67%;
         transform: translateY(-50%);
     }
 }

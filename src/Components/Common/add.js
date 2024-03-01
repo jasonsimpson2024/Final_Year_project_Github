@@ -1,8 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase.js';
-import { setDoc, doc } from 'firebase/firestore';
+import { doc, setDoc, collection, getDocs, deleteDoc, addDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
+import { S3 } from 'aws-sdk';
+
+// Initialize AWS S3
+const s3 = new S3({
+    accessKeyId: 'AKIAW3PSKY74XAFLLDWF',
+    secretAccessKey: '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',
+    region: 'eu-west-1',
+});
+
+async function checkFileExists(bucket, key) {
+
+    try {
+        await s3.headObject({ Bucket: bucket, Key: key }).promise();
+        return true; // File exists
+    } catch (error) {
+        if (error.statusCode === 404) {
+            return false; // File does not exist
+        }
+        throw error; // Handle other errors appropriately
+    }
+}
+
+async function getUniqueFilename(bucket, originalName) {
+    let baseName = originalName.replace(/\.[^/.]+$/, "");
+    let extension = originalName.match(/\.[^/.]+$/)[0];
+    let count = 0;
+    let newName = originalName;
+
+    while (await checkFileExists(bucket, `photos/${newName}`)) {
+        count++;
+        newName = `${baseName}(${count})${extension}`;
+    }
+
+    return newName;
+}
 
 function ListBusiness() {
     const navigate = useNavigate();
@@ -26,14 +61,12 @@ function ListBusiness() {
         startHour: '9 AM',
         endHour: '5 PM',
         excludedDays: [],
+        mediaDocs: [], // State for uploaded media documents
     });
+
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [loading, setLoading] = useState(false); // State for loading status
     const [endHourOptions, setEndHourOptions] = useState([]);
-
-    const user = auth.currentUser;
-
-    useEffect(() => {
-        updateEndHourOptions(formData.startHour);
-    }, []);
 
     const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
@@ -46,33 +79,64 @@ function ListBusiness() {
         }
     };
 
-    const handleExcludedDaysChange = (day) => {
-        setFormData((prevState) => ({
-            ...prevState,
-            excludedDays: prevState.excludedDays.includes(day)
-                ? prevState.excludedDays.filter(d => d !== day)
-                : [...prevState.excludedDays, day],
-        }));
+    const handleFileChange = (event) => {
+        setSelectedFiles(event.target.files);
+    };
+
+
+    const uploadFile = async (file) => {
+        let fileName = file.name;
+        let uniqueFileName = await getUniqueFilename('bookinglite', fileName);
+        const s3Key = `photos/${uniqueFileName}`;
+        const uploadParams = {
+            Bucket: 'bookinglite',
+            Key: s3Key,
+            Body: file,
+        };
+
+        await s3.upload(uploadParams).promise();
+        const downloadURL = s3.getSignedUrl('getObject', {
+            Bucket: 'bookinglite',
+            Key: s3Key,
+            Expires: 9999999,
+        });
+
+        return { downloadURL, uniqueFileName, s3Key };
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         try {
+            if (selectedFiles.length > 0) {
+                for (let file of selectedFiles) {
+                    const businessModel=formData.businessModel
+                    const { downloadURL, uniqueFileName, s3Key } = await uploadFile(file);
+                    const mediaCollectionRef = collection(db, businessModel, auth.currentUser.uid, 'media');
+                    await addDoc(mediaCollectionRef, {
+                        title: uniqueFileName,
+                        url: downloadURL,
+                        s3Key: s3Key,
+                    });
+                }
+            }
+
             const businessData = {
                 ...formData,
-                ownerUID: user.uid,
-                slotDuration: Number(formData.slotDuration),
-                // No conversion for startHour and endHour; they're submitted as is
+                ownerUID: auth.currentUser.uid,
+                slotDuration: parseInt(formData.slotDuration, 10),
             };
 
             const businessModel = formData.businessModel;
-            const businessDocRef = doc(db, businessModel, user.uid);
+            const businessDocRef = doc(db, businessModel, auth.currentUser.uid);
             await setDoc(businessDocRef, businessData);
 
-            navigate(`/add-job-types/${formData.businessModel}/${user.uid}`);
+            navigate("/"); // or wherever you need to redirect to
         } catch (error) {
-            console.error('Error adding document:', error);
+            console.error('Error submitting form:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -83,17 +147,17 @@ function ListBusiness() {
             const amPm = i < 12 ? 'AM' : 'PM';
             options.push({ label: `${hour} ${amPm}`, value: `${hour} ${amPm}` });
         }
-        return options;
+        return options.map(option => <option key={option.value} value={option.label}>{option.label}</option>);
     };
 
     const updateEndHourOptions = (startHour) => {
         const startHourIndex = convertTo24HourFormat(startHour);
-        const options = generateHourOptions().filter(option => convertTo24HourFormat(option.label) > startHourIndex);
-        setEndHourOptions(options.map(option => <option key={option.value} value={option.label}>{option.label}</option>));
+        const options = generateHourOptions().filter(option => convertTo24HourFormat(option.props.value) > startHourIndex);
+        setEndHourOptions(options);
 
         const currentEndHourIndex = convertTo24HourFormat(formData.endHour);
         if (currentEndHourIndex <= startHourIndex) {
-            setFormData(prevState => ({ ...prevState, endHour: options[0]?.label }));
+            setFormData(prevState => ({ ...prevState, endHour: options[0]?.props.value }));
         }
     };
 
@@ -102,7 +166,16 @@ function ListBusiness() {
         let hourConverted = parseInt(hour, 10);
         hourConverted += amPm === 'PM' && hourConverted !== 12 ? 12 : 0;
         hourConverted -= amPm === 'AM' && hourConverted === 12 ? 12 : 0;
-        return hourConverted % 24; // Ensure hour is within 0-23 range
+        return hourConverted % 24;
+    };
+
+    const handleExcludedDaysChange = (day) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            excludedDays: prevState.excludedDays.includes(day)
+                ? prevState.excludedDays.filter(d => d !== day)
+                : [...prevState.excludedDays, day],
+        }));
     };
 
     return (
@@ -209,7 +282,7 @@ function ListBusiness() {
                         <label>
                             Start Hour:
                             <select name="startHour" value={formData.startHour} onChange={handleCarInfoChange} required>
-                                {generateHourOptions().map(option => <option key={option.value} value={option.label}>{option.label}</option>)}
+                                {generateHourOptions()}
                             </select>
                         </label>
                         <br />
@@ -235,6 +308,7 @@ function ListBusiness() {
                                 </div>
                             ))}
                         </div>
+                        <input type="file" multiple onChange={handleFileChange} disabled={loading || formData.mediaDocs.length >= 4} />
 
                         <br />
                         <button type="submit">Submit</button>

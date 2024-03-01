@@ -1,9 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase.js';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { useParams, useNavigate } from 'react-router-dom';
+import { doc, getDoc, updateDoc, addDoc, collection, getDocs, deleteDoc} from 'firebase/firestore';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { FirebaseError } from 'firebase/app';
+
+import { S3 } from 'aws-sdk';
+
+const s3 = new S3({
+    accessKeyId: 'AKIAW3PSKY74XAFLLDWF',
+    secretAccessKey: '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',
+    region: 'eu-west-1',
+});
+
+async function checkFileExists(bucket, key) {
+    try {
+        await s3.headObject({ Bucket: bucket, Key: key }).promise();
+        return true; // File exists
+    } catch (error) {
+        if (error.statusCode === 404) {
+            return false; // File does not exist
+        }
+        throw error; // Handle other errors appropriately
+    }
+}
+
+async function getUniqueFilename(bucket, originalName) {
+    let baseName = originalName.replace(/\.[^/.]+$/, "");
+    let extension = originalName.match(/\.[^/.]+$/)[0];
+    let count = 0;
+    let newName = originalName;
+
+    while (await checkFileExists(bucket, `photos/${newName}`)) {
+        count++;
+        newName = `${baseName}(${count})${extension}`;
+    }
+
+    return newName;
+}
 
 function ManageBusiness() {
+    const user=auth.currentUser;
     const { collectionName } = useParams();
     const navigate = useNavigate();
     const [businessData, setBusinessData] = useState({
@@ -17,8 +53,17 @@ function ManageBusiness() {
         startHour: '9 AM',
         endHour: '5 PM',
     });
+
     const [excludedDays, setExcludedDays] = useState([]); // New state for tracking excluded days
     const [endHourOptions, setEndHourOptions] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [mediaDocs, setMediaDocs] = useState([]);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    const handleFileChange = (event) => {
+        setSelectedFiles(event.target.files);
+    };
 
     useEffect(() => {
         const fetchBusinessData = async () => {
@@ -48,35 +93,36 @@ function ManageBusiness() {
                 console.error('Error fetching business data:', error);
             }
         };
+
+
+
         fetchBusinessData();
+    }, [collectionName]);
+
+    useEffect(() => {
+        const fetchMediaDocs = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const mediaCollectionRef = collection(db, collectionName, user.uid, 'media');
+                const querySnapshot = await getDocs(mediaCollectionRef);
+                const mediaDocuments = querySnapshot.docs.map(doc => ({
+                    ...doc.data(),
+                    id: doc.id, // Store the Firestore document ID
+                }));
+                setMediaDocs(mediaDocuments);
+            } else {
+                console.log('No user is currently authenticated for fetching media.');
+            }
+        };
+
+        // Call fetchMediaDocs
+        fetchMediaDocs();
     }, [collectionName]);
 
     useEffect(() => {
         // Dynamically generate end hour options based on the selected start hour
         updateEndHourOptions(businessData.startHour);
     }, [businessData.startHour]);
-
-    const handleUpdate = async () => {
-        try {
-            const user = auth.currentUser;
-            if (user) {
-                const documentRef = doc(db, collectionName, user.uid);
-                await updateDoc(documentRef, {
-                    ...businessData,
-                    slotDuration: parseInt(businessData.slotDuration, 10),
-                    startHour: businessData.startHour,
-                    endHour: businessData.endHour,
-                    excludedDays, // Include excludedDays in the update
-                });
-                console.log('Document updated successfully!');
-                navigate("/");
-            } else {
-                console.log('No user is currently authenticated.');
-            }
-        } catch (error) {
-            console.error('Error updating document:', error);
-        }
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -126,13 +172,132 @@ function ManageBusiness() {
         return hourConverted % 24; // Ensure hour is within 0-23 range
     };
 
+    const uploadFile = async (file) => {
+        let fileName = file.name;
+        let uniqueFileName = await getUniqueFilename('bookinglite', fileName);
+        const s3Key = `photos/${uniqueFileName}`;
+        const uploadParams = {
+            Bucket: 'bookinglite',
+            Key: s3Key,
+            Body: file,
+        };
+
+        await s3.upload(uploadParams).promise();
+        const downloadURL = s3.getSignedUrl('getObject', {
+            Bucket: 'bookinglite',
+            Key: s3Key,
+            Expires: 9999999,
+        });
+
+        return { downloadURL, uniqueFileName, s3Key };
+    };
+
+    const deletePhoto = async (event, docId, s3Key) => {
+        // Prevent default action (if the event is provided)
+        event?.preventDefault();
+
+        const confirmDelete = window.confirm('Do you really want to delete this photo?');
+        if (confirmDelete) {
+            setLoading(true);
+            try {
+                // Delete from Firestore
+                const mediaDocRef = doc(db, collectionName, user.uid, 'media', docId);
+                await deleteDoc(mediaDocRef);
+
+                // Delete from S3
+                const deleteParams = {
+                    Bucket: 'bookinglite',
+                    Key: s3Key,
+                };
+                await s3.deleteObject(deleteParams).promise();
+
+                // Update UI
+                setMediaDocs(mediaDocs.filter(doc => doc.s3Key !== s3Key));
+            } catch (error) {
+                console.error('Error deleting photo:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+
+
+
+    const handleUpdate = async () => {
+        setLoading(true);
+        try {
+            // Prevent upload if there are already more than 4 documents in the media collection
+            if (mediaDocs.length >= 4) {
+                alert('Cannot upload more than 4 documents.');
+                return;
+            }
+
+            // Handle multiple file uploads
+            if (selectedFiles.length > 0) {
+                for (let file of selectedFiles) {
+                    let fileName = file.name;
+                    let uniqueFileName = await getUniqueFilename('bookinglite', fileName);
+
+                    const s3Key = `photos/${uniqueFileName}`;
+
+                    const uploadParams = {
+                        Bucket: 'bookinglite',
+                        Key: s3Key,
+                        Body: file,
+                    };
+
+                    // Upload file to S3
+                    await s3.upload(uploadParams).promise();
+
+                    // Get the download URL
+                    const downloadURL = s3.getSignedUrl('getObject', {
+                        Bucket: 'bookinglite',
+                        Key: s3Key,
+                        Expires: 9999999,
+                    });
+
+                    // Create document in Firestore
+                    const mediaCollectionRef = collection(db, collectionName, auth.currentUser.uid, 'media');
+                    await addDoc(mediaCollectionRef, {
+                        title: uniqueFileName,
+                        url: downloadURL,
+                        s3Key: s3Key,
+                    });
+                }
+            }
+
+            // Proceed with updating the business document in Firestore (if necessary)
+            // This part remains as is, no changes needed for the upload logic
+            if (auth.currentUser) {
+                const documentRef = doc(db, collectionName, auth.currentUser.uid);
+                await updateDoc(documentRef, {
+                    ...businessData,
+                    slotDuration: parseInt(businessData.slotDuration, 10),
+                    startHour: businessData.startHour,
+                    endHour: businessData.endHour,
+                    excludedDays,
+                });
+                console.log('Document updated successfully!');
+                navigate("/");
+            } else {
+                console.log('No user is currently authenticated.');
+            }
+        } catch (error) {
+            console.error('Error during update:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
 
     return (
         <div className="form-container">
             <div className="booking-form-container">
                 <div className="booking-form">
                     <h2>Manage Business</h2>
-                    <form>
+                    <form className='exclude-days-container'>
                         <label>Name:</label>
                         <input type="text" name="Name" value={businessData.Name} onChange={handleChange} />
                         <br />
@@ -150,12 +315,12 @@ function ManageBusiness() {
                         <br />
                         <label>Description (max 400 characters):</label>
                         <textarea className="textbox"
-                            name="Description"
-                            value={businessData.Description}
-                            onChange={handleChange}
-                            maxLength={400}
-                            rows={4}
-                            style={{ width: '400px', resize: 'none' }}
+                                  name="Description"
+                                  value={businessData.Description}
+                                  onChange={handleChange}
+                                  maxLength={400}
+                                  rows={4}
+                                  style={{ width: '400px', resize: 'none' }}
                         />
                         <br />
                         <label>Slot Duration:</label>
@@ -189,8 +354,30 @@ function ManageBusiness() {
                                 </div>
                             ))}
                         </div>
+                        <br/>
+                        <div className="exclude-days-container">
+                            {mediaDocs.map((doc, index) => (
+                                <div key={index} className="photo-container">
+                                    <img src={doc.url} alt={doc.title} style={{ width: '100px', height: '100px' }} />
+                                    <button
+                                        className="delete-button"
+                                        onClick={(e) => deletePhoto(e, doc.id, doc.s3Key)} // Pass the event as the first argument
+                                    >
+                                        X
+                                    </button>
+
+                                </div>
+                            ))}
+                        </div>
+
+                        <br/>
+                        <input type="file" multiple onChange={handleFileChange} disabled={loading || mediaDocs.length >= 4} />
+
+                        {loading && <p>Uploading...</p>}
                         <br />
-                        <button type="button" onClick={handleUpdate}>Update</button>
+                        <button type="button" onClick={handleUpdate} disabled={loading}>
+                            {loading ? 'Updating...' : 'Update'}
+                        </button>
                     </form>
                 </div>
             </div>
@@ -199,3 +386,4 @@ function ManageBusiness() {
 }
 
 export default ManageBusiness;
+

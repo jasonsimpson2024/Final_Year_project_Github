@@ -15,11 +15,9 @@ function CalendarSlotSelector() {
     const navigate = useNavigate();
     const { doc1, documentId } = useParams();
 
-
-
     useEffect(() => {
         const fetchData = async () => {
-            const automotiveCollection = collection(db, 'SPA'); // Adjust this to your collection name
+            const automotiveCollection = collection(db, 'SPA');
             const carDoc = doc(automotiveCollection, doc1);
 
             try {
@@ -55,38 +53,41 @@ function CalendarSlotSelector() {
         };
 
         fetchData();
-
     }, [doc1, documentId, slotDuration]);
 
+    const isCurrentDay = () => {
+        return currentWeekStart.isSame(moment(), 'day');
+    };
+
     const isCurrentWeek = () => {
-        return currentWeekStart.isSame(moment().startOf('week'), 'day');
+        return currentWeekStart.isSame(moment(), 'week');
     };
 
     const nextWeek = () => {
-        setCurrentWeekStart(prev => prev.clone().add(7, 'days'));
+        setCurrentWeekStart(prev => prev.clone().add(1, 'week'));
     };
 
     const previousWeek = () => {
-        if (!isCurrentWeek()) {
-            setCurrentWeekStart(prev => prev.clone().subtract(7, 'days'));
+        if (!currentWeekStart.isSame(moment().startOf('week'))) {
+            setCurrentWeekStart(prev => prev.clone().subtract(1, 'week'));
         }
     };
 
     const convertTimeTo24HourFormat = (time) => {
-        const [hour, amPm] = time.split(' ');
-        let hourConverted = parseInt(hour, 10);
-        if (amPm === 'PM' && hourConverted !== 12) hourConverted += 12;
-        if (amPm === 'AM' && hourConverted === 12) hourConverted = 0;
-        return hourConverted;
+        const [hour, part] = time.split(' ');
+        let hours = parseInt(hour, 10);
+        if (part === 'PM' && hours < 12) hours += 12;
+        if (part === 'AM' && hours === 12) hours = 0;
+        return hours;
     };
 
     const generateTimeSlots = () => {
         const slots = [];
-        const start = businessHours.startHour;
-        const end = businessHours.endHour;
-        let currentTime = moment().hour(start).minute(0).second(0);
+        const startHour = businessHours.startHour;
+        const endHour = businessHours.endHour;
+        let currentTime = moment().startOf('day').hour(startHour);
 
-        while (currentTime.hour() < end) {
+        while (currentTime.hour() < endHour) {
             slots.push(currentTime.format('HH:mm'));
             currentTime.add(slotDuration, 'minutes');
         }
@@ -94,15 +95,18 @@ function CalendarSlotSelector() {
         return slots;
     };
 
-    const daysOfWeek = Array.from({ length: 7 }, (_, i) => currentWeekStart.clone().add(i, 'days'))
-        .filter(day => !excludedDays.includes(day.format('dddd')))
-        .map(day => ({
-            day,
-            label: day.format('ddd (DD/MM/YY)')
-        }));
+    const daysOfWeek = () => {
+        let start = isCurrentWeek() ? moment() : currentWeekStart.startOf('week');
+        return Array.from({ length: 7 }, (_, i) => start.clone().add(i, 'days'))
+            .filter(day => !excludedDays.includes(day.format('dddd')))
+            .map(day => ({
+                day,
+                label: day.format('ddd (DD/MM/YY)')
+            }));
+    };
 
     const handleSlotSelect = async (dayIndex, time) => {
-        const day = daysOfWeek[dayIndex].day;
+        const day = daysOfWeek()[dayIndex].day;
         const [hour, minute] = time.split(':').map(Number);
         const slotTime = day.clone().hour(hour).minute(minute);
 
@@ -121,7 +125,7 @@ function CalendarSlotSelector() {
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId && !isSlotAlreadyBooked) {
-            const bookedDoc = doc(db, 'SPA', doc1, 'booking', documentId); // Adjust path as necessary
+            const bookedDoc = doc(db, 'SPA', doc1, 'booking', documentId);
 
             try {
                 await updateDoc(bookedDoc, {
@@ -139,22 +143,21 @@ function CalendarSlotSelector() {
         }
     };
 
-
-
+    // Corrected usage in the return statement:
     return (
         <div className="calendar-slot-selector">
             <div className="custom-calendar">
                 <div className="navigation">
-                    <button onClick={previousWeek} disabled={isCurrentWeek()}>Previous Week</button>
+                    <button onClick={previousWeek} disabled={isCurrentDay()}>Previous Week</button>
                     <button onClick={nextWeek}>Next Week</button>
                 </div>
                 <div className="days-header">
-                    {daysOfWeek.map(({ label }, index) => (
+                    {daysOfWeek().map(({ label }, index) => (
                         <div key={index} className="day-header">{label}</div>
                     ))}
                 </div>
                 <div className="slots">
-                    {daysOfWeek.map(({ day }, dayIndex) => (
+                    {daysOfWeek().map(({ day }, dayIndex) => (
                         <div key={day.format('YYYY-MM-DD')} className="day-column">
                             {generateTimeSlots().map((time, timeIndex) => {
                                 const slotTime = day.clone().startOf('day').add(moment.duration(time));
@@ -171,10 +174,8 @@ function CalendarSlotSelector() {
                                 );
                             })}
                         </div>
-
                     ))}
                 </div>
-
             </div>
             {selectedSlot && (
                 <div className='slot-confirm'>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase.js';
 import { doc, getDoc, updateDoc, addDoc, collection, getDocs, deleteDoc} from 'firebase/firestore';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { FirebaseError } from 'firebase/app';
 
 import { S3 } from 'aws-sdk';
 
@@ -60,6 +59,7 @@ function ManageBusiness() {
     const [mediaDocs, setMediaDocs] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [jobTypes, setJobTypes] = useState([]);
 
     const handleFileChange = (event) => {
         setSelectedFiles(event.target.files);
@@ -94,10 +94,36 @@ function ManageBusiness() {
             }
         };
 
-
-
         fetchBusinessData();
     }, [collectionName]);
+
+    useEffect(() => {
+        const fetchJobTypes = async () => {
+            if (user) {
+                const jobTypesRef = collection(db, collectionName, user.uid, 'jobtypes');
+                const snapshot = await getDocs(jobTypesRef);
+                const jobTypesData = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    name: doc.data().name,
+                }));
+
+                // Ensure there are always 6 job types (empty for missing ones)
+                for (let i = jobTypesData.length; i < 6; i++) {
+                    jobTypesData.push({ id: null, name: '' });
+                }
+
+                setJobTypes(jobTypesData);
+            }
+        };
+
+        fetchJobTypes();
+    }, [collectionName, user]);
+
+
+    useEffect(() => {
+        // Dynamically generate end hour options based on the selected start hour
+        updateEndHourOptions(businessData.startHour);
+    }, [businessData.startHour]);
 
     useEffect(() => {
         const fetchMediaDocs = async () => {
@@ -123,6 +149,17 @@ function ManageBusiness() {
         // Dynamically generate end hour options based on the selected start hour
         updateEndHourOptions(businessData.startHour);
     }, [businessData.startHour]);
+
+
+    const handleChangeJobType = (index, value) => {
+        let updatedJobTypes = [...jobTypes];
+        updatedJobTypes[index] = { ...updatedJobTypes[index], name: value };
+        setJobTypes(updatedJobTypes);
+    };
+
+
+
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -172,26 +209,6 @@ function ManageBusiness() {
         return hourConverted % 24; // Ensure hour is within 0-23 range
     };
 
-    const uploadFile = async (file) => {
-        let fileName = file.name;
-        let uniqueFileName = await getUniqueFilename('bookinglite', fileName);
-        const s3Key = `photos/${uniqueFileName}`;
-        const uploadParams = {
-            Bucket: 'bookinglite',
-            Key: s3Key,
-            Body: file,
-        };
-
-        await s3.upload(uploadParams).promise();
-        const downloadURL = s3.getSignedUrl('getObject', {
-            Bucket: 'bookinglite',
-            Key: s3Key,
-            Expires: 9999999,
-        });
-
-        return { downloadURL, uniqueFileName, s3Key };
-    };
-
     const deletePhoto = async (event, docId, s3Key) => {
         // Prevent default action (if the event is provided)
         event?.preventDefault();
@@ -221,14 +238,11 @@ function ManageBusiness() {
         }
     };
 
-
-
-
     const handleUpdate = async () => {
         setLoading(true);
         try {
             // Prevent upload if there are already more than 4 documents in the media collection
-            if (mediaDocs.length >= 4) {
+            if (mediaDocs.length > 4) {
                 alert('Cannot upload more than 4 documents.');
                 return;
             }
@@ -267,10 +281,9 @@ function ManageBusiness() {
                 }
             }
 
-            // Proceed with updating the business document in Firestore (if necessary)
-            // This part remains as is, no changes needed for the upload logic
             if (auth.currentUser) {
                 const documentRef = doc(db, collectionName, auth.currentUser.uid);
+
                 await updateDoc(documentRef, {
                     ...businessData,
                     slotDuration: parseInt(businessData.slotDuration, 10),
@@ -278,11 +291,25 @@ function ManageBusiness() {
                     endHour: businessData.endHour,
                     excludedDays,
                 });
+
                 console.log('Document updated successfully!');
                 navigate("/");
             } else {
                 console.log('No user is currently authenticated.');
             }
+
+            for (const [index, jobType] of jobTypes.entries()) {
+                if (jobType.id) {
+                    // Update existing job type
+                    const jobTypeDocRef = doc(db, collectionName, user.uid, 'jobtypes', jobType.id);
+                    await updateDoc(jobTypeDocRef, { name: jobType.name });
+                } else if (jobType.name.trim() !== '') {
+                    // Add new job type if it has a name
+                    const jobTypesRef = collection(db, collectionName, user.uid, 'jobtypes');
+                    await addDoc(jobTypesRef, { name: jobType.name });
+                }
+            }
+
         } catch (error) {
             console.error('Error during update:', error);
         } finally {
@@ -290,14 +317,12 @@ function ManageBusiness() {
         }
     };
 
-
-
     return (
         <div className="form-container">
             <div className="booking-form-container">
                 <div className="booking-form">
                     <h2>Manage Business</h2>
-                    <form className='exclude-days-container'>
+                    <form>
                         <label>Name:</label>
                         <input type="text" name="Name" value={businessData.Name} onChange={handleChange} />
                         <br />
@@ -339,6 +364,35 @@ function ManageBusiness() {
                         <select name="endHour" value={businessData.endHour} onChange={handleChange} required>
                             {endHourOptions.length > 0 ? endHourOptions : generateHourOptions()}
                         </select>
+                        <br />
+                        {jobTypes.slice(0, 10).map((jobType, index) => (
+                            <div key={index}>
+                                <label>Job Type {index + 1}:</label>
+                                <input
+                                    type="text"
+                                    name={`jobType-${index}`}
+                                    value={jobType.name}
+                                    onChange={(e) => handleChangeJobType(index, e.target.value)}
+                                />
+                                <br />
+                            </div>
+                        ))}
+                        <br />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (jobTypes.length < 10) {
+                                    setJobTypes([...jobTypes, { id: null, name: '' }]);
+                                } else {
+                                    alert('You can only add up to 10 job types.');
+                                }
+                            }}
+                            disabled={jobTypes.length >= 10}
+                        >
+                            Add Job Type
+                        </button>
+
+                        {/* Repositioned Exclude Days container here */}
                         <label>Exclude Days:</label>
                         <div className="exclude-days-container">
                             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
@@ -361,20 +415,18 @@ function ManageBusiness() {
                                     <img src={doc.url} alt={doc.title} style={{ width: '100px', height: '100px' }} />
                                     <button
                                         className="delete-button"
-                                        onClick={(e) => deletePhoto(e, doc.id, doc.s3Key)} // Pass the event as the first argument
+                                        onClick={(e) => deletePhoto(e, doc.id, doc.s3Key)}
                                     >
                                         X
                                     </button>
-
                                 </div>
                             ))}
+                            <br />
                         </div>
-
-                        <br/>
-                        <input type="file" multiple onChange={handleFileChange} disabled={loading || mediaDocs.length >= 4} />
-
-                        {loading && <p>Uploading...</p>}
                         <br />
+                        <input type="file" multiple onChange={handleFileChange} disabled={loading || mediaDocs.length >= 4} />
+                        {loading && <p>Uploading...</p>}
+                        <br/>
                         <button type="button" onClick={handleUpdate} disabled={loading}>
                             {loading ? 'Updating...' : 'Update'}
                         </button>
@@ -383,6 +435,7 @@ function ManageBusiness() {
             </div>
         </div>
     );
+
 }
 
 export default ManageBusiness;

@@ -82,10 +82,13 @@ function BookingForm() {
 
                 const jobTypes = [];
                 jobTypesQuerySnapshot.forEach((doc) => {
-                    jobTypes.push(doc.data().name);
+                    const jobTypeName = doc.data().name;
+                    if (jobTypeName.trim() !== '') { // Check if jobTypeName is not an empty string
+                        jobTypes.push(jobTypeName);
+                    }
                 });
 
-                // Update state with fetched job types
+                // Update state with fetched and filtered job types
                 setFormData((prevState) => ({
                     ...prevState,
                     jobTypes,
@@ -168,7 +171,7 @@ function BookingForm() {
             <div className="booking-form-container">
                 <div className="booking-form">
                     <h2>Book an Appointment</h2>
-                    <form onSubmit={handleSubmit}>
+                    <form className='box-container' onSubmit={handleSubmit}>
                         {/* Personal Information */}
                         <h3>Personal Information</h3>
                         <label>

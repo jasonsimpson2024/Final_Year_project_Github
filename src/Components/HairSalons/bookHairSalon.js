@@ -28,7 +28,6 @@ function BookingForm() {
     };
 
     useEffect(() => {
-        // Fetch job types from the hair salon's 'jobtypes' subcollection
         const fetchJobTypes = async () => {
             const hairDocRef = doc(db, 'HairSalon', hairId);
             const jobTypesCollectionRef = collection(hairDocRef, 'jobtypes');
@@ -38,7 +37,11 @@ function BookingForm() {
 
                 const jobTypes = [];
                 jobTypesQuerySnapshot.forEach((doc) => {
-                    jobTypes.push(doc.data().name);
+                    // Only add job types that are not empty strings
+                    const jobTypeName = doc.data().name;
+                    if (jobTypeName.trim() !== '') {
+                        jobTypes.push(jobTypeName);
+                    }
                 });
 
                 // Update the jobType dropdown options with the fetched job types
@@ -103,7 +106,7 @@ function BookingForm() {
             <div className="booking-form-container">
                 <div className="booking-form">
                     <h2>Book an Appointment</h2>
-                    <form onSubmit={handleSubmit}>
+                    <form className='exclude-days-container' onSubmit={handleSubmit}>
                         <label>
                             Name:
                             <input

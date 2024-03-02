@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase.js';
 import { addDoc, doc, setDoc, collection, getDocs, query } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getAuth  } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 
 function BookingForm() {
     const navigate = useNavigate();
@@ -42,7 +42,11 @@ function BookingForm() {
 
                 const jobTypes = [];
                 jobTypesQuerySnapshot.forEach((doc) => {
-                    jobTypes.push(doc.data().name);
+                    // Only add job types that are not empty strings
+                    const jobTypeName = doc.data().name;
+                    if (jobTypeName.trim() !== '') {
+                        jobTypes.push(jobTypeName);
+                    }
                 });
 
                 // Update the jobType dropdown options with the fetched job types
@@ -111,7 +115,7 @@ function BookingForm() {
             <div className="booking-form-container">
                 <div className="booking-form">
                     <h2>Book an Appointment</h2>
-                    <form onSubmit={handleSubmit}>
+                    <form className='exclude-days-container' onSubmit={handleSubmit}>
                         <label>
                             Name:
                             <input

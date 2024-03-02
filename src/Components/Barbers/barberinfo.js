@@ -59,7 +59,7 @@ function BarberDetails() {
             alert("You may not book an appointment with your own business.");
         }
         else {
-            navigate(`/barber/${barber.id}`);
+            navigate(`/barber/${barberId}`);
         }
     };
 

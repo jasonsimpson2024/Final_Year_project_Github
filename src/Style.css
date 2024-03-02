@@ -221,6 +221,23 @@ h1 {
     justify-content: center; /* Align items to the start of the container */
 }
 
+.box-container {
+    padding: 50px;
+    background-color: rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 600px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the space between checkboxes as needed */
+    align-items: center; /* Align items vertically in the center */
+    justify-content: center; /* Align items to the start of the container */
+}
+
+.box-container label{
+    width: 420px;
+}
+
 .exclude-days-container div {
     display: flex;
     align-items: center; /* Align the checkbox and label text vertically */
@@ -644,6 +661,8 @@ footer {
 
 @media (max-width: 1024px) {
 
+
+
     .booking-form input,
     .booking-form select,
     .booking-form textarea.textbox {
@@ -865,6 +884,21 @@ footer {
 }
 
 @media (max-width: 540px){
+
+    .box-container {
+        padding: 50px;
+        background-color: rgba(255, 255, 255, 0.22);
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px; /* Adjust the space between checkboxes as needed */
+        align-items: center; /* Align items vertically in the center */
+        justify-content: center; /* Align items to the start of the container */
+    }
+
+
 
     .normal-container {
         padding: 20px;

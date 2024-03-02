@@ -60,7 +60,7 @@ function BeautyDetails() {
             alert("You may not book an appointment with your own business.");
         }
         else {
-            navigate(`/bookbeautysalon/${hair.id}`);
+            navigate(`/bookbeautysalon/${hairId}`);
         }
     };
 

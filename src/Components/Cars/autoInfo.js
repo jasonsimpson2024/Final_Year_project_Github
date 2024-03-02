@@ -60,7 +60,7 @@ function AutoDetails() {
             alert("You may not book an appointment with your own business.");
         }
         else{
-            navigate(`/bookingcars/${car.id}`);
+            navigate(`/bookingcars/${carId}`);
         }
     };
 

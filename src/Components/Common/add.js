@@ -40,6 +40,7 @@ async function getUniqueFilename(bucket, originalName) {
 }
 
 function ListBusiness() {
+    const user=auth.currentUser;
     const navigate = useNavigate();
     const auth = getAuth();
     const counties = [
@@ -132,7 +133,7 @@ function ListBusiness() {
             const businessDocRef = doc(db, businessModel, auth.currentUser.uid);
             await setDoc(businessDocRef, businessData);
 
-            navigate("/"); // or wherever you need to redirect to
+            navigate(`/add-job-types/${formData.businessModel}/${user.uid}`);// or wherever you need to redirect to
         } catch (error) {
             console.error('Error submitting form:', error);
         } finally {

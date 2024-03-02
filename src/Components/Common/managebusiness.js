@@ -62,8 +62,21 @@ function ManageBusiness() {
     const [jobTypes, setJobTypes] = useState([]);
 
     const handleFileChange = (event) => {
-        setSelectedFiles(event.target.files);
+        const files = Array.from(event.target.files).filter((file) =>
+            file.type.match('image.*')
+        );
+
+        if (files.length !== event.target.files.length) {
+            alert('Only image files are allowed.');
+            // Clear the file input if any non-image file is selected
+            event.target.value = ''; // This resets the file input
+        } else {
+            setSelectedFiles(files);
+        }
     };
+
+
+
 
     useEffect(() => {
         const fetchBusinessData = async () => {
@@ -318,7 +331,7 @@ function ManageBusiness() {
     };
 
     return (
-        <div className="form-container">
+        <div className="list-form-container">
             <div className="booking-form-container">
                 <div className="booking-form">
                     <h2>Manage Business</h2>
@@ -391,8 +404,7 @@ function ManageBusiness() {
                         >
                             Add Job Type
                         </button>
-
-                        {/* Repositioned Exclude Days container here */}
+                        <br/>
                         <label>Exclude Days:</label>
                         <div className="exclude-days-container">
                             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
@@ -424,6 +436,7 @@ function ManageBusiness() {
                             <br />
                         </div>
                         <br />
+                        <label>Upload Images (Max 4)</label>
                         <input type="file" multiple onChange={handleFileChange} disabled={loading || mediaDocs.length >= 4} />
                         {loading && <p>Uploading...</p>}
                         <br/>

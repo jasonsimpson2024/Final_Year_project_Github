@@ -154,8 +154,10 @@ h1 {
     font-weight: bold;
     margin-bottom: 10px;
     font-size: 14px;
+    width: 250px;
     color: #ffffff;
 }
+
 
 .form-container input,
 .form-container select {
@@ -179,6 +181,45 @@ h1 {
 }
 
 .form-container button:hover {
+    background-color: #0056b3;
+}
+
+.list-form-container {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.list-form-container label{
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.list-form-container input,
+.list-form-container select {
+    width: 100%;
+    padding: 4px 4px !important;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px !important;
+    font-size: 14px;
+    color: #555;
+}
+
+.list-form-container button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.list-form-container button:hover {
     background-color: #0056b3;
 }
 
@@ -641,6 +682,35 @@ footer {
 
 .photos:hover {
     transform: scale(1.05);
+}
+
+.file-upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.file-upload-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-upload-button {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.file-upload-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    color: #666666;
 }
 
 

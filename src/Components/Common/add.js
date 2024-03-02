@@ -40,9 +40,9 @@ async function getUniqueFilename(bucket, originalName) {
 }
 
 function ListBusiness() {
-    const user=auth.currentUser;
     const navigate = useNavigate();
     const auth = getAuth();
+    const user=auth.currentUser;
     const counties = [
         "Co. Antrim", "Co. Armagh", "Co. Carlow", "Co. Cavan", "Co. Clare", "Co. Cork", "Co. Derry", "Co. Donegal",
         "Co. Down", "Co. Dublin", "Co. Fermanagh", "Co. Galway", "Co. Kerry", "Co. Kildare", "Co. Kilkenny",
@@ -81,9 +81,18 @@ function ListBusiness() {
     };
 
     const handleFileChange = (event) => {
-        setSelectedFiles(event.target.files);
-    };
+        const files = Array.from(event.target.files).filter((file) =>
+            file.type.match('image.*')
+        );
 
+        if (files.length !== event.target.files.length) {
+            alert('Only image files are allowed.');
+            // Clear the file input if any non-image file is selected
+            event.target.value = ''; // This resets the file input
+        } else {
+            setSelectedFiles(files);
+        }
+    };
 
     const uploadFile = async (file) => {
         let fileName = file.name;
@@ -180,7 +189,7 @@ function ListBusiness() {
     };
 
     return (
-        <div className="form-container">
+        <div className="list-form-container">
             <div className="booking-form-container">
                 <div className="booking-form">
                     <h2>List your business</h2>
@@ -309,6 +318,7 @@ function ListBusiness() {
                                 </div>
                             ))}
                         </div>
+                        <label>Upload Images (Max 4)</label>
                         <input type="file" multiple onChange={handleFileChange} disabled={loading || formData.mediaDocs.length >= 4} />
 
                         <br />

@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase.js';
 import { doc, getDoc, updateDoc, addDoc, collection, getDocs, deleteDoc} from 'firebase/firestore';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-
 import { S3 } from 'aws-sdk';
 
 const s3 = new S3({
-    accessKeyId: 'AKIAW3PSKY74XAFLLDWF',
-    secretAccessKey: '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',
-    region: 'eu-west-1',
+    accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID,
+    secretAccessKey:process.env.REACT_APP_SECRET_ACCESS_KEY,
+    region: process.env.REACT_APP_REGION
+
 });
 
 async function checkFileExists(bucket, key) {
@@ -74,9 +74,6 @@ function ManageBusiness() {
             setSelectedFiles(files);
         }
     };
-
-
-
 
     useEffect(() => {
         const fetchBusinessData = async () => {

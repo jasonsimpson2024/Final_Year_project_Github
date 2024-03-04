@@ -109,11 +109,9 @@ function ManageBusiness() {
                                     {booking.selectedSlot
                                         ? (() => {
                                             const timestamp = booking.selectedSlot.seconds * 1000; // Convert seconds to milliseconds
-                                            const formattedDate = new Date(timestamp).toLocaleString();
-
-                                            return formattedDate !== 'Invalid Date'
-                                                ? formattedDate
-                                                : 'N/A';
+                                            const datePart = new Date(timestamp).toLocaleDateString();
+                                            const timePart = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                            return `${datePart} ${timePart}`;
                                         })()
                                         : 'N/A'}
                                 </p>
@@ -121,7 +119,7 @@ function ManageBusiness() {
                         </div>
                     ))}
                 </div>
-                <div>
+                <div className='pagination'>
                     {/* Pagination buttons */}
                     <button
                         onClick={() => setCurrentPage(currentPage - 1)}

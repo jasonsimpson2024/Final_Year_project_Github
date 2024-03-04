@@ -249,19 +249,6 @@ h1 {
     font-family: Arial;
 }
 
-.exclude-days-container {
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.22);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Adjust the space between checkboxes as needed */
-    align-items: center; /* Align items vertically in the center */
-    justify-content: center; /* Align items to the start of the container */
-}
-
 .box-container {
     padding: 50px;
     background-color: rgba(255, 255, 255, 0.22);
@@ -279,16 +266,50 @@ h1 {
     width: 420px;
 }
 
-.exclude-days-container div {
+.exclude-days-container {
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
     display: flex;
-    align-items: center; /* Align the checkbox and label text vertically */
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the space between checkboxes as needed */
+    align-items: center; /* Align items vertically in the center */
+    justify-content: center; /* Align items to the start of the container */
 }
 
-/* Optional: Style adjustments for the label to improve spacing and interaction */
+.exclude-days-container div {
+    display: flex;
+    align-items: center; /* Ensure label and checkbox are aligned properly */
+}
+
+.exclude-days-container input[type="checkbox"] {
+    margin-right: 5px; /* Space between checkbox and label */
+    cursor: pointer; /* Change cursor to pointer when hovering over the checkbox */
+    /* Reset browser-specific styles */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Custom checkbox styles */
+    width: 16px; /* Checkbox size */
+    height: 16px; /* Checkbox size */
+    border-radius: 4px; /* Rounded corners of the checkbox */
+    background-color: #fff; /* Background color */
+}
+
+.exclude-days-container input[type="checkbox"]:checked {
+    background-color: #ff0000; /* Background color when checked */
+    border-color: #000000; /* Border color when checked */
+    /* Optional: add a checkmark or custom design */
+}
+
 .exclude-days-container label {
     margin-left: 5px; /* Space between the checkbox and its label */
     cursor: pointer; /* Changes the cursor to a pointer when hovering over the label */
+    user-select: none; /* Prevent text selection */
 }
+
 
 
 .login-container {
@@ -514,6 +535,23 @@ footer {
     transition: all 0.3s ease-in-out;
     color: black;
 }
+
+.container-details button{
+    background-color: rgb(3, 171, 171);
+}
+
+.container-details button:hover{
+    background-color: rgb(0, 192, 192);
+}
+
+.login-button{
+    background-color: rgb(3, 171, 171);
+}
+
+.login-button:hover{
+    background-color: rgb(0, 192, 192);
+}
+
 
 .container-details a {
     color: black;

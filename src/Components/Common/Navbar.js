@@ -86,7 +86,7 @@ function Navbar() {
     const isJobTypesPage = location.pathname.includes('/add-job-types');
 
     return (
-        <nav className={`navbar ${scrollPosition > 100 ? 'less-transparent' : ''}`}>
+        <nav className={`navbar ${scrollPosition > 50 ? 'less-transparent' : ''}`}>
             <div className="logo">
                 {isJobTypesPage ? (
                     <div>

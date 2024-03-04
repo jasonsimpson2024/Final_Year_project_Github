@@ -70,7 +70,7 @@ export default function SignUp() {
                     <option value="Business">Business</option>
                 </select>
             </div>
-            <button type="button" onClick={signup}>Sign Up</button>
+            <button className='login-button' type="button" onClick={signup}>Sign Up</button>
         </div>
     );
 }

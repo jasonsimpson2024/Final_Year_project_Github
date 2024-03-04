@@ -73,7 +73,7 @@ export default function Login() {
                     className="logSign"
                 />
             </div>
-            <button type="button" onClick={login} disabled={!isEmailVerified}>
+            <button className='login-button' type="button" onClick={login} disabled={!isEmailVerified}>
                 Login
             </button>
         </div>

@@ -19,7 +19,9 @@ function AppointInfo() {
                 if (bookingDocSnapshot.exists()) {
                     const data = bookingDocSnapshot.data();
                     const Slot = data.selectedSlot
-                        ? new Date(data.selectedSlot.seconds * 1000).toLocaleString()
+                        ? `${new Date(data.selectedSlot.seconds * 1000)
+                            .toLocaleDateString()} ${new Date(data.selectedSlot.seconds * 1000)
+                            .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                         : 'N/A';
                     setBookingData({ ...data, Slot });
                 } else {
@@ -49,6 +51,17 @@ function AppointInfo() {
         }
     };
 
+    const displayNameMap = {
+        name: 'Name',
+        phone: 'Phone',
+        Make: 'Make',
+        model: 'Model',
+        year: 'Year',
+        jobType: 'Job Type',
+        Slot: 'Appointment Slot',
+        email: 'Email',
+    };
+
     if (bookingData) {
         const fieldOrder =
             collectionName === 'Automotive'
@@ -61,7 +74,7 @@ function AppointInfo() {
                     <h2>Booking Information</h2>
                     {fieldOrder.map((field) => (
                         <div key={field}>
-                            <strong>{field}:</strong> {bookingData[field] ? bookingData[field].toString() : 'N/A'}
+                            <strong>{displayNameMap[field]}:</strong> {bookingData[field] ? bookingData[field].toString() : 'N/A'}
                         </div>
                     ))}
                     <button onClick={handleDelete}>Cancel Booking</button>

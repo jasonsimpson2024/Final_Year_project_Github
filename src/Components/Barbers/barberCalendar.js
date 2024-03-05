@@ -125,23 +125,62 @@ function CalendarSlotSelector() {
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId && !isSlotAlreadyBooked) {
-            const bookedDoc = doc(db, 'Barber', doc1, 'booking', documentId);
+            // Document references
+            const bookingDocRef = doc(db, 'Barber', doc1, 'booking', documentId);
+            const companyDocRef = doc(db, 'Barber', doc1);
 
             try {
-                await updateDoc(bookedDoc, {
+                // Update the booking document with the selected slot
+                await updateDoc(bookingDocRef, {
                     selectedSlot: selectedSlot,
                 });
 
+                // Fetch the booking document to get the customer's email
+                const bookingDoc = await getDoc(bookingDocRef);
+                const bookingData = bookingDoc.data();
+
+                // Fetch the company document to get the company name
+                const companyDoc = await getDoc(companyDocRef);
+                const companyName = companyDoc.exists() ? companyDoc.data().Name : "Unknown Company";
+
+                // Define the email data
+                const emailData = {
+                    to: bookingData.email, // Use the email from the booking document
+                    from: 'bookinglite@outlook.com', // your verified sender email address
+                    subject: 'Booking Confirmation',
+                    text: `Dear Customer,\n\nYour booking has been confirmed with ${companyName} for ${moment(selectedSlot).format('LLL')}.\n\nThank you for using BookingLite.\n\nIf you have a customer account, you can cancel online. Otherwise, please contact ${companyName} to cancel this booking.`
+                };
+
+                // Replace with your Firebase Cloud Function endpoint
+                const functionUrl = 'https://us-central1-fyp---car-dealership.cloudfunctions.net/sendEmail';
+
+                // Send the email via your Cloud Function
+                const response = await fetch(functionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(emailData),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send email');
+                }
+
+                console.log('Email sent successfully');
                 navigate('/confirmation', {
                     state: {
                         selectedSlot: moment(selectedSlot).format('LLL'),
                     },
                 });
             } catch (error) {
-                console.error('Error updating booking document:', error);
+                console.error('Error updating booking document or sending email:', error);
             }
         }
     };
+
+
+
 
     // Corrected usage in the return statement:
     return (

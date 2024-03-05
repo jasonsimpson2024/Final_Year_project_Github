@@ -4,11 +4,12 @@ import { db, auth } from '../../firebase.js';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 
 function BarberDetails() {
-    const user=auth.currentUser;
+    const user = auth.currentUser;
     const uid = user ? user.uid : null;
     const [barber, setBarber] = useState(null);
     const [photos, setPhotos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isBusinessAccount, setIsBusinessAccount] = useState(false);
     const [selectedImageUrl, setSelectedImageUrl] = useState(null);
     const [isZoomed, setIsZoomed] = useState(false);
     const location = useLocation();
@@ -16,6 +17,14 @@ function BarberDetails() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const checkIfBusinessAccount = async () => {
+            if (uid) {
+                const docRef = doc(db, 'Business', uid);
+                const docSnap = await getDoc(docRef);
+                setIsBusinessAccount(docSnap.exists()); // Set true if user is a business account, else false
+            }
+        };
+
         const fetchBarberDataAndPhotos = async () => {
             setIsLoading(true);
             try {
@@ -41,24 +50,24 @@ function BarberDetails() {
             }
         };
 
+        checkIfBusinessAccount(); // Check if the user has a business account
         fetchBarberDataAndPhotos();
-    }, [barberId]);
+    }, [barberId, uid]);
 
     const handleImageClick = (imageUrl) => {
         setSelectedImageUrl(imageUrl);
-        setIsZoomed(true); // Indicate that the image is zoomed in
+        setIsZoomed(true);
     };
 
     const handleCloseImage = () => {
-        setIsZoomed(false); // Start zooming out
-        setTimeout(() => setSelectedImageUrl(null), 300); // Wait for animation to complete
+        setIsZoomed(false);
+        setTimeout(() => setSelectedImageUrl(null), 300);
     };
 
     const handleAppointmentBooking = () => {
-        if (barberId == uid) {
-            alert("You may not book an appointment with your own business.");
-        }
-        else {
+        if (isBusinessAccount) { // Prevent booking if the user has a business account
+            alert("Business accounts cannot book appointments.");
+        } else {
             navigate(`/barber/${barberId}`);
         }
     };

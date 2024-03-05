@@ -10,6 +10,7 @@ function BookingConfirmation() {
             <div className="booking-container">
                 <h3>Your booking has been confirmed!</h3>
                 <p>Selected Slot: {selectedSlot}</p>
+                <p>A booking confirmation has been emailed to you.</p>
                 <Link to="/">
                     <button className="confirm-button">Home</button>
                 </Link>

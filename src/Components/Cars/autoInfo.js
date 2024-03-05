@@ -11,11 +11,21 @@ function AutoDetails() {
     const [selectedImageUrl, setSelectedImageUrl] = useState(null);
     const [isZoomed, setIsZoomed] = useState(false);
     const [isLoading, setIsLoading] = React.useState(true);
+    const [isBusinessAccount, setIsBusinessAccount] = useState(false);
     const location = useLocation();
     const carId = location.pathname.split('/').pop();
     const navigate = useNavigate();
 
     useEffect(() => {
+
+        const checkIfBusinessAccount = async () => {
+            if (uid) {
+                const docRef = doc(db, 'Business', uid);
+                const docSnap = await getDoc(docRef);
+                setIsBusinessAccount(docSnap.exists()); // Set true if user is a business account, else false
+            }
+        };
+
         const fetchBarberDataAndPhotos = async () => {
             setIsLoading(true);
             try {
@@ -40,7 +50,7 @@ function AutoDetails() {
                 setIsLoading(false);
             }
         };
-
+        checkIfBusinessAccount();
         fetchBarberDataAndPhotos();
     }, [carId]);
 
@@ -56,10 +66,9 @@ function AutoDetails() {
 
 
     const handleAppointmentBooking = () => {
-        if(carId==uid){
-            alert("You may not book an appointment with your own business.");
-        }
-        else{
+        if (isBusinessAccount) { // Prevent booking if the user has a business account
+            alert("Business accounts cannot book appointments.");
+        } else {
             navigate(`/bookingcars/${carId}`);
         }
     };

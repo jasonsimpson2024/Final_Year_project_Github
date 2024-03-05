@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase.js';
-import { doc, setDoc, collection, getDocs, deleteDoc, addDoc } from 'firebase/firestore';
+import {doc, setDoc, collection, getDocs, deleteDoc, addDoc, getDoc} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { S3 } from 'aws-sdk';
@@ -69,6 +69,10 @@ function ListBusiness() {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [loading, setLoading] = useState(false); // State for loading status
     const [endHourOptions, setEndHourOptions] = useState([]);
+    useEffect(() => {
+        // Ensure end hour options are updated based on the default start hour when the component mounts
+        updateEndHourOptions(formData.startHour);
+    }, []);
 
     const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
@@ -95,6 +99,8 @@ function ListBusiness() {
         }
     };
 
+
+
     const uploadFile = async (file) => {
         let fileName = file.name;
         let uniqueFileName = await getUniqueFilename('bookinglite', fileName);
@@ -120,11 +126,29 @@ function ListBusiness() {
         setLoading(true);
 
         try {
+            const businessModel = formData.businessModel;
+            const userUid = auth.currentUser.uid;
+            const businessDocRef = doc(db, businessModel, userUid);
+            const docRef = doc(db, 'Customers', user);
+            const custdoc = await getDoc(docRef);
+
+            if (custdoc.exists()) {
+                alert("Please create a business account to list a business");
+                return; // Prevent further execution
+            }
+
+            const docSnap = await getDoc(businessDocRef);
+            if (docSnap.exists()) {
+                alert("You already have a business.");
+                navigate('/mybusinesses'); // Redirect the user
+                setLoading(false); // Stop the loading state
+                return; // Exit the function to prevent further execution
+            }
+
             if (selectedFiles.length > 0) {
                 for (let file of selectedFiles) {
-                    const businessModel=formData.businessModel
                     const { downloadURL, uniqueFileName, s3Key } = await uploadFile(file);
-                    const mediaCollectionRef = collection(db, businessModel, auth.currentUser.uid, 'media');
+                    const mediaCollectionRef = collection(db, businessModel, userUid, 'media');
                     await addDoc(mediaCollectionRef, {
                         title: uniqueFileName,
                         url: downloadURL,
@@ -135,17 +159,17 @@ function ListBusiness() {
 
             const businessData = {
                 ...formData,
-                ownerUID: auth.currentUser.uid,
+                ownerUID: userUid,
                 slotDuration: parseInt(formData.slotDuration, 10),
             };
 
-            const businessModel = formData.businessModel;
-            const businessDocRef = doc(db, businessModel, auth.currentUser.uid);
+            // You already have businessDocRef from earlier
             await setDoc(businessDocRef, businessData);
 
-            navigate(`/add-job-types/${formData.businessModel}/${user.uid}`);// or wherever you need to redirect to
+            navigate(`/add-job-types/${formData.businessModel}/${userUid}`); // or wherever you need to redirect to
         } catch (error) {
             console.error('Error submitting form:', error);
+            alert("Please create a business account to list a business");
         } finally {
             setLoading(false);
         }
@@ -300,7 +324,7 @@ function ListBusiness() {
                         <label>
                             End Hour:
                             <select name="endHour" value={formData.endHour} onChange={handleCarInfoChange} required>
-                                {endHourOptions.length > 0 ? endHourOptions : <option key="default" value={formData.endHour}>{formData.endHour}</option>}
+                                {endHourOptions.length > 0 ? endHourOptions : generateHourOptions()}
                             </select>
                         </label>
 

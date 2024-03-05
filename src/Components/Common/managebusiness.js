@@ -167,10 +167,6 @@ function ManageBusiness() {
         setJobTypes(updatedJobTypes);
     };
 
-
-
-
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setBusinessData((prevData) => ({ ...prevData, [name]: value }));
@@ -435,7 +431,7 @@ function ManageBusiness() {
                         <br />
                         <label>Upload Images (Max 4)</label>
                         <input type="file" multiple onChange={handleFileChange} disabled={loading || mediaDocs.length >= 4} />
-                        {loading && <p>Uploading...</p>}
+                        {loading && <p>Please Wait...</p>}
                         <br/>
                         <button type="button" onClick={handleUpdate} disabled={loading}>
                             {loading ? 'Updating...' : 'Update'}

@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import { db } from '../../firebase.js';
 import { collection, doc, getDocs, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 function ManageBusiness() {
     const auth = getAuth();
+    const navigate = useNavigate(); // Hook for programmatically navigating
     const user = auth.currentUser ? auth.currentUser.uid : null;
     const [bookings, setBookings] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const bookingsPerPage = 3;
 
     useEffect(() => {
+
+
+
         const loadBookingsFromLocalStorage = () => {
             const storedBookings = localStorage.getItem('bookings');
             if (storedBookings) {
@@ -70,7 +74,7 @@ function ManageBusiness() {
 
             fetchAllBookings();
         }
-    }, [user]);
+    }, [user, navigate]);
 
     // Calculate the index of the last booking on the current page
     const indexOfLastBooking = currentPage * bookingsPerPage;

@@ -1,7 +1,6 @@
 const functions = require("firebase-functions");
 const sgMail = require("@sendgrid/mail");
 
-// Set your SendGrid API Key here
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.sendEmail = functions.https.onRequest(async (req, res) => {

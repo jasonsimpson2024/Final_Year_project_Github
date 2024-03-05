@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const sgMail = require("@sendgrid/mail");
 
 // Set your SendGrid API Key here
-sgMail.setApiKey("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");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.sendEmail = functions.https.onRequest(async (req, res) => {
     // Enable CORS using the `cors` module, or manually set HTTP headers

@@ -26,9 +26,10 @@ function CalendarSlotSelector() {
                     const { slotDuration: sd, startHour: sh, endHour: eh, excludedDays: ed } = businessDoc.data();
                     setSlotDuration(sd || 60);
                     setBusinessHours({
-                        startHour: convertTimeTo24HourFormat(sh || '9 AM'),
-                        endHour: convertTimeTo24HourFormat(eh || '5 PM')
+                        startHour: convertTimeTo24HourFormat(`${sh || '9 AM'}`),
+                        endHour: convertTimeTo24HourFormat(`${eh || '5 PM'}`)
                     });
+
                     setExcludedDays(ed || []);
                 }
 
@@ -74,12 +75,20 @@ function CalendarSlotSelector() {
     };
 
     const convertTimeTo24HourFormat = (time) => {
+        // Ensure the input is a string
+        if (typeof time !== 'string') {
+            console.error('convertTimeTo24HourFormat expects a string', { time });
+            // Handle this case appropriately. For example, return a default value:
+            return 9; // default to 9 AM for example, adjust as needed
+        }
+
         const [hour, part] = time.split(' ');
         let hours = parseInt(hour, 10);
         if (part === 'PM' && hours < 12) hours += 12;
         if (part === 'AM' && hours === 12) hours = 0;
         return hours;
     };
+
 
     const generateTimeSlots = () => {
         const slots = [];

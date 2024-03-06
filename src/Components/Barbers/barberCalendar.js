@@ -151,10 +151,9 @@ function CalendarSlotSelector() {
                     text: `Dear Customer,\n\nYour booking has been confirmed with ${companyName} for ${moment(selectedSlot).format('LLL')}.\n\nThank you for using BookingLite.\n\nIf you have a customer account, you can cancel online. Otherwise, please contact ${companyName} to cancel this booking.`
                 };
 
-                // Replace with your Firebase Cloud Function endpoint
                 const functionUrl = 'https://us-central1-fyp---car-dealership.cloudfunctions.net/sendEmail';
 
-                // Send the email via your Cloud Function
+
                 const response = await fetch(functionUrl, {
                     method: 'POST',
                     headers: {

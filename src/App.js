@@ -39,6 +39,14 @@ import SpaDetails from "./Components/SPA/spainfo";
 import Bookspa from "./Components/SPA/bookspa";
 import Spacalendar from "./Components/SPA/spacalendar";
 import AppointInfo from "./Components/Common/appointmentinfo";
+import Fitness from "./Components/fitness/fitness";
+import FitnessDetails from "./Components/fitness/fitinfo";
+import Bookfitness from "./Components/fitness/bookfitness";
+import Fitnesscalendar from "./Components/fitness/fitnesscalendar";
+import Other from "./Components/Other/other";
+import OtherDetails from "./Components/Other/otherinfo";
+import Bookother from "./Components/Other/bookother";
+import Othercalendar from "./Components/Other/othercalendar";
 
 function App() {
     return (
@@ -81,6 +89,14 @@ function App() {
                     <Route exact path='/spainfo/:id' element={<SpaDetails />} />
                     <Route exact path='/bookspa/:id' element={<Bookspa />} />
                     <Route exact path='/spaslot/:doc1/:documentId' element={<Spacalendar />} />
+                    <Route exact path='/fitness' element={<Fitness />} />
+                    <Route exact path='/fitnessinfo/:id' element={<FitnessDetails />} />
+                    <Route exact path='/bookfitness/:id' element={<Bookfitness />} />
+                    <Route exact path='/fitnessslot/:doc1/:documentId' element={<Fitnesscalendar />} />
+                    <Route exact path='/other' element={<Other />} />
+                    <Route exact path='/otherinfo/:id' element={<OtherDetails />} />
+                    <Route exact path='/bookother/:id' element={<Bookother />} />
+                    <Route exact path='/otherslot/:doc1/:documentId' element={<Othercalendar />} />
                 </Routes>
                 </Layout>
             </Router>

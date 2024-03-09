@@ -3,7 +3,7 @@ import { db } from '../../firebase.js';
 import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 
-function Barber() {
+function Other() {
     const [barberData, setBarberData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(1);
@@ -18,7 +18,7 @@ function Barber() {
     useEffect(() => {
         const fetchData = async (pageNumber) => {
             try {
-                const barbersCollection = collection(db, 'Barber');
+                const barbersCollection = collection(db, 'Other');
                 let q = query(barbersCollection, orderBy('Name'), limit(barbersPerPage));
 
                 if (pageNumber > 1 && lastDocumentName) {
@@ -111,7 +111,7 @@ function Barber() {
                 <div className="car-details-list">
                     {filteredData.map((barber) => (
                         <div key={barber.id} className="car-details">
-                            <Link to={`/barberinfo/${barber.id}`} className="car-detail">
+                            <Link to={`/otherinfo/${barber.id}`} className="car-detail">
                                 Name: {barber.Name} <br />
                                 Location: {barber.Street} {barber.Town} {barber.County} {barber.Eircode}
                             </Link>
@@ -127,4 +127,4 @@ function Barber() {
     );
 }
 
-export default Barber;
+export default Other;

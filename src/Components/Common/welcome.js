@@ -90,25 +90,22 @@ function Welcome() {
                     <Link to="/Automotive">
                         <button className="action-button">Automotive Services</button>
                     </Link>
-                    <Link to="/Hairsalon">
+                    <Link to="/hairsalon">
                         <button className="action-button">Hair Salons</button>
                     </Link>
-                    <Link to="/Barbers">
+                    <Link to="/barbers">
                         <button className="action-button">Barber shops</button>
                     </Link>
-                    <Link to="/Beautysalon">
+                    <Link to="/beautysalon">
                         <button className="action-button">Beauty Salons</button>
                     </Link>
                     <Link to="/spa">
                         <button className="action-button">Spa & Massage</button>
                     </Link>
-                    <Link to="/">
-                        <button className="action-button">Gym & Fitness</button>
+                    <Link to="/fitness">
+                        <button className="action-button">Fitness</button>
                     </Link>
-                    <Link to="/">
-                        <button className="action-button">Psychotherapy</button>
-                    </Link>
-                    <Link to="/">
+                    <Link to="/other">
                         <button className="action-button">Other</button>
                     </Link>
                 </div>

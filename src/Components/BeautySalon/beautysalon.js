@@ -95,7 +95,7 @@ function BeautySalon() {
                     <div className='search-bar'>
                     <input
                         type="text"
-                        placeholder="Browse beauty salons"
+                        placeholder="Browse services"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                     />

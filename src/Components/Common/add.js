@@ -129,7 +129,7 @@ function ListBusiness() {
             const businessModel = formData.businessModel;
             const userUid = auth.currentUser.uid;
             const businessDocRef = doc(db, businessModel, userUid);
-            const docRef = doc(db, 'Customers', user);
+            const docRef = doc(db, 'Customers', userUid);
             const custdoc = await getDoc(docRef);
 
             if (custdoc.exists()) {

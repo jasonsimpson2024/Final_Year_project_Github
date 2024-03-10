@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase.js';
-import { doc, getDoc, updateDoc, addDoc, collection, getDocs, deleteDoc} from 'firebase/firestore';
+import {query, doc, getDoc, updateDoc, addDoc, collection, getDocs, deleteDoc} from 'firebase/firestore';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { S3 } from 'aws-sdk';
 
@@ -244,6 +244,71 @@ function ManageBusiness() {
         }
     };
 
+    // Function to delete all documents in a subcollection
+    const deleteSubcollectionDocs = async (parentDocRef, subcollectionName) => {
+        const subcollectionRef = collection(db, parentDocRef.path, subcollectionName);
+        const snapshot = await getDocs(subcollectionRef);
+
+        const deletionPromises = snapshot.docs.map((doc) => {
+            return deleteDoc(doc.ref);
+        });
+
+        await Promise.all(deletionPromises);
+    };
+
+// Function to delete a document and its known subcollections
+    const deleteMediaFilesFromS3 = async (parentDocRef, subcollectionName) => {
+        const subcollectionRef = collection(db, parentDocRef.path, subcollectionName);
+        const snapshot = await getDocs(subcollectionRef);
+
+        const s3DeletionPromises = snapshot.docs.map((doc) => {
+            const media = doc.data();
+            const deleteParams = {
+                Bucket: 'bookinglite', // Your S3 bucket name
+                Key: media.s3Key,
+            };
+            return s3.deleteObject(deleteParams).promise();
+        });
+
+        await Promise.all(s3DeletionPromises);
+    };
+
+// Enhanced function to delete a document, its subcollections, and S3 media
+    const deleteDocumentAndSubcollections = async (docPath) => {
+        // First, delete media files from S3 in the 'media' subcollection
+        await deleteMediaFilesFromS3(doc(db, docPath), 'media');
+
+        // Then, delete documents in subcollections
+        const subcollections = ['media', 'jobtypes']; // Assuming 'media' stores S3 references
+        for (const subcollectionName of subcollections) {
+            await deleteSubcollectionDocs(doc(db, docPath), subcollectionName);
+        }
+
+        // Finally, delete the main document
+        await deleteDoc(doc(db, docPath));
+    };
+
+    const handleBusinessDelete = async () => {
+        const isConfirmed = window.confirm("Are you sure you want to delete your business?");
+        if (!isConfirmed) {
+            return;
+        }
+        setLoading(true);
+
+        try {
+            // Construct the path to the document
+            const docPath = `${collectionName}/${user.uid}`;
+            await deleteDocumentAndSubcollections(docPath);
+
+            navigate('/'); // Navigate away after deletion
+        } catch (error) {
+            console.error('Error during deletion process:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     const handleUpdate = async () => {
         setLoading(true);
         try {
@@ -435,6 +500,9 @@ function ManageBusiness() {
                         <br/>
                         <button type="button" onClick={handleUpdate} disabled={loading}>
                             {loading ? 'Updating...' : 'Update'}
+                        </button>
+                        <button type="button" onClick={handleBusinessDelete}>
+                            Delete Business
                         </button>
                     </form>
                 </div>

@@ -10,7 +10,7 @@ function Welcome() {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const searchCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon'];
+    const searchCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon', 'Other', 'SPA'];
 
     const handleSearch = async () => {
         if (!searchInput.trim()) {

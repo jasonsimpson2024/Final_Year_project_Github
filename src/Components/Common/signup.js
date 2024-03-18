@@ -60,8 +60,10 @@ export default function SignUp() {
             </div>
             <div className="form-group">
                 <select
+                    id="userType"
                     value={userType}
                     onChange={(e) => setUserType(e.target.value)}
+                    data-testid="user-type-select"
                     className="userTypeSelect"
                     required
                 >
@@ -70,7 +72,7 @@ export default function SignUp() {
                     <option value="Business">Business</option>
                 </select>
             </div>
-            <button className='login-button' type="button" onClick={signup}>Sign Up</button>
+            <button className='login-button' type="button" onClick={signup} data-testid="sign-up-button">Sign Up</button>
         </div>
     );
 }

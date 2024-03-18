@@ -43,7 +43,8 @@ async function getUniqueFilename(bucket, originalName) {
 function ListBusiness() {
     const navigate = useNavigate();
     const auth = getAuth();
-    const user=auth.currentUser;
+    const user = auth ? auth.currentUser : null;
+
     const counties = [
         "Co. Antrim", "Co. Armagh", "Co. Carlow", "Co. Cavan", "Co. Clare", "Co. Cork", "Co. Derry", "Co. Donegal",
         "Co. Down", "Co. Dublin", "Co. Fermanagh", "Co. Galway", "Co. Kerry", "Co. Kildare", "Co. Kilkenny",
@@ -288,6 +289,8 @@ function ListBusiness() {
                                 <option value="HairSalon">Hair Salon</option>
                                 <option value="BeautySalon">Beauty Salon</option>
                                 <option value="SPA">Spa & Massage</option>
+                                <option value="Fitness">Fitness</option>
+                                <option value="Other">Other</option>
                             </select>
                         </label>
 
@@ -343,8 +346,16 @@ function ListBusiness() {
                                 </div>
                             ))}
                         </div>
-                        <label>Upload Images (Max 4)</label>
-                        <input type="file" multiple onChange={handleFileChange} disabled={loading || formData.mediaDocs.length >= 4} />
+                        <label>
+                            Upload Images (Max 4)
+                            <input
+                                type="file"
+                                multiple
+                                onChange={handleFileChange}
+                                disabled={loading || formData.mediaDocs.length >= 4}
+                            />
+                        </label>
+
 
                         <br />
                         <button type="submit">Submit</button>

@@ -94,7 +94,7 @@ function Welcome() {
                         <button className="action-button">Hair Salons</button>
                     </Link>
                     <Link to="/barbers">
-                        <button className="action-button">Barber shops</button>
+                        <button className="action-button">Barber Shops</button>
                     </Link>
                     <Link to="/beautysalon">
                         <button className="action-button">Beauty Salons</button>
@@ -102,11 +102,9 @@ function Welcome() {
                     <Link to="/spa">
                         <button className="action-button">Spa & Massage</button>
                     </Link>
-                    <Link to="/fitness">
-                        <button className="action-button">Fitness</button>
-                    </Link>
+
                     <Link to="/other">
-                        <button className="action-button">Other</button>
+                        <button className="action-button">More Services</button>
                     </Link>
                 </div>
             </div>

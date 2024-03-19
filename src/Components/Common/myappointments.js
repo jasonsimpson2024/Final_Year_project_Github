@@ -26,7 +26,7 @@ function ManageBusiness() {
         loadBookingsFromLocalStorage();
 
         if (user) {
-            const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon', 'SPA'];
+            const topLevelCollections = ['Automotive', 'HairSalon', 'Barber', 'BeautySalon', 'SPA', 'Other'];
             const currentTimestamp = new Date().getTime();
 
             const fetchAllBookings = async () => {

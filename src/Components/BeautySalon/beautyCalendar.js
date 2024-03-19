@@ -26,10 +26,9 @@ function CalendarSlotSelector() {
                     const { slotDuration: sd, startHour: sh, endHour: eh, excludedDays: ed } = businessDoc.data();
                     setSlotDuration(sd || 60);
                     setBusinessHours({
-                        startHour: convertTimeTo24HourFormat(`${sh || '9 AM'}`),
-                        endHour: convertTimeTo24HourFormat(`${eh || '5 PM'}`)
+                        startHour: convertTimeTo24HourFormat(sh || '9 AM'),
+                        endHour: convertTimeTo24HourFormat(eh || '5 PM')
                     });
-
                     setExcludedDays(ed || []);
                 }
 
@@ -75,20 +74,12 @@ function CalendarSlotSelector() {
     };
 
     const convertTimeTo24HourFormat = (time) => {
-        // Ensure the input is a string
-        if (typeof time !== 'string') {
-            console.error('convertTimeTo24HourFormat expects a string', { time });
-            // Handle this case appropriately. For example, return a default value:
-            return 9; // default to 9 AM for example, adjust as needed
-        }
-
         const [hour, part] = time.split(' ');
         let hours = parseInt(hour, 10);
         if (part === 'PM' && hours < 12) hours += 12;
         if (part === 'AM' && hours === 12) hours = 0;
         return hours;
     };
-
 
     const generateTimeSlots = () => {
         const slots = [];
@@ -105,19 +96,35 @@ function CalendarSlotSelector() {
     };
 
     const daysOfWeek = () => {
-        let start = isCurrentWeek() ? moment() : currentWeekStart.startOf('week');
+        let start = currentWeekStart.clone().startOf('week');
+        if (currentWeekStart.isSame(moment(), 'week')) {
+            start = moment(); // Start from the current day if it's the current week
+        }
         return Array.from({ length: 7 }, (_, i) => start.clone().add(i, 'days'))
             .filter(day => !excludedDays.includes(day.format('dddd')))
             .map(day => ({
                 day,
-                label: day.format('ddd (DD/MM/YY)')
+                label: day.format('ddd (DD/MM/YY)'),
+                isPast: day.endOf('day').isBefore(moment()) // Check if the day is in the past
             }));
     };
 
+
     const handleSlotSelect = async (dayIndex, time) => {
-        const day = daysOfWeek()[dayIndex].day;
+        const dayInfo = daysOfWeek()[dayIndex];
+        const day = dayInfo.day;
+        if (dayInfo.isPast) { // Do not allow selecting days in the past
+            console.log("Cannot select a day in the past.");
+            return;
+        }
+
         const [hour, minute] = time.split(':').map(Number);
         const slotTime = day.clone().hour(hour).minute(minute);
+
+        if (slotTime.isBefore(moment())) {
+            console.log("Cannot select a slot in the past.");
+            return; // Early return to prevent selecting past slots
+        }
 
         const selectedSlotTimestamp = slotTime.valueOf();
         const slotTaken = events.some(event => {
@@ -131,6 +138,7 @@ function CalendarSlotSelector() {
             setSelectedSlot(slotTime.toDate());
         }
     };
+
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId && !isSlotAlreadyBooked) {
@@ -157,13 +165,12 @@ function CalendarSlotSelector() {
                     to: bookingData.email, // Use the email from the booking document
                     from: 'bookinglite@outlook.com', // your verified sender email address
                     subject: 'Booking Confirmation',
-                    text: `Dear Customer,\n\nYour booking has been confirmed with ${companyName} for ${moment(selectedSlot).format('LLL')}.\n\nThank you for using BookingLite.\n\nIIf you have a customer account, you can cancel online. Otherwise, please contact ${companyName} to cancel this booking.`
+                    text: `Dear Customer,\n\nYour booking has been confirmed with ${companyName} for ${moment(selectedSlot).format('LLL')}.\n\nThank you for using BookingLite.\n\nIf you have a customer account, you can cancel online. Otherwise, please contact ${companyName} to cancel this booking.`
                 };
 
-                // Replace with your Firebase Cloud Function endpoint
                 const functionUrl = 'https://us-central1-fyp---car-dealership.cloudfunctions.net/sendEmail';
 
-                // Send the email via your Cloud Function
+
                 const response = await fetch(functionUrl, {
                     method: 'POST',
                     headers: {
@@ -188,12 +195,15 @@ function CalendarSlotSelector() {
         }
     };
 
+
+
+
     // Corrected usage in the return statement:
     return (
         <div className="calendar-slot-selector">
             <div className="custom-calendar">
                 <div className="navigation">
-                    <button onClick={previousWeek} disabled={isCurrentDay()}>Previous Week</button>
+                    <button onClick={previousWeek}>Previous Week</button>
                     <button onClick={nextWeek}>Next Week</button>
                 </div>
                 <div className="days-header">
@@ -205,13 +215,13 @@ function CalendarSlotSelector() {
                     {daysOfWeek().map(({ day }, dayIndex) => (
                         <div key={day.format('YYYY-MM-DD')} className="day-column">
                             {generateTimeSlots().map((time, timeIndex) => {
-                                const slotTime = day.clone().startOf('day').add(moment.duration(time));
-                                const isBooked = events.some(event => moment(event.start).isSame(slotTime, 'minute'));
+                                const slotDateTime = day.clone().startOf('day').add(moment.duration(time));
+                                const isBooked = events.some(event => moment(event.start).isSame(slotDateTime, 'minute')) || slotDateTime.isBefore(moment());
 
                                 return (
                                     <div
                                         key={`${dayIndex}-${timeIndex}`}
-                                        className={`time-slot ${selectedSlot && moment(selectedSlot).isSame(slotTime, 'minute') ? 'selected' : ''} ${isBooked ? 'booked' : ''}`}
+                                        className={`time-slot ${isBooked ? 'booked' : ''} ${selectedSlot && moment(selectedSlot).isSame(slotDateTime, 'minute') ? 'selected' : ''}`}
                                         onClick={() => !isBooked && handleSlotSelect(dayIndex, time)}
                                     >
                                         {time}
@@ -226,7 +236,7 @@ function CalendarSlotSelector() {
                 <div className='slot-confirm'>
                     <p>Selected Slot: {moment(selectedSlot).format('LLL')}</p>
                     {isSlotAlreadyBooked ? (
-                        <p>This slot is already booked. Please select another.</p>
+                        <p>This slot is already booked or in the past. Please select another.</p>
                     ) : (
                         <button onClick={handleConfirmBooking}>Confirm Booking</button>
                     )}

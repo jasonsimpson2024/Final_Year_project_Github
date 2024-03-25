@@ -22,7 +22,7 @@ function AutoDetails() {
             if (uid) {
                 const docRef = doc(db, 'Business', uid);
                 const docSnap = await getDoc(docRef);
-                setIsBusinessAccount(docSnap.exists()); // Set true if user is a business account, else false
+                setIsBusinessAccount(docSnap.exists()); // set true if user is a business account, else false
             }
         };
 
@@ -56,17 +56,17 @@ function AutoDetails() {
 
     const handleImageClick = (imageUrl) => {
         setSelectedImageUrl(imageUrl);
-        setIsZoomed(true); // Indicate that the image is zoomed in
+        setIsZoomed(true);
     };
 
     const handleCloseImage = () => {
-        setIsZoomed(false); // Start zooming out
-        setTimeout(() => setSelectedImageUrl(null), 300); // Wait for animation to complete
+        setIsZoomed(false);
+        setTimeout(() => setSelectedImageUrl(null), 300);
     };
 
 
     const handleAppointmentBooking = () => {
-        if (isBusinessAccount) { // Prevent booking if the user has a business account
+        if (isBusinessAccount) { // prevent booking if the user has a business account
             alert("Business accounts cannot book appointments.");
         } else {
             navigate(`/bookingcars/${carId}`);
@@ -87,7 +87,17 @@ function AutoDetails() {
                 <div className='normal-container'>
                     <h2>{car.Name}</h2>
                     <p>
-                        Location: {car.Street}, {car.Town}, {car.County} - Eircode: {car.Eircode}
+                        Location: {car.Street}, {car.Town},
+                        <br/>
+                        {car.County} - Eircode: {car.Eircode}
+                    </p>
+                    <p>
+                        Phone:
+                        {car.Phone ? (
+                            <a href={`tel:${car.Phone}`}> {car.Phone}</a>
+                        ) : (
+                            ' N/A'
+                        )}
                     </p>
                     <p>{car.Description}</p>
                     <div className="photos-container">
@@ -101,7 +111,6 @@ function AutoDetails() {
                             />
                         ))}
                     </div>
-                    {/* Use handleAppointmentBooking instead of direct navigate */}
                     <button onClick={handleAppointmentBooking}>Book an Appointment</button>
                 </div>
             </div>

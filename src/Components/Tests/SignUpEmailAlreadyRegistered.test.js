@@ -5,13 +5,12 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { createUserWithEmailAndPassword, auth, sendEmailVerification } from 'firebase/auth';
 import { waitFor } from "@testing-library/react";
 
-// Correctly mock Firebase Auth and Firestore
+
 jest.mock('firebase/auth', () => {
     const originalModule = jest.requireActual('firebase/auth');
 
-    // Mock the getAuth method if it's used in your application
     const mockGetAuth = jest.fn(() => ({
-        // Mock any auth methods used by your application here
+
     }));
 
     return {
@@ -19,7 +18,7 @@ jest.mock('firebase/auth', () => {
         ...originalModule,
         getAuth: mockGetAuth,
         auth: jest.fn(() => ({
-            // Continue mocking other methods or properties as needed
+
         })),
         createUserWithEmailAndPassword: jest.fn(),
         sendEmailVerification: jest.fn(),
@@ -30,10 +29,10 @@ jest.mock('firebase/firestore');
 
 describe('SignUp Component', () => {
     beforeEach(() => {
-        // Reset mocks before each test
+        // reset mocks before each test
         createUserWithEmailAndPassword.mockClear();
         sendEmailVerification.mockClear();
-        window.alert = jest.fn(); // Ensure alert is mocked if not done elsewhere
+        window.alert = jest.fn(); // ensuring alert is mocked if not done elsewhere
     });
 
     test('does not allow signup with already registered email', async () => {
@@ -48,7 +47,6 @@ describe('SignUp Component', () => {
         );
         const emailInput = screen.getByPlaceholderText('Email...');
         const passwordInput = screen.getByPlaceholderText('Password...');
-        // Assuming your SignUp component's userType select and signUp button have these data-testid attributes
         const userTypeSelect = screen.getByTestId('user-type-select');
         const signUpButton = screen.getByTestId('sign-up-button');
 
@@ -57,7 +55,7 @@ describe('SignUp Component', () => {
         fireEvent.change(userTypeSelect, { target: { value: 'Customers' } });
         fireEvent.click(signUpButton);
 
-        // Use waitFor for async operations
+        //waitFor for async operations
         await waitFor(() => {
             expect(window.alert).toHaveBeenCalledWith("Error signing up. Please try again.");
         });

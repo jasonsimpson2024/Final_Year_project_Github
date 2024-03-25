@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth, db } from '../../firebase.js'; // Assuming these are correctly set up
+import { auth, db } from '../../firebase.js';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 export default function SignUp() {
     const [signupEmail, setSignupEmail] = useState("");
     const [signupPassword, setSignupPassword] = useState("");
-    const [userType, setUserType] = useState(""); // New state for the dropdown selection
+    const [userType, setUserType] = useState("");
     const navigate = useNavigate();
 
     const signup = async () => {
@@ -19,9 +19,9 @@ export default function SignUp() {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
             const user = userCredential.user;
-            await sendEmailVerification(user);
+            await sendEmailVerification(user); // sends verification email
 
-            // Store the email in the selected collection based on userType
+            // store the email in the selected collection based on userType
             await setDoc(doc(db, userType, user.uid), {
                 email: signupEmail
             });
@@ -39,8 +39,9 @@ export default function SignUp() {
         <div className="login-container">
             <h1>Sign Up</h1>
             <div className="form-group">
-                <label>Email:</label>
+                <label htmlFor="signupEmail">Email:</label>
                 <input
+                    id="signupEmail"
                     type="email"
                     placeholder="Email..."
                     value={signupEmail}
@@ -49,8 +50,9 @@ export default function SignUp() {
                 />
             </div>
             <div className="form-group">
-                <label>Password:</label>
+                <label htmlFor="signupPassword">Password:</label>
                 <input
+                    id="signupPassword"
                     type="password"
                     placeholder="Password..."
                     value={signupPassword}

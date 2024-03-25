@@ -5,24 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { S3 } from 'aws-sdk';
 
-// Initialize AWS S3
+// initialize AWS S3
 const s3 = new S3({
     accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID,
     secretAccessKey:process.env.REACT_APP_SECRET_ACCESS_KEY,
     region: process.env.REACT_APP_REGION
-
 });
 
 async function checkFileExists(bucket, key) {
 
     try {
         await s3.headObject({ Bucket: bucket, Key: key }).promise();
-        return true; // File exists
+        return true; // file exists
     } catch (error) {
         if (error.statusCode === 404) {
-            return false; // File does not exist
+            return false; // file does not exist
         }
-        throw error; // Handle other errors appropriately
+        throw error;
     }
 }
 
@@ -58,20 +57,21 @@ function ListBusiness() {
         Town: '',
         County: '',
         Eircode: '',
+        Phone: '',
         businessModel: '',
         Description: '',
         slotDuration: '60',
         startHour: '9 AM',
         endHour: '5 PM',
         excludedDays: [],
-        mediaDocs: [], // State for uploaded media documents
+        mediaDocs: [], // state for uploaded media documents
     });
 
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const [loading, setLoading] = useState(false); // State for loading status
+    const [loading, setLoading] = useState(false); // state for loading status
     const [endHourOptions, setEndHourOptions] = useState([]);
     useEffect(() => {
-        // Ensure end hour options are updated based on the default start hour when the component mounts
+        // end hour options are updated based on the default start hour when the component mounts
         updateEndHourOptions(formData.startHour);
     }, []);
 
@@ -93,14 +93,12 @@ function ListBusiness() {
 
         if (files.length !== event.target.files.length) {
             alert('Only image files are allowed.');
-            // Clear the file input if any non-image file is selected
-            event.target.value = ''; // This resets the file input
+            // clear the file input if any non-image file is selected
+            event.target.value = ''; // resets the file input
         } else {
             setSelectedFiles(files);
         }
     };
-
-
 
     const uploadFile = async (file) => {
         let fileName = file.name;
@@ -135,15 +133,15 @@ function ListBusiness() {
 
             if (custdoc.exists()) {
                 alert("Please create a business account to list a business");
-                return; // Prevent further execution
+                return; // prevent further execution
             }
 
             const docSnap = await getDoc(businessDocRef);
             if (docSnap.exists()) {
                 alert("You already have a business.");
-                navigate('/mybusinesses'); // Redirect the user
-                setLoading(false); // Stop the loading state
-                return; // Exit the function to prevent further execution
+                navigate('/mybusinesses'); // redirect the user
+                setLoading(false); // stops the loading state
+                return; // exit the function to prevent further execution
             }
 
             if (selectedFiles.length > 0) {
@@ -164,10 +162,9 @@ function ListBusiness() {
                 slotDuration: parseInt(formData.slotDuration, 10),
             };
 
-            // You already have businessDocRef from earlier
             await setDoc(businessDocRef, businessData);
 
-            navigate(`/add-job-types/${formData.businessModel}/${userUid}`); // or wherever you need to redirect to
+            navigate(`/add-job-types/${formData.businessModel}/${userUid}`);
         } catch (error) {
             console.error('Error submitting form:', error);
             alert("Please create a business account to list a business");
@@ -220,7 +217,6 @@ function ListBusiness() {
                 <div className="booking-form">
                     <h2>List your business</h2>
                     <form onSubmit={handleSubmit}>
-                        {/* Personal Information */}
                         <label>
                             Name:
                             <input
@@ -231,7 +227,6 @@ function ListBusiness() {
                                 required
                             />
                         </label>
-                        {/* Address */}
                         <h3>Address:</h3>
                         <label>
                             Street:
@@ -274,7 +269,16 @@ function ListBusiness() {
                                 onChange={handleCarInfoChange}
                             />
                         </label>
-                        {/* Business Model */}
+                        <label>
+                            Phone Number:
+                            <input
+                                placeholder='eg: 0871234567'
+                                type="text"
+                                name="Phone"
+                                value={formData.Phone}
+                                onChange={handleCarInfoChange}
+                            />
+                        </label>
                         <label>
                             Business Model:
                             <select
@@ -302,11 +306,10 @@ function ListBusiness() {
                                 onChange={handleCarInfoChange}
                                 maxLength={400}
                                 rows={4}
-                                style={{ width: '400px', resize: 'none' }} // Set the desired width and disable resizing
+                                style={{ width: '400px', resize: 'none' }}
                             />
                         </label>
 
-                        {/* Slot Duration */}
                         <label>
                             Slot Duration:
                             <select name="slotDuration" value={formData.slotDuration} onChange={handleCarInfoChange} required>

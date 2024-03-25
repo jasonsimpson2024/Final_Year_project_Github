@@ -36,7 +36,7 @@ function UserDocuments() {
 
                     setUserDocs(allUserDocs);
 
-                    // Save the userDocs array to localStorage
+                    // save the userDocs array to localStorage
                     localStorage.setItem('userDocs', JSON.stringify(allUserDocs));
                 } else {
                     console.log('No user is currently authenticated.');
@@ -46,14 +46,14 @@ function UserDocuments() {
             }
         };
 
-        // Fetch userDocs on component mount and whenever authentication changes
+        // fetch userDocs on component mount and whenever authentication changes
         const unsubscribe = auth.onAuthStateChanged(() => {
             fetchUserDocs();
         });
 
-        // Cleanup function to unsubscribe from the auth state listener
+
         return () => unsubscribe();
-    }, []); // Empty dependency array means this effect only runs on mount and unmount
+    }, []);
 
     return (
         <div>

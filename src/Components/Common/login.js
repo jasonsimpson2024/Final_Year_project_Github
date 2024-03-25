@@ -29,13 +29,13 @@ export default function Login() {
 
             const user = userCredential.user;
 
-            // Check if the email is verified before allowing login
+            // check if the email is verified before allowing login
             if (user.emailVerified) {
                 alert("Log In successful!");
                 console.log(getUserEmail());
                 navigate("/");
             } else {
-                // If email is not verified, sign the user out
+                // if email is not verified, sign the user out
                 await auth.signOut();
                 alert("Please verify your email before logging in.");
             }

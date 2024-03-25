@@ -8,10 +8,10 @@ import { getAuth  } from 'firebase/auth';
 function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
-    const carId = location.pathname.split('/').pop(); // Extract the car ID from the URL
-    const { currentUser } = getAuth(); // Get the logged-in user's info
+    const carId = location.pathname.split('/').pop(); // extract the car ID from the URL
+    const { currentUser } = getAuth(); // get the logged-in user's info
 
-    // Define state for form data
+    // define state for form data
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -62,7 +62,7 @@ function BookingForm() {
     const years = Array.from({ length: 125 }, (_, index) => (2024 - index).toString());
 
 
-    // Function to handle form changes
+    // function to handle form changes
     const handleCarInfoChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevState) => ({
@@ -71,7 +71,7 @@ function BookingForm() {
         }));
     };
 
-    // Fetch job types from the business's 'jobtypes' subcollection
+    // fetch job types from the business's 'jobtypes' subcollection
     useEffect(() => {
         const fetchJobTypes = async () => {
             const businessDocRef = doc(db, 'Automotive', carId);
@@ -88,7 +88,7 @@ function BookingForm() {
                     }
                 });
 
-                // Update state with fetched and filtered job types
+                // update state with fetched and filtered job types
                 setFormData((prevState) => ({
                     ...prevState,
                     jobTypes,
@@ -101,7 +101,7 @@ function BookingForm() {
         fetchJobTypes();
     }, [carId]);
 
-    // Handle form submission
+    // handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -123,27 +123,25 @@ function BookingForm() {
             businessID: carId,
         };
 
-        // Reference the 'cars' collection
         const carsCollectionRef = collection(db, 'Automotive');
 
-        // Reference the 'car' document within the 'cars' collection
         const carDocRef = doc(carsCollectionRef, carId);
 
         let bookingDocRef;
 
         if (currentUser) {
-            // If user is logged in, use UID as document ID
+            // if user is logged in, use UID as document ID
             bookingDocRef = doc(carDocRef, 'booking', currentUser.uid);
             await setDoc(bookingDocRef, carData);
         } else {
-            // If user is not logged in, let Firestore generate a random ID
+            // if user is not logged in, let Firestore generate a random ID
             const bookingsCollectionRef = collection(carDocRef, 'booking');
             bookingDocRef = await addDoc(bookingsCollectionRef, carData);
         }
 
         console.log('Document added successfully with ID:', bookingDocRef.id);
 
-        // Reset form data and navigate
+        // reset form data and navigate
         setFormData({
             name: '',
             email: '',
@@ -172,7 +170,6 @@ function BookingForm() {
                 <div className="booking-form">
                     <h2>Book an Appointment</h2>
                     <form className='box-container' onSubmit={handleSubmit}>
-                        {/* Personal Information */}
                         <h3>Personal Information</h3>
                         <label>
                             Name:
@@ -204,7 +201,6 @@ function BookingForm() {
                                 required
                             />
                         </label>
-                        {/* Address */}
                         <h3>Address:</h3>
                         <label>
                             Street:
@@ -245,7 +241,6 @@ function BookingForm() {
                                 onChange={handleCarInfoChange}
                             />
                         </label>
-                        {/* Car Information */}
                         <h3>Car Information</h3>
                         <label>
                             Make:

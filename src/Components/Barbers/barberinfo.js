@@ -21,7 +21,7 @@ function BarberDetails() {
             if (uid) {
                 const docRef = doc(db, 'Business', uid);
                 const docSnap = await getDoc(docRef);
-                setIsBusinessAccount(docSnap.exists()); // Set true if user is a business account, else false
+                setIsBusinessAccount(docSnap.exists()); // set true if user is a business account, else false
             }
         };
 
@@ -50,7 +50,7 @@ function BarberDetails() {
             }
         };
 
-        checkIfBusinessAccount(); // Check if the user has a business account
+        checkIfBusinessAccount(); // check if the user has a business account
         fetchBarberDataAndPhotos();
     }, [barberId, uid]);
 
@@ -65,7 +65,7 @@ function BarberDetails() {
     };
 
     const handleAppointmentBooking = () => {
-        if (isBusinessAccount) { // Prevent booking if the user has a business account
+        if (isBusinessAccount) { // prevent booking if the user has a business account
             alert("Business accounts cannot book appointments.");
         } else {
             navigate(`/barber/${barberId}`);
@@ -81,7 +81,17 @@ function BarberDetails() {
                 <div className='normal-container'>
                     <h2>{barber.Name}</h2>
                     <p>
-                        Location: {barber.Street}, {barber.Town}, {barber.County} - Eircode: {barber.Eircode}
+                        Location: {barber.Street}, {barber.Town},
+                        <br/>
+                        {barber.County} - Eircode: {barber.Eircode}
+                    </p>
+                    <p>
+                        Phone:
+                        {barber.Phone ? (
+                            <a href={`tel:${barber.Phone}`}> {barber.Phone}</a>
+                        ) : (
+                            ' N/A'
+                        )}
                     </p>
                     <p>{barber.Description}</p>
                     <div className="photos-container">

@@ -7,13 +7,12 @@ function Automotive() {
     const [carData, setCarData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(1);
-    const carsPerPage = 5;
+    const carsPerPage = 3;
     const [lastDocumentName, setLastDocumentName] = useState(null);
     const [hasMoreCars, setHasMoreCars] = useState(true);
     const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
 
-    // List of counties in Ireland
     const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
 
     useEffect(() => {
@@ -47,7 +46,7 @@ function Automotive() {
                     setHasMoreCars(false);
                 }
 
-                // Filter data based on search input and selected county
+                // filter data based on search input and selected county
                 const searchLower = searchInput.toLowerCase();
                 const filtered = newCarData.filter(car =>
                     car.County.toLowerCase().includes(selectedCounty.toLowerCase()) &&

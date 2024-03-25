@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { db } from '../../firebase.js';
-import { doc, getDoc, deleteDoc } from 'firebase/firestore'; // Import deleteDoc
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 function AppointInfo() {
@@ -44,7 +44,6 @@ function AppointInfo() {
                 await deleteDoc(bookingDocRef);
                 alert('Booking Cancelled');
                 navigate("/Myappointments");
-                // You may also redirect the user to a different page or perform any other action after deletion.
             } catch (error) {
                 console.error('Error deleting booking:', error);
             }

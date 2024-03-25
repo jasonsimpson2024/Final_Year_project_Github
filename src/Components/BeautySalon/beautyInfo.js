@@ -22,7 +22,7 @@ function BeautyDetails() {
             if (uid) {
                 const docRef = doc(db, 'Business', uid);
                 const docSnap = await getDoc(docRef);
-                setIsBusinessAccount(docSnap.exists()); // Set true if user is a business account, else false
+                setIsBusinessAccount(docSnap.exists()); // set true if user is a business account, else false
             }
         };
 
@@ -56,17 +56,17 @@ function BeautyDetails() {
 
     const handleImageClick = (imageUrl) => {
         setSelectedImageUrl(imageUrl);
-        setIsZoomed(true); // Indicate that the image is zoomed in
+        setIsZoomed(true);
     };
 
     const handleCloseImage = () => {
-        setIsZoomed(false); // Start zooming out
-        setTimeout(() => setSelectedImageUrl(null), 300); // Wait for animation to complete
+        setIsZoomed(false);
+        setTimeout(() => setSelectedImageUrl(null), 300);
     };
 
 
     const handleAppointmentBooking = () => {
-        if (isBusinessAccount) { // Prevent booking if the user has a business account
+        if (isBusinessAccount) { // prevents booking if the user has a business account
             alert("Business accounts cannot book appointments.");
         } else {
             navigate(`/bookbeautysalon/${hairId}`);
@@ -87,7 +87,17 @@ function BeautyDetails() {
                 <div className='normal-container'>
                     <h2>{hair.Name}</h2>
                     <p>
-                        Location: {hair.Street}, {hair.Town}, {hair.County} - Eircode: {hair.Eircode}
+                        Location: {hair.Street}, {hair.Town},
+                        <br/>
+                        {hair.County} - Eircode: {hair.Eircode}
+                    </p>
+                    <p>
+                        Phone:
+                        {hair.Phone ? (
+                            <a href={`tel:${hair.Phone}`}> {hair.Phone}</a>
+                        ) : (
+                            ' N/A'
+                        )}
                     </p>
                     <p>{hair.Description}</p>
                     <div className="photos-container">
@@ -101,7 +111,7 @@ function BeautyDetails() {
                             />
                         ))}
                     </div>
-                    {/* Use handleAppointmentBooking instead of direct navigate */}
+
                     <button onClick={handleAppointmentBooking}>Book an Appointment</button>
                 </div>
             </div>

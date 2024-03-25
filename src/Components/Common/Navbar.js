@@ -6,8 +6,8 @@ import { doc, getDoc, getFirestore } from 'firebase/firestore';
 
 function Navbar() {
     const [user, setUser] = useState(null);
-    const [hasBusiness, setHasBusiness] = useState(false);
-    const [isCustomer, setIsCustomer] = useState(false); // State to manage if the user is a customer
+    const [hasBusiness, setHasBusiness] = useState(false); //state to manage if the user has a business
+    const [isCustomer, setIsCustomer] = useState(false); // state to manage if the user is a customer
     const [dataLoaded, setDataLoaded] = useState(false);
     const location = useLocation();
     const [scrollPosition, setScrollPosition] = useState(0);
@@ -33,7 +33,7 @@ function Navbar() {
 
             if (currentUser) {
                 await checkBusinessListing(currentUser);
-                await checkCustomerStatus(currentUser.uid); // Check if the user is a customer
+                await checkCustomerStatus(currentUser.uid); // check if the user is a customer
             }
 
             setDataLoaded(true);
@@ -58,7 +58,7 @@ function Navbar() {
 
             if (businessDocSnapshot.exists()) {
                 setHasBusiness(true);
-                return; // Exit the loop if a document is found
+                return;
             }
         }
 
@@ -70,7 +70,7 @@ function Navbar() {
         const docRef = doc(db, "Customers", uid);
         const docSnap = await getDoc(docRef);
 
-        setIsCustomer(docSnap.exists()); // Set true if user is a customer
+        setIsCustomer(docSnap.exists());
     };
 
     const handleLogout = async () => {
@@ -101,7 +101,7 @@ function Navbar() {
             <ul className="navbar-menu">
                 {dataLoaded && user ? (
                     <>
-                        {hasBusiness && !isCustomer ? ( // Adjusted to include !isCustomer check
+                        {hasBusiness && !isCustomer ? ( // if business account has business
                             <>
                                 <li>
                                     {isJobTypesPage ? (
@@ -112,7 +112,7 @@ function Navbar() {
                                 </li>
                             </>
                         ) : null}
-                        {!hasBusiness && !isCustomer ? (
+                        {!hasBusiness && !isCustomer ? ( //if business account and hasn't business
                             <li>
                                 {isJobTypesPage ? (
                                     <div className="navfont">List your business</div>
@@ -121,7 +121,7 @@ function Navbar() {
                                 )}
                             </li>
                         ) : null}
-                        {isCustomer ? ( // Show for customers
+                        {isCustomer ? ( // if they are a customer account
                             <>
                                 <li>
                                     <Link to="/Myappointments">My Appointments</Link>
@@ -134,7 +134,7 @@ function Navbar() {
                             </Link>
                         </li>
                     </>
-                ) : (
+                ) : ( //if not signed in ..
                     <>
                         <li>
                             <Link to="/login">Sign In</Link>

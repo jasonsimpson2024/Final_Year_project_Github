@@ -7,7 +7,7 @@ function Other() {
     const [barberData, setBarberData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(1);
-    const barbersPerPage = 5;
+    const barbersPerPage = 3;
     const [lastDocumentName, setLastDocumentName] = useState(null);
     const [hasMoreBarbers, setHasMoreBarbers] = useState(true);
     const [searchInput, setSearchInput] = useState('');
@@ -46,7 +46,7 @@ function Other() {
                     setHasMoreBarbers(false);
                 }
 
-                // Filter data based on search input and selected county
+                // filter data based on search input and selected county
                 const filtered = newBarberData.filter((barber) => {
                     const searchLower = searchInput.toLowerCase();
                     return (

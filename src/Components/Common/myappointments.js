@@ -6,7 +6,7 @@ import { getAuth } from 'firebase/auth';
 
 function ManageBusiness() {
     const auth = getAuth();
-    const navigate = useNavigate(); // Hook for programmatically navigating
+    const navigate = useNavigate();
     const user = auth.currentUser ? auth.currentUser.uid : null;
     const [bookings, setBookings] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +37,7 @@ function ManageBusiness() {
                     const businessQuerySnapshot = await getDocs(businessCollectionRef);
 
                     for (const businessDoc of businessQuerySnapshot.docs) {
-                        const businessDocId = businessDoc.id; // This stores the business document ID
+                        const businessDocId = businessDoc.id; // stores the business document ID
 
                         const bookingDocRef = doc(db, collectionName, businessDocId, 'booking', user);
 
@@ -48,7 +48,7 @@ function ManageBusiness() {
                                 const selectedSlot = data.selectedSlot ? data.selectedSlot.toMillis() : 0;
                                 if (selectedSlot > currentTimestamp) {
                                     bookingData.push({
-                                        businessDocId, // Use this ID for the link
+                                        businessDocId,
                                         collectionName,
                                         name: data.name,
                                         jobType: data.jobType,
@@ -76,11 +76,11 @@ function ManageBusiness() {
         }
     }, [user, navigate]);
 
-    // Calculate the index of the last booking on the current page
+    // calculate the index of the last booking on the current page
     const indexOfLastBooking = currentPage * bookingsPerPage;
-    // Calculate the index of the first booking on the current page
+    // calculate the index of the first booking on the current page
     const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-    // Get the current page's bookings
+    // get the current page's bookings
     const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
 
     return (
@@ -90,7 +90,6 @@ function ManageBusiness() {
                 <div>
                     {currentBookings.map((booking) => (
                         <div key={booking.businessDocId} className="car-details">
-                            {/* Use businessDocId in the link */}
                             <Link to={`/appointinfo/${booking.collectionName}/${booking.businessDocId}/${user}`}>
                                 <p>
                                     <strong>Name:</strong> {booking.name}
@@ -102,7 +101,7 @@ function ManageBusiness() {
                                     <strong>Booking date and time:</strong>{' '}
                                     {booking.selectedSlot
                                         ? (() => {
-                                            const timestamp = booking.selectedSlot.seconds * 1000; // Convert seconds to milliseconds
+                                            const timestamp = booking.selectedSlot.seconds * 1000; // convert seconds to milliseconds
                                             const datePart = new Date(timestamp).toLocaleDateString();
                                             const timePart = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                             return `${datePart} ${timePart}`;
@@ -114,7 +113,6 @@ function ManageBusiness() {
                     ))}
                 </div>
                 <div className='pagination'>
-                    {/* Pagination buttons */}
                     <button
                         onClick={() => setCurrentPage(currentPage - 1)}
                         disabled={currentPage === 1}

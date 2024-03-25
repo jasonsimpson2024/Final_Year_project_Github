@@ -45,11 +45,11 @@ function ManageBusiness() {
                             console.log('Current Timestamp:', currentTimestamp);
                             console.log('Comparison Result:', selectedSlot > currentTimestamp);
 
-                            // Only include future bookings
+
                             if (selectedSlot > currentTimestamp) {
                                 bookingData.push({
                                     id: doc.id,
-                                    collectionName, // Add collectionName to distinguish the collection
+                                    collectionName, // add collectionName to distinguish the collection
                                     name: data.name,
                                     jobType: data.jobType,
                                     selectedSlot: data.selectedSlot,
@@ -59,7 +59,7 @@ function ManageBusiness() {
                     });
                 }
 
-                // Sort the bookingData array based on timestamp proximity to the current time
+                // sort the bookingData array based on timestamp proximity to the current time
                 const currentTimestamp = new Date().getTime();
                 bookingData.sort((a, b) => {
                     const timestampA = a.selectedSlot ? a.selectedSlot.toMillis() : 0;
@@ -68,7 +68,7 @@ function ManageBusiness() {
                     return Math.abs(timestampA - currentTimestamp) - Math.abs(timestampB - currentTimestamp);
                 });
 
-                // Save data to localStorage
+                // save data to localStorage
                 localStorage.setItem('bookings', JSON.stringify(bookingData));
 
                 console.log('All Booking data:', bookingData);
@@ -81,11 +81,11 @@ function ManageBusiness() {
 
     console.log('Rendered with bookings:', bookings);
 
-    // Calculate the index of the last booking on the current page
+    // calculate the index of the last booking on the current page
     const indexOfLastBooking = currentPage * bookingsPerPage;
-    // Calculate the index of the first booking on the current page
+    // calculate the index of the first booking on the current page
     const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-    // Get the current page's bookings
+    // get the current page's bookings
     const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
 
     return (
@@ -108,7 +108,7 @@ function ManageBusiness() {
                                     <strong>Booking date and time:</strong>{' '}
                                     {booking.selectedSlot
                                         ? (() => {
-                                            const timestamp = booking.selectedSlot.seconds * 1000; // Convert seconds to milliseconds
+                                            const timestamp = booking.selectedSlot.seconds * 1000; // convert seconds to milliseconds
                                             const datePart = new Date(timestamp).toLocaleDateString();
                                             const timePart = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                             return `${datePart} ${timePart}`;
@@ -120,7 +120,6 @@ function ManageBusiness() {
                     ))}
                 </div>
                 <div className='pagination'>
-                    {/* Pagination buttons */}
                     <button
                         onClick={() => setCurrentPage(currentPage - 1)}
                         disabled={currentPage === 1}

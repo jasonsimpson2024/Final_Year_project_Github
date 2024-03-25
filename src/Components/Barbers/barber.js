@@ -7,12 +7,13 @@ function Barber() {
     const [barberData, setBarberData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [page, setPage] = useState(1);
-    const barbersPerPage = 5;
+    const barbersPerPage = 3;
     const [lastDocumentName, setLastDocumentName] = useState(null);
     const [hasMoreBarbers, setHasMoreBarbers] = useState(true);
     const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
 
+    //array of counties for dropdown menu
     const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
 
     useEffect(() => {
@@ -46,7 +47,7 @@ function Barber() {
                     setHasMoreBarbers(false);
                 }
 
-                // Filter data based on search input and selected county
+                // filter data based on search input and selected county
                 const filtered = newBarberData.filter((barber) => {
                     const searchLower = searchInput.toLowerCase();
                     return (
@@ -77,7 +78,7 @@ function Barber() {
     const prevPage = () => {
         if (page > 1) {
             if (page === 2) {
-                setLastDocumentName(null);
+                setLastDocumentName(null)
             }
             setPage(page - 1);
         }
@@ -109,7 +110,7 @@ function Barber() {
                     </div>
                 </div>
                 <div className="car-details-list">
-                    {filteredData.map((barber) => (
+                    {filteredData.map((barber) => ( //gets data from each document
                         <div key={barber.id} className="car-details">
                             <Link to={`/barberinfo/${barber.id}`} className="car-detail">
                                 Name: {barber.Name} <br />

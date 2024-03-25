@@ -3,7 +3,7 @@ import { db } from '../../firebase.js';
 import { collection, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import "../../Welcome.css";
-import { debounce } from 'lodash'; // Import debounce from lodash
+import { debounce } from 'lodash';
 
 function Welcome() {
     const [searchInput, setSearchInput] = useState('');
@@ -48,7 +48,7 @@ function Welcome() {
         setIsLoading(false);
     };
 
-    // Debounce the handleSearch function
+    // debounce the handleSearch function to improve performance and prevent over fetching
     const debouncedSearch = debounce(() => {
         handleSearch();
     }, 300); // 300ms delay
@@ -56,11 +56,10 @@ function Welcome() {
     useEffect(() => {
         debouncedSearch();
 
-        // Cleanup
         return () => {
             debouncedSearch.cancel();
         };
-    }, [searchInput]); // Effect dependencies
+    }, [searchInput]);
 
     return (
         <div className="welcome-container">

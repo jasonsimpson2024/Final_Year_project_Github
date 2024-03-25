@@ -7,8 +7,8 @@ import { getAuth } from 'firebase/auth';
 function BookingForm() {
     const navigate = useNavigate();
     const location = useLocation();
-    const hairId = location.pathname.split('/').pop(); // Extract the hair salon ID from the URL
-    const { currentUser } = getAuth(); // Get the logged-in user's info
+    const hairId = location.pathname.split('/').pop();
+    const { currentUser } = getAuth();
 
     console.log("Current pathname:", location.pathname);
     console.log("Extracted hairId:", location.pathname.split('/').pop());
@@ -19,11 +19,11 @@ function BookingForm() {
         phone: '',
         jobType: '',
         selectedSlot: null,
-        jobTypes: [], // Store the fetched job types
+        jobTypes: [],
     });
 
-    // Function to handle form field changes
-    const handleCarInfoChange = (e) => {
+    // function to handle form field changes
+    const handleInfoChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevState) => ({
             ...prevState,
@@ -31,7 +31,7 @@ function BookingForm() {
         }));
     };
 
-    // Fetch job types from the hair salon's 'jobtypes' subcollection
+
     useEffect(() => {
         const fetchJobTypes = async () => {
             const hairDocRef = doc(db, 'Other', hairId);
@@ -42,14 +42,14 @@ function BookingForm() {
 
                 const jobTypes = [];
                 jobTypesQuerySnapshot.forEach((doc) => {
-                    // Only add job types that are not empty strings
+                    // only add job types that are not empty strings
                     const jobTypeName = doc.data().name;
                     if (jobTypeName.trim() !== '') {
                         jobTypes.push(jobTypeName);
                     }
                 });
 
-                // Update the jobType dropdown options with the fetched job types
+                // update the jobType dropdown options with the fetched job types
                 setFormData((prevState) => ({
                     ...prevState,
                     jobTypes,
@@ -62,7 +62,6 @@ function BookingForm() {
         fetchJobTypes();
     }, [hairId]);
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -76,20 +75,17 @@ function BookingForm() {
                 businessID: hairId,
             };
 
-            // Reference the 'cars' collection
             const carsCollectionRef = collection(db, 'Other');
 
-            // Reference the 'car' document within the 'cars' collection
             const carDocRef = doc(carsCollectionRef, hairId);
 
-            // Reference the 'bookings' subcollection within the 'car' document
             let bookingDocRef;
             if (currentUser) {
-                // If user is logged in, use UID as document ID
+                // if user is logged in, use UID as document ID
                 bookingDocRef = doc(carDocRef, 'booking', currentUser.uid);
                 await setDoc(bookingDocRef, carData);
             } else {
-                // If user is not logged in, let Firestore generate a random ID
+                // if user is not logged in, let Firestore generate a random ID
                 const bookingsCollectionRef = collection(carDocRef, 'booking');
                 bookingDocRef = await addDoc(bookingsCollectionRef, carData);
             }
@@ -122,7 +118,7 @@ function BookingForm() {
                                 type="text"
                                 name="name"
                                 value={formData.name}
-                                onChange={handleCarInfoChange}
+                                onChange={handleInfoChange}
                                 required
                             />
                         </label>
@@ -132,7 +128,7 @@ function BookingForm() {
                                 type="email"
                                 name="email"
                                 value={formData.email}
-                                onChange={handleCarInfoChange}
+                                onChange={handleInfoChange}
                                 required
                             />
                         </label>
@@ -142,7 +138,7 @@ function BookingForm() {
                                 type="tel"
                                 name="phone"
                                 value={formData.phone}
-                                onChange={handleCarInfoChange}
+                                onChange={handleInfoChange}
                                 required
                             />
                         </label>
@@ -151,7 +147,7 @@ function BookingForm() {
                             <select
                                 name="jobType"
                                 value={formData.jobType}
-                                onChange={handleCarInfoChange}
+                                onChange={handleInfoChange}
                                 required
                             >
                                 <option value="">Select a job type</option>

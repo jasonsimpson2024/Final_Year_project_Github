@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function AddJobTypes() {
     const navigate = useNavigate();
-    const { businessModel, uid } = useParams(); // Get businessModel and UID from URL parameters
+    const { businessModel, uid } = useParams(); // get businessModel and UID from URL parameters
 
     const [formData, setFormData] = useState({
         jobType1: '',
@@ -42,9 +42,9 @@ function AddJobTypes() {
                 return;
             }
 
-            const businessDocRef = doc(db, businessModel, uid); // Use the user's UID as the document ID
+            const businessDocRef = doc(db, businessModel, uid); // use the user's UID as the document ID
 
-            // Add job types to the "jobtypes" subcollection
+            // add job types to the "jobtypes" subcollection
             const jobTypesCollectionRef = collection(businessDocRef, 'jobtypes');
             jobTypes.forEach(async (jobType) => {
                 await addDoc(jobTypesCollectionRef, { name: jobType });

@@ -14,12 +14,12 @@ const s3 = new S3({
 async function checkFileExists(bucket, key) {
     try {
         await s3.headObject({ Bucket: bucket, Key: key }).promise();
-        return true; // File exists
+        return true; // file exists
     } catch (error) {
         if (error.statusCode === 404) {
-            return false; // File does not exist
+            return false; // file does not exist
         }
-        throw error; // Handle other errors appropriately
+        throw error;
     }
 }
 
@@ -47,13 +47,14 @@ function ManageBusiness() {
         Town: '',
         County: '',
         Eircode: '',
+        Phone: '',
         Description: '',
         slotDuration: '60',
         startHour: '9 AM',
         endHour: '5 PM',
     });
 
-    const [excludedDays, setExcludedDays] = useState([]); // New state for tracking excluded days
+    const [excludedDays, setExcludedDays] = useState([]); // new state for tracking excluded days
     const [endHourOptions, setEndHourOptions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [mediaDocs, setMediaDocs] = useState([]);
@@ -68,8 +69,8 @@ function ManageBusiness() {
 
         if (files.length !== event.target.files.length) {
             alert('Only image files are allowed.');
-            // Clear the file input if any non-image file is selected
-            event.target.value = ''; // This resets the file input
+            // clear the file input if any non-image file is selected
+            event.target.value = ''; // resets the file input
         } else {
             setSelectedFiles(files);
         }
@@ -91,7 +92,7 @@ function ManageBusiness() {
                             startHour: docData.startHour?.toString() || '9 AM',
                             endHour: docData.endHour?.toString() || '5 PM',
                         }));
-                        // Update excludedDays from the fetched data if available
+                        // update excludedDays from the fetched data if available
                         if (docData.excludedDays) {
                             setExcludedDays(docData.excludedDays);
                         }
@@ -117,7 +118,6 @@ function ManageBusiness() {
                     name: doc.data().name,
                 }));
 
-                // Ensure there are always 6 job types (empty for missing ones)
                 for (let i = jobTypesData.length; i < 6; i++) {
                     jobTypesData.push({ id: null, name: '' });
                 }
@@ -131,7 +131,7 @@ function ManageBusiness() {
 
 
     useEffect(() => {
-        // Dynamically generate end hour options based on the selected start hour
+        // dynamically generate end hour options based on the selected start hour
         updateEndHourOptions(businessData.startHour);
     }, [businessData.startHour]);
 
@@ -151,12 +151,10 @@ function ManageBusiness() {
             }
         };
 
-        // Call fetchMediaDocs
         fetchMediaDocs();
     }, [collectionName]);
 
     useEffect(() => {
-        // Dynamically generate end hour options based on the selected start hour
         updateEndHourOptions(businessData.startHour);
     }, [businessData.startHour]);
 
@@ -199,7 +197,7 @@ function ManageBusiness() {
         const filteredOptions = generateHourOptions().filter((_, index) => index > startHourIndex);
         setEndHourOptions(filteredOptions);
 
-        // Automatically adjust endHour if it's now invalid
+        // automatically adjust endHour if it's now invalid
         const endHourIndex = convertTo24HourFormat(businessData.endHour);
         if (endHourIndex <= startHourIndex) {
             const newEndHour = filteredOptions[0]?.props.value;
@@ -212,29 +210,29 @@ function ManageBusiness() {
         let hourConverted = parseInt(hour, 10);
         hourConverted += amPm === 'PM' && hourConverted !== 12 ? 12 : 0;
         hourConverted -= amPm === 'AM' && hourConverted === 12 ? 12 : 0;
-        return hourConverted % 24; // Ensure hour is within 0-23 range
+        return hourConverted % 24; // ensure hour is within 0-23 range
     };
 
     const deletePhoto = async (event, docId, s3Key) => {
-        // Prevent default action (if the event is provided)
+        // prevent default action
         event?.preventDefault();
 
         const confirmDelete = window.confirm('Do you really want to delete this photo?');
         if (confirmDelete) {
             setLoading(true);
             try {
-                // Delete from Firestore
+                // delete from Firestore
                 const mediaDocRef = doc(db, collectionName, user.uid, 'media', docId);
                 await deleteDoc(mediaDocRef);
 
-                // Delete from S3
+                // delete from S3
                 const deleteParams = {
                     Bucket: 'bookinglite',
                     Key: s3Key,
                 };
                 await s3.deleteObject(deleteParams).promise();
 
-                // Update UI
+                // update UI
                 setMediaDocs(mediaDocs.filter(doc => doc.s3Key !== s3Key));
             } catch (error) {
                 console.error('Error deleting photo:', error);
@@ -244,7 +242,7 @@ function ManageBusiness() {
         }
     };
 
-    // Function to delete all documents in a subcollection
+    // function to delete all documents in a subcollection
     const deleteSubcollectionDocs = async (parentDocRef, subcollectionName) => {
         const subcollectionRef = collection(db, parentDocRef.path, subcollectionName);
         const snapshot = await getDocs(subcollectionRef);
@@ -256,7 +254,7 @@ function ManageBusiness() {
         await Promise.all(deletionPromises);
     };
 
-// Function to delete a document and its known subcollections
+// function to delete a document and its known subcollections
     const deleteMediaFilesFromS3 = async (parentDocRef, subcollectionName) => {
         const subcollectionRef = collection(db, parentDocRef.path, subcollectionName);
         const snapshot = await getDocs(subcollectionRef);
@@ -273,18 +271,18 @@ function ManageBusiness() {
         await Promise.all(s3DeletionPromises);
     };
 
-// Enhanced function to delete a document, its subcollections, and S3 media
+// enhanced function to delete a document, its subcollections, and S3 media
     const deleteDocumentAndSubcollections = async (docPath) => {
-        // First, delete media files from S3 in the 'media' subcollection
+        // first, delete media files from S3 in the 'media' subcollection
         await deleteMediaFilesFromS3(doc(db, docPath), 'media');
 
-        // Then, delete documents in subcollections
-        const subcollections = ['media', 'jobtypes']; // Assuming 'media' stores S3 references
+        // then, delete documents in subcollections
+        const subcollections = ['media', 'jobtypes'];
         for (const subcollectionName of subcollections) {
             await deleteSubcollectionDocs(doc(db, docPath), subcollectionName);
         }
 
-        // Finally, delete the main document
+        // finally, delete the main document
         await deleteDoc(doc(db, docPath));
     };
 
@@ -296,11 +294,10 @@ function ManageBusiness() {
         setLoading(true);
 
         try {
-            // Construct the path to the document
             const docPath = `${collectionName}/${user.uid}`;
             await deleteDocumentAndSubcollections(docPath);
 
-            navigate('/'); // Navigate away after deletion
+            navigate('/'); // navigate away after deletion
         } catch (error) {
             console.error('Error during deletion process:', error);
         } finally {
@@ -312,13 +309,13 @@ function ManageBusiness() {
     const handleUpdate = async () => {
         setLoading(true);
         try {
-            // Prevent upload if there are already more than 4 documents in the media collection
+            // prevent upload if there are already more than 4 documents in the media collection
             if (mediaDocs.length > 4) {
-                alert('Cannot upload more than 4 documents.');
+                alert('Cannot upload more than 4 images.');
                 return;
             }
 
-            // Handle multiple file uploads
+            // handle multiple file uploads
             if (selectedFiles.length > 0) {
                 for (let file of selectedFiles) {
                     let fileName = file.name;
@@ -332,17 +329,17 @@ function ManageBusiness() {
                         Body: file,
                     };
 
-                    // Upload file to S3
+                    // upload file to S3
                     await s3.upload(uploadParams).promise();
 
-                    // Get the download URL
+                    // get the download URL
                     const downloadURL = s3.getSignedUrl('getObject', {
                         Bucket: 'bookinglite',
                         Key: s3Key,
                         Expires: 9999999,
                     });
 
-                    // Create document in Firestore
+                    // create document in Firestore
                     const mediaCollectionRef = collection(db, collectionName, auth.currentUser.uid, 'media');
                     await addDoc(mediaCollectionRef, {
                         title: uniqueFileName,
@@ -371,11 +368,11 @@ function ManageBusiness() {
 
             for (const [index, jobType] of jobTypes.entries()) {
                 if (jobType.id) {
-                    // Update existing job type
+                    // update existing job type
                     const jobTypeDocRef = doc(db, collectionName, user.uid, 'jobtypes', jobType.id);
                     await updateDoc(jobTypeDocRef, { name: jobType.name });
                 } else if (jobType.name.trim() !== '') {
-                    // Add new job type if it has a name
+                    // add new job type if it has a name
                     const jobTypesRef = collection(db, collectionName, user.uid, 'jobtypes');
                     await addDoc(jobTypesRef, { name: jobType.name });
                 }
@@ -408,6 +405,12 @@ function ManageBusiness() {
                         <br />
                         <label>Eircode:</label>
                         <input type="text" name="Eircode" value={businessData.Eircode} onChange={handleChange} />
+                        <br />
+                        <label>Eircode:</label>
+                        <input type="text" name="Eircode" value={businessData.Eircode} onChange={handleChange} />
+                        <br />
+                        <label>Phone:</label>
+                        <input placeholder="eg: 0871234567" type="text" name="Phone" value={businessData.Phone} onChange={handleChange} />
                         <br />
                         <label>Description (max 400 characters):</label>
                         <textarea className="textbox"

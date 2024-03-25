@@ -21,9 +21,6 @@ import Signup from "./Components/Common/signup";
 import Manage from "./Components/Common/managebook";
 import Bookinfo from "./Components/Common/bookinginfo";
 import Jobtype from "./Components/Common/jobtype";
-import Meet from "./Components/Meeting/meeting";
-import BookMeet from "./Components/Meeting/bookmeeting";
-import MeetSlot from "./Components/Meeting/meetcalendar";
 import ManageBus from "./Components/Common/managebusiness";
 import YourBus from "./Components/Common/YourBusiness";
 import Myappointments from "./Components/Common/myappointments";
@@ -39,16 +36,12 @@ import SpaDetails from "./Components/SPA/spainfo";
 import Bookspa from "./Components/SPA/bookspa";
 import Spacalendar from "./Components/SPA/spacalendar";
 import AppointInfo from "./Components/Common/appointmentinfo";
-import Fitness from "./Components/fitness/fitness";
-import FitnessDetails from "./Components/fitness/fitinfo";
-import Bookfitness from "./Components/fitness/bookfitness";
-import Fitnesscalendar from "./Components/fitness/fitnesscalendar";
 import Other from "./Components/Other/other";
 import OtherDetails from "./Components/Other/otherinfo";
 import Bookother from "./Components/Other/bookother";
 import Othercalendar from "./Components/Other/othercalendar";
 
-function App() {
+function App() { // routes for navigation
     return (
         <div className="App">
             <Router>
@@ -75,9 +68,6 @@ function App() {
                     <Route path="/bookinginfo/:collectionName/:userId/:bookingId" element={<Bookinfo />} />
                     <Route path="/appointinfo/:collectionName/:userId/:bookingId" element={<AppointInfo />} />
                     <Route exact path='/add-job-types/:businessModel/:uid' element={<Jobtype />} />
-                    <Route exact path='/meet' element={<Meet />} />
-                    <Route exact path='/meeting/:id' element={<BookMeet />} />
-                    <Route exact path='/meetingslot/:doc1/:documentId' element={<MeetSlot />} />
                     <Route exact path='/managebusiness/:collectionName/:documentId' element={<ManageBus />} />
                     <Route exact path='/mybusinesses' element={<YourBus />} />
                     <Route exact path='/Myappointments' element={<Myappointments />} />
@@ -89,10 +79,6 @@ function App() {
                     <Route exact path='/spainfo/:id' element={<SpaDetails />} />
                     <Route exact path='/bookspa/:id' element={<Bookspa />} />
                     <Route exact path='/spaslot/:doc1/:documentId' element={<Spacalendar />} />
-                    <Route exact path='/fitness' element={<Fitness />} />
-                    <Route exact path='/fitnessinfo/:id' element={<FitnessDetails />} />
-                    <Route exact path='/bookfitness/:id' element={<Bookfitness />} />
-                    <Route exact path='/fitnessslot/:doc1/:documentId' element={<Fitnesscalendar />} />
                     <Route exact path='/other' element={<Other />} />
                     <Route exact path='/otherinfo/:id' element={<OtherDetails />} />
                     <Route exact path='/bookother/:id' element={<Bookother />} />

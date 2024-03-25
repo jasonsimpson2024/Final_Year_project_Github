@@ -55,14 +55,6 @@ function CalendarSlotSelector() {
         fetchData();
     }, [doc1, documentId, slotDuration]);
 
-    const isCurrentDay = () => {
-        return currentWeekStart.isSame(moment(), 'day');
-    };
-
-    const isCurrentWeek = () => {
-        return currentWeekStart.isSame(moment(), 'week');
-    };
-
     const nextWeek = () => {
         setCurrentWeekStart(prev => prev.clone().add(1, 'week'));
     };
@@ -98,14 +90,14 @@ function CalendarSlotSelector() {
     const daysOfWeek = () => {
         let start = currentWeekStart.clone().startOf('week');
         if (currentWeekStart.isSame(moment(), 'week')) {
-            start = moment(); // Start from the current day if it's the current week
+            start = moment(); // start from the current day if it's the current week
         }
         return Array.from({ length: 7 }, (_, i) => start.clone().add(i, 'days'))
             .filter(day => !excludedDays.includes(day.format('dddd')))
             .map(day => ({
                 day,
                 label: day.format('ddd (DD/MM/YY)'),
-                isPast: day.endOf('day').isBefore(moment()) // Check if the day is in the past
+                isPast: day.endOf('day').isBefore(moment()) // check if the day is in the past
             }));
     };
 
@@ -113,7 +105,7 @@ function CalendarSlotSelector() {
     const handleSlotSelect = async (dayIndex, time) => {
         const dayInfo = daysOfWeek()[dayIndex];
         const day = dayInfo.day;
-        if (dayInfo.isPast) { // Do not allow selecting days in the past
+        if (dayInfo.isPast) { // do not allow selecting days in the past
             console.log("Cannot select a day in the past.");
             return;
         }
@@ -123,7 +115,7 @@ function CalendarSlotSelector() {
 
         if (slotTime.isBefore(moment())) {
             console.log("Cannot select a slot in the past.");
-            return; // Early return to prevent selecting past slots
+            return; // early return to prevent selecting past slots
         }
 
         const selectedSlotTimestamp = slotTime.valueOf();
@@ -142,28 +134,28 @@ function CalendarSlotSelector() {
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId && !isSlotAlreadyBooked) {
-            // Document references
+            // document references
             const bookingDocRef = doc(db, 'HairSalon', doc1, 'booking', documentId);
             const companyDocRef = doc(db, 'HairSalon', doc1);
 
             try {
-                // Update the booking document with the selected slot
+                // update the booking document with the selected slot
                 await updateDoc(bookingDocRef, {
                     selectedSlot: selectedSlot,
                 });
 
-                // Fetch the booking document to get the customer's email
+                // fetch the booking document to get the customer's email
                 const bookingDoc = await getDoc(bookingDocRef);
                 const bookingData = bookingDoc.data();
 
-                // Fetch the company document to get the company name
+                // fetch the company document to get the company name
                 const companyDoc = await getDoc(companyDocRef);
                 const companyName = companyDoc.exists() ? companyDoc.data().Name : "Unknown Company";
 
-                // Define the email data
+                // email data
                 const emailData = {
-                    to: bookingData.email, // Use the email from the booking document
-                    from: 'bookinglite@outlook.com', // your verified sender email address
+                    to: bookingData.email,
+                    from: 'bookinglite@outlook.com',
                     subject: 'Booking Confirmation',
                     text: `Dear Customer,\n\nYour booking has been confirmed with ${companyName} for ${moment(selectedSlot).format('LLL')}.\n\nThank you for using BookingLite.\n\nIf you have a customer account, you can cancel online. Otherwise, please contact ${companyName} to cancel this booking.`
                 };
@@ -196,9 +188,6 @@ function CalendarSlotSelector() {
     };
 
 
-
-
-    // Corrected usage in the return statement:
     return (
         <div className="calendar-slot-selector">
             <div className="custom-calendar">

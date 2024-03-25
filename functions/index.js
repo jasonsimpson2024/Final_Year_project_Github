@@ -4,20 +4,20 @@ const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 exports.sendEmail = functions.https.onRequest(async (req, res) => {
-    // Enable CORS using the `cors` module, or manually set HTTP headers
+
     res.set('Access-Control-Allow-Origin', '*');
     if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
+        // send response to OPTIONS requests
         res.set('Access-Control-Allow-Methods', 'POST');
         res.set('Access-Control-Allow-Headers', 'Content-Type');
         res.set('Access-Control-Max-Age', '3600');
         res.status(204).send('');
     } else {
-        // Your email sending logic
+        // email sending logic
         const { to, subject, text } = req.body;
         const msg = {
             to,
-            from: "bookinglite@outlook.com", //email verified with SendGrid
+            from: "bookinglite@outlook.com", // email verified with SendGrid
             subject,
             text,
         };

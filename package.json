@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@sendgrid/mail": "^8.1.1",
-    "@testing-library/jest-dom": "^5.17.0",
     "aws-sdk": "^2.1566.0",
     "css-loader": "^6.8.1",
     "date-fns": "^2.30.0",
@@ -25,7 +24,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && cp public/_redirects build/_redirects",
-    "test": "react-scripts test --silent",
+    "test": "react-scripts test --silent --env=jsdom --reporters=default --reporters=jest-html-reporter",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -48,8 +47,11 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
-    "eslint": "^8.52.0"
+    "eslint": "^8.52.0",
+    "jest-fetch-mock": "^3.0.3",
+    "jest-html-reporter": "^3.10.2"
   }
 }

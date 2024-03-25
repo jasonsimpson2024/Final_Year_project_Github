@@ -257,7 +257,7 @@ h1 {
     width: 600px;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Adjust the space between checkboxes as needed */
+    gap: 10px;
     align-items: center; /* Align items vertically in the center */
     justify-content: center; /* Align items to the start of the container */
 }
@@ -274,7 +274,7 @@ h1 {
     max-width: 500px;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Adjust the space between checkboxes as needed */
+    gap: 10px;
     align-items: center; /* Align items vertically in the center */
     justify-content: center; /* Align items to the start of the container */
 }
@@ -285,8 +285,8 @@ h1 {
 }
 
 .exclude-days-container input[type="checkbox"] {
-    margin-right: 5px; /* Space between checkbox and label */
-    cursor: pointer; /* Change cursor to pointer when hovering over the checkbox */
+    margin-right: 5px;
+    cursor: pointer;
     /* Reset browser-specific styles */
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -300,14 +300,13 @@ h1 {
 
 .exclude-days-container input[type="checkbox"]:checked {
     background-color: #ff0000; /* Background color when checked */
-    border-color: #000000; /* Border color when checked */
-    /* Optional: add a checkmark or custom design */
+    border-color: #000000;
 }
 
 .exclude-days-container label {
-    margin-left: 5px; /* Space between the checkbox and its label */
-    cursor: pointer; /* Changes the cursor to a pointer when hovering over the label */
-    user-select: none; /* Prevent text selection */
+    margin-left: 5px;
+    cursor: pointer;
+    user-select: none;
 }
 
 
@@ -409,17 +408,17 @@ footer {
     padding: 20px;
     border-radius: 15px;
     background-color: rgb(255, 255, 255);
-    display: flex; /* Updated this line to use flex */
-    justify-content: center; /* This centers the children horizontally */
-    align-items: center; /* This centers the children vertically */
-    flex-direction: column; /* This stacks children vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     margin-bottom: 10px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     border-top: 2px solid #ccc;
     font-family: Arial, sans-serif;
     font-size: 16px;
     line-height: 1.5;
-    text-align: center; /* Updated to center text inside the container */
+    text-align: center;
     transition: all 0.3s ease-in-out;
     width: 700px;
     color: black;
@@ -438,12 +437,12 @@ footer {
     transition-duration: 0.4s;
     cursor: pointer;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .normal-container button:hover {
-    background-color: rgb(0, 121, 121); /* Darker Green */
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Add a deeper shadow effect on hover */
+    background-color: rgb(0, 121, 121);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -520,7 +519,6 @@ footer {
     background-color: rgb(0, 192, 192);
 }
 
-
 .container-details {
     padding: 20px;
     border-radius: 5px;
@@ -573,60 +571,60 @@ footer {
 }
 
 .search-bar input[type="text"] {
-    flex-grow: 1; /* Allow the input to fill the space */
-    width: 100%; /* Use 100% width to fill the container */
-    padding: 8px 50px; /* Adjust padding as needed */
-    font-size: 16px; /* Standard font size for better cross-browser consistency */
-    border: 1px solid #ccc; /* Standard border */
-    border-radius: 5px; /* Rounded corners */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    outline: none; /* Remove default focus outline */
-    background-color: #fff; /* Background color */
-    color: #333; /* Text color */
-    margin-bottom: 16px; /* Adjusted bottom margin to create space between the elements */
+    flex-grow: 1;
+    width: 100%;
+    padding: 8px 50px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
+    background-color: #fff;
+    color: #333;
+    margin-bottom: 16px;
 }
 
-/* Adjust placeholder color */
+
 .search-bar input[type="text"]::placeholder {
     color: #888;
 }
 
-/* Style for input focus state */
+
 .search-bar input[type="text"]:focus {
     border-color: #555;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Dropdown menu styling with custom arrow and reset for consistency */
+
 .dropdown-menu select {
-    display: block; /* Ensure it's a block element to fill the width */
-    width: 100%; /* Adjusted width to match the input field */
-    padding: 8px 16px; /* Adjust padding to match the input field */
-    font-size: 16px; /* Adjusted font size for consistency with the input field */
-    border: 1px solid #ccc; /* Consistent border */
-    border-radius: 5px; /* Rounded corners for aesthetics */
-    margin-top: -10px; /* Adjusted margin to reduce space between elements if necessary */
-    /* Other styles remain the same */
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: -10px;
+
 }
 
 
 .dropdown-menu option {
-    padding: 10px; /* Padding for options for easier interaction */
-    background-color: #fff; /* Background color */
+    padding: 10px;
+    background-color: #fff;
 }
 
 .userTypeSelect {
-    width: 60%; /* Full width to match the form */
-    padding: 8px; /* Padding for better touch */
-    margin-top: 8px; /* Space from the previous element */
-    border: 1px solid #ccc; /* Consistent with other inputs */
+    width: 60%;
+    padding: 8px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
     border-radius: 4px; /* Rounded corners */
     background-color: white;
     font-size: 16px;
     line-height: 1.5;
 }
 
-/* You might want to add focus and hover styles for better UX */
+
 .userTypeSelect:focus {
     border-color: #4A90E2; /* Focus border color */
     outline: none; /* Remove default focus outline */
@@ -667,10 +665,10 @@ footer {
 
 .photos-container {
     display: flex;
-    flex-direction: row; /* Align children horizontally */
-    align-items: center; /* Align children vertically in the center */
-    overflow-x: auto; /* Enable horizontal scrolling for overflow */
-    gap: 10px; /* Optional: Adds some space between the images */
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    gap: 10px;
 }
 
 .image-overlay {
@@ -774,8 +772,7 @@ footer {
     .booking-form input,
     .booking-form select,
     .booking-form textarea.textbox {
-        max-width: calc(100% - 2.4rem); /* Adjust the subtraction value based on your padding/margin */
-        /* This calculation ensures the input fields reduce evenly as the screen size decreases */
+        max-width: calc(100% - 2.4rem);
     }
 
     .car-details {
@@ -824,23 +821,23 @@ footer {
 
     .dropdown-menu select {
         margin-top: 8px;
-        -webkit-appearance: none; /* Remove default Chrome/Safari style */
-        -moz-appearance: none; /* Remove default Firefox style */
-        appearance: none; /* Standard CSS property to remove default browser styling */
-        flex-grow: 1; /* Allow the select to fill the space */
-        width: 100%; /* Full width to match the container */
-        padding: 9px 60px; /* Comfortable padding */
-        font-size: 16px; /* Readability */
-        border: 1px solid #ccc; /* Consistent border */
-        border-radius: 5px; /* Rounded corners for aesthetics */
-        background-color: #fff; /* Background color */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        flex-grow: 1;
+        width: 100%;
+        padding: 9px 60px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
         background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="%23ccc" d="M6.5 7.5l3.5 3.5 3.5-3.5z"/></svg>');
         background-repeat: no-repeat;
-        background-position: right 10px top 50%; /* Position the arrow on the right */
-        background-size: 12px; /* Size of the custom arrow */
-        cursor: pointer; /* Cursor pointer to indicate it's selectable */
-        outline: none; /* Remove default focus outline */
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        background-position: right 10px top 50%;
+        background-size: 12px;
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .login-container {
@@ -947,7 +944,7 @@ footer {
 
     .navigation button {
         background-color: rgb(0, 138, 138);
-        margin-right: 10px; /* Adds a gap to the right of each button */
+        margin-right: 10px;
     }
 
     .navigation button:hover {
@@ -1001,9 +998,9 @@ footer {
         width: 300px;
         display: flex;
         flex-wrap: wrap;
-        gap: 10px; /* Adjust the space between checkboxes as needed */
-        align-items: center; /* Align items vertically in the center */
-        justify-content: center; /* Align items to the start of the container */
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
     }
 
 

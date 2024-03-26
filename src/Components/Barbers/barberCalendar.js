@@ -135,8 +135,8 @@ function CalendarSlotSelector() {
 
     const handleConfirmBooking = async () => {
         if (selectedSlot && documentId && !isSlotAlreadyBooked) {
-            const bookingDocRef = doc(db, 'Barber', doc1, 'booking', documentId);
-            const companyDocRef = doc(db, 'Barber', doc1);
+            const bookingDocRef = doc(db, 'Barber', doc1, 'booking', documentId); //reference booking document
+            const companyDocRef = doc(db, 'Barber', doc1); //reference business with doc1 being the business document ID
 
             try {
                 // update the booking document with the selected slot
@@ -163,7 +163,7 @@ function CalendarSlotSelector() {
                 const functionUrl = 'https://us-central1-fyp---car-dealership.cloudfunctions.net/sendEmail';
 
 
-                const response = await fetch(functionUrl, {
+                const response = await fetch(functionUrl, { //send HTTP POST request to functionUrl with emailData
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -172,17 +172,17 @@ function CalendarSlotSelector() {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to send email');
+                    throw new Error('Failed to send email');  //indicates issue with request
                 }
 
-                console.log('Email sent successfully');
-                navigate('/confirmation', {
+                console.log('Email sent successfully'); //logs successful trigger of the cloud function and email has been sent
+                navigate('/confirmation', { //navigate to the confirmation screen
                     state: {
                         selectedSlot: moment(selectedSlot).format('LLL'),
                     },
                 });
             } catch (error) {
-                console.error('Error updating booking document or sending email:', error);
+                console.error('Error updating booking document or sending email:', error); //logs if an error occurs
             }
         }
     };

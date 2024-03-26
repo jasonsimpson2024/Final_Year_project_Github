@@ -75,22 +75,22 @@ function BookingForm() {
                 businessID: hairId,
             };
 
-            const carsCollectionRef = collection(db, 'Barber');
+            const carsCollectionRef = collection(db, 'Barber'); //reference barber collection
 
-            const carDocRef = doc(carsCollectionRef, hairId);
+            const carDocRef = doc(carsCollectionRef, hairId); //hairId represents the document ID containing the business being booked
 
             let bookingDocRef;
             if (currentUser) {
-                // if user is logged in, use UID as document ID
+                // if consumer is logged in, use UID as document ID
                 bookingDocRef = doc(carDocRef, 'booking', currentUser.uid);
                 await setDoc(bookingDocRef, carData);
             } else {
-                // if user is not logged in, let Firestore generate a random ID as normal
+                // if consumer is not logged in, let Firestore generate a random ID as normal
                 const bookingsCollectionRef = collection(carDocRef, 'booking');
                 bookingDocRef = await addDoc(bookingsCollectionRef, carData);
             }
 
-            console.log('Document added successfully with ID:', bookingDocRef.id);
+            console.log('Document added successfully with ID:', bookingDocRef.id); //log if successful
 
             setFormData({
                 name: '',
@@ -98,11 +98,11 @@ function BookingForm() {
                 phone: '',
                 jobType: '',
                 selectedSlot: null,
-            });
+            }); //resets the form after execution
 
-            navigate(`/barberslot/${hairId}/${bookingDocRef.id}`);
+            navigate(`/barberslot/${hairId}/${bookingDocRef.id}`); //navigate to the calendar to select a slot
         } catch (error) {
-            console.error('Error adding document:', error);
+            console.error('Error adding document:', error); //if there's an error, log it
         }
     }
 

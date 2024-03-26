@@ -13,7 +13,7 @@ function Barber() {
     const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
 
-    //array of counties for dropdown menu
+    // array of counties for dropdown menu
     const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
 
     useEffect(() => {
@@ -110,7 +110,7 @@ function Barber() {
                     </div>
                 </div>
                 <div className="car-details-list">
-                    {filteredData.map((barber) => ( //gets data from each document
+                    {filteredData.map((barber) => (  //gets data from each document
                         <div key={barber.id} className="car-details">
                             <Link to={`/barberinfo/${barber.id}`} className="car-detail">
                                 Name: {barber.Name} <br />

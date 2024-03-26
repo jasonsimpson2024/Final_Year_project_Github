@@ -406,9 +406,6 @@ function ManageBusiness() {
                         <label>Eircode:</label>
                         <input type="text" name="Eircode" value={businessData.Eircode} onChange={handleChange} />
                         <br />
-                        <label>Eircode:</label>
-                        <input type="text" name="Eircode" value={businessData.Eircode} onChange={handleChange} />
-                        <br />
                         <label>Phone:</label>
                         <input placeholder="eg: 0871234567" type="text" name="Phone" value={businessData.Phone} onChange={handleChange} />
                         <br />

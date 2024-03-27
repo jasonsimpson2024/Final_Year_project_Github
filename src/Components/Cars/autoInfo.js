@@ -89,7 +89,7 @@ function AutoDetails() {
                     <p>
                         Location: {car.Street}, {car.Town},
                         <br/>
-                        {car.County} - Eircode: {car.Eircode}
+                        {car.County} {car.Eircode}
                     </p>
                     <p>
                         Phone:

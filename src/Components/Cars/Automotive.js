@@ -4,85 +4,63 @@ import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase
 import { Link } from 'react-router-dom';
 
 function Automotive() {
-    const [carData, setCarData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
+    const [allBarbers, setAllBarbers] = useState([]);
+    const [displayBarbers, setDisplayBarbers] = useState([]);
     const [page, setPage] = useState(1);
-    const carsPerPage = 3;
-    const [lastDocumentName, setLastDocumentName] = useState(null);
-    const [hasMoreCars, setHasMoreCars] = useState(true);
+    const barbersPerPage = 3;
     const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
+    const [totalFilteredBarbers, setTotalFilteredBarbers] = useState(0);
 
     const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
 
     useEffect(() => {
-        const fetchData = async (pageNumber) => {
-            try {
-                const carsCollection = collection(db, 'Automotive');
-                let q = query(carsCollection, orderBy('Name'), limit(carsPerPage));
-
-                if (pageNumber > 1 && lastDocumentName) {
-                    q = query(carsCollection, orderBy('Name'), startAfter(lastDocumentName), limit(carsPerPage));
-                }
-
-                const snapshot = await getDocs(q);
-
-                const newCarData = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    Name: doc.data().Name,
-                    Street: doc.data().Street,
-                    Town: doc.data().Town,
-                    County: doc.data().County,
-                    Eircode: doc.data().Eircode,
-                }));
-
-                setCarData(newCarData);
-
-                if (newCarData.length > 0) {
-                    const lastCar = newCarData[newCarData.length - 1];
-                    setLastDocumentName(lastCar.Name);
-                    setHasMoreCars(newCarData.length === carsPerPage);
-                } else {
-                    setHasMoreCars(false);
-                }
-
-                // filter data based on search input and selected county
-                const searchLower = searchInput.toLowerCase();
-                const filtered = newCarData.filter(car =>
-                    car.County.toLowerCase().includes(selectedCounty.toLowerCase()) &&
-                    (car.Name.toLowerCase().includes(searchLower) ||
-                        car.Street.toLowerCase().includes(searchLower) ||
-                        car.Town.toLowerCase().includes(searchLower) ||
-                        car.Eircode.toLowerCase().includes(searchLower))
-                );
-                setFilteredData(filtered);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setHasMoreCars(false);
-            }
+        const fetchAllBarbers = async () => {
+            const barbersCollection = collection(db, 'Automotive');
+            const q = query(barbersCollection, orderBy('Name'));
+            const snapshot = await getDocs(q);
+            const barbers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setAllBarbers(barbers);
         };
 
-        fetchData(page);
-    }, [page, searchInput, selectedCounty]);
+        fetchAllBarbers();
+    }, []);
+
+    useEffect(() => {
+        const filteredBarbers = allBarbers.filter(barber => {
+            const searchLower = searchInput.toLowerCase();
+            return (
+                barber.County.toLowerCase().includes(selectedCounty.toLowerCase()) &&
+                (barber.Name.toLowerCase().includes(searchLower) ||
+                    barber.Street.toLowerCase().includes(searchLower) ||
+                    barber.Town.toLowerCase().includes(searchLower) ||
+                    barber.Eircode.toLowerCase().includes(searchLower))
+            );
+        });
+
+        setTotalFilteredBarbers(filteredBarbers.length);
+        const pageBarbers = filteredBarbers.slice((page - 1) * barbersPerPage, page * barbersPerPage);
+        setDisplayBarbers(pageBarbers);
+    }, [allBarbers, searchInput, selectedCounty, page]);
 
     const nextPage = () => {
-        if (hasMoreCars) {
-            setPage(page + 1);
-        }
+        setPage(prev => prev + 1);
     };
 
     const prevPage = () => {
-        if (page > 1) {
-            if (page === 2) {
-                setLastDocumentName(null);
-            }
-            setPage(page - 1);
-        }
+        setPage(prev => prev > 1 ? prev - 1 : 1);
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchInput(e.target.value);
+        setPage(1); // Reset to the first page after a search
     };
 
     const handleCountyChange = (e) => {
         setSelectedCounty(e.target.value);
+        setPage(1); // Reset to the first page after changing the filter
     };
+
 
     return (
         <div>
@@ -93,7 +71,7 @@ function Automotive() {
                             type="text"
                             placeholder="Browse services"
                             value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
+                            onChange={handleSearchChange}
                         />
                     </div>
                     <div className='dropdown-menu'>
@@ -106,7 +84,7 @@ function Automotive() {
                     </div>
                 </div>
                 <div className="car-details-list">
-                    {filteredData.map((car) => (
+                    {displayBarbers.map((car) => (
                         <div key={car.id} className="car-details">
                             <Link to={`/autoinfo/${car.id}`} className="car-detail">
                                 Name: {car.Name} <br />
@@ -117,7 +95,7 @@ function Automotive() {
                 </div>
                 <div className="pagination">
                     <button onClick={prevPage} disabled={page === 1}>Previous</button>
-                    <button onClick={nextPage} disabled={!hasMoreCars}>Next</button>
+                    <button onClick={nextPage} disabled={((page * barbersPerPage) >= totalFilteredBarbers)}>Next</button>
                 </div>
             </div>
         </div>

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { db } from '../../firebase.js';
 import { collection, doc, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import BeautySalon from "../BeautySalon/beautysalon";
 
 function ManageBusiness() {
     const auth = getAuth();

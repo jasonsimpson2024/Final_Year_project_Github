@@ -86,7 +86,7 @@ function ManageBusiness() {
     return (
         <div>
             <div className='booking-confirmation'>
-                <h2>Your bookings:</h2>
+                <h2>Your Appointments:</h2>
                 <div>
                     {currentBookings.map((booking) => (
                         <div key={booking.businessDocId} className="car-details">

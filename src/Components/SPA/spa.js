@@ -3,90 +3,64 @@ import { db } from '../../firebase.js';
 import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 
-function Spa() {
-    const [carData, setCarData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
+function SPA() {
+    const [allBarbers, setAllBarbers] = useState([]);
+    const [displayBarbers, setDisplayBarbers] = useState([]);
     const [page, setPage] = useState(1);
-    const carsPerPage = 3;
-    const [lastDocumentName, setLastDocumentName] = useState(null);
-    const [hasMoreCars, setHasMoreCars] = useState(true);
+    const barbersPerPage = 3;
     const [searchInput, setSearchInput] = useState('');
     const [selectedCounty, setSelectedCounty] = useState('');
+    const [totalFilteredBarbers, setTotalFilteredBarbers] = useState(0);
 
     const counties = ['Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal', 'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow'];
 
     useEffect(() => {
-        const fetchData = async (pageNumber) => {
-            try {
-                const carsCollection = collection(db, 'SPA');
-                let q = query(carsCollection, orderBy('Name'), limit(carsPerPage));
-
-                if (pageNumber > 1 && lastDocumentName) {
-                    q = query(carsCollection, orderBy('Name'), startAfter(lastDocumentName), limit(carsPerPage));
-                }
-
-                const snapshot = await getDocs(q);
-
-                const newCarData = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    Name: doc.data().Name,
-                    Street: doc.data().Street,
-                    Town: doc.data().Town,
-                    County: doc.data().County,
-                    Eircode: doc.data().Eircode,
-                }));
-
-                setCarData(newCarData);
-
-                if (newCarData.length > 0) {
-                    const lastCar = newCarData[newCarData.length - 1];
-                    setLastDocumentName(lastCar.Name);
-                    setHasMoreCars(newCarData.length === carsPerPage);
-                } else {
-                    setHasMoreCars(false);
-                }
-
-                // apply filters based on search criteria and selected county
-                const filtered = newCarData.filter((hair) => {
-                    const searchLower = searchInput.toLowerCase();
-                    return (
-                        (hair.Name.toLowerCase().includes(searchLower) ||
-                            hair.Street.toLowerCase().includes(searchLower) ||
-                            hair.Town.toLowerCase().includes(searchLower) ||
-                            hair.County.toLowerCase().includes(searchLower) ||
-                            hair.Eircode.toLowerCase().includes(searchLower)) &&
-                        hair.County.toLowerCase().includes(selectedCounty.toLowerCase())
-                    );
-                });
-
-                setFilteredData(filtered);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setHasMoreCars(false);
-            }
+        const fetchAllBarbers = async () => {
+            const barbersCollection = collection(db, 'SPA');
+            const q = query(barbersCollection, orderBy('Name'));
+            const snapshot = await getDocs(q);
+            const barbers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setAllBarbers(barbers);
         };
 
-        fetchData(page);
-    }, [page, searchInput, selectedCounty]);
+        fetchAllBarbers();
+    }, []);
+
+    useEffect(() => {
+        const filteredBarbers = allBarbers.filter(barber => {
+            const searchLower = searchInput.toLowerCase();
+            return (
+                barber.County.toLowerCase().includes(selectedCounty.toLowerCase()) &&
+                (barber.Name.toLowerCase().includes(searchLower) ||
+                    barber.Street.toLowerCase().includes(searchLower) ||
+                    barber.Town.toLowerCase().includes(searchLower) ||
+                    barber.Eircode.toLowerCase().includes(searchLower))
+            );
+        });
+
+        setTotalFilteredBarbers(filteredBarbers.length);
+        const pageBarbers = filteredBarbers.slice((page - 1) * barbersPerPage, page * barbersPerPage);
+        setDisplayBarbers(pageBarbers);
+    }, [allBarbers, searchInput, selectedCounty, page]);
 
     const nextPage = () => {
-        if (hasMoreCars) {
-            setPage(page + 1);
-        }
+        setPage(prev => prev + 1);
     };
 
     const prevPage = () => {
-        if (page > 1) {
-            if (page === 2) {
-                setLastDocumentName(null);
-            }
-            setPage(page - 1);
-        }
+        setPage(prev => prev > 1 ? prev - 1 : 1);
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchInput(e.target.value);
+        setPage(1); // Reset to the first page after a search
     };
 
     const handleCountyChange = (e) => {
         setSelectedCounty(e.target.value);
+        setPage(1); // Reset to the first page after changing the filter
     };
+
 
     return (
         <div>
@@ -95,9 +69,9 @@ function Spa() {
                     <div className='search-bar'>
                         <input
                             type="text"
-                            placeholder="Browse Spa & Massage"
+                            placeholder="Browse services"
                             value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
+                            onChange={handleSearchChange}
                         />
                     </div>
                     <div className='dropdown-menu'>
@@ -110,7 +84,7 @@ function Spa() {
                     </div>
                 </div>
                 <div className="car-details-list">
-                    {filteredData.map((hair) => (
+                    {displayBarbers.map((hair) => (
                         <div key={hair.id} className="car-details">
                             <Link to={`/spainfo/${hair.id}`} className="car-detail">
                                 Name: {hair.Name} <br />
@@ -121,11 +95,11 @@ function Spa() {
                 </div>
                 <div className="pagination">
                     <button onClick={prevPage} disabled={page === 1}>Previous</button>
-                    <button onClick={nextPage} disabled={!hasMoreCars}>Next</button>
+                    <button onClick={nextPage} disabled={((page * barbersPerPage) >= totalFilteredBarbers)}>Next</button>
                 </div>
             </div>
         </div>
     );
 }
 
-export default Spa;
+export default SPA;

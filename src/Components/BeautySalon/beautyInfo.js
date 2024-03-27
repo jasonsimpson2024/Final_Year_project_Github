@@ -89,7 +89,7 @@ function BeautyDetails() {
                     <p>
                         Location: {hair.Street}, {hair.Town},
                         <br/>
-                        {hair.County} - Eircode: {hair.Eircode}
+                        {hair.County} {hair.Eircode}
                     </p>
                     <p>
                         Phone:

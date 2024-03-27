@@ -83,7 +83,7 @@ function BarberDetails() {
                     <p>
                         Location: {barber.Street}, {barber.Town},
                         <br/>
-                        {barber.County} - Eircode: {barber.Eircode}
+                        {barber.County} {barber.Eircode}
                     </p>
                     <p>
                         Phone:

@@ -5,14 +5,14 @@ import { getFirestore } from "firebase/firestore";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB-r5foQTv6-nOVgF8tt-0n5NqZpzo5InE",
-    authDomain: "fyp---car-dealership.firebaseapp.com",
-    databaseURL: "https://fyp---car-dealership-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "fyp---car-dealership",
-    storageBucket: "fyp---car-dealership.appspot.com",
-    messagingSenderId: "660528174336",
-    appId: "1:660528174336:web:bf79f3e930909c9b9c8fe5",
-    measurementId: "G-9BMQ29FHND"
+    apiKey: process.env.REACT_APP_API_KEY,
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+    databaseURL: process.env.REACT_APP_DATABASE_URL,
+    projectId: process.env.REACT_APP_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_APP_ID,
+    measurementId: process.env.REACT_APP_MEASUREMENT_ID
 };
 
 // Initialize Firebase

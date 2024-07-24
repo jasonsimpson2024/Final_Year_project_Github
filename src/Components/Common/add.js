@@ -101,24 +101,38 @@ function ListBusiness() {
     };
 
     const uploadFile = async (file) => {
-        let fileName = file.name;
-        let uniqueFileName = await getUniqueFilename('bookinglite', fileName);
-        const s3Key = `photos/${uniqueFileName}`;
-        const uploadParams = {
+        try {
+          let fileName = file.name;
+          let uniqueFileName = await getUniqueFilename('bookinglite', fileName);
+          const s3Key = `photos/${uniqueFileName}`;
+          const uploadParams = {
             Bucket: 'bookinglite',
             Key: s3Key,
             Body: file,
-        };
-
-        await s3.upload(uploadParams).promise();
-        const downloadURL = s3.getSignedUrl('getObject', {
+          };
+      
+          await s3.upload(uploadParams).promise();
+      
+          // Generate a pre-signed URL with a reasonable expiration time (1 hour)
+          const expirationTime = 99999999; 
+          const downloadURL = s3.getSignedUrl('getObject', {
             Bucket: 'bookinglite',
             Key: s3Key,
-            Expires: 9999999,
-        });
-
-        return { downloadURL, uniqueFileName, s3Key };
-    };
+            Expires: expirationTime,
+          });
+      
+          // Log details for debugging
+          console.log(`Generated new pre-signed URL: ${downloadURL}`);
+          console.log(`Expiration time (in seconds): ${expirationTime}`);
+      
+          return { downloadURL, uniqueFileName, s3Key };
+        } catch (error) {
+          console.error('Error uploading file or generating URL:', error);
+          throw error;
+        }
+      };
+    
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -174,14 +188,19 @@ function ListBusiness() {
     };
 
     const generateHourOptions = () => {
+        //array to store the hour options.
         const options = [];
         for (let i = 0; i < 24; i++) {
+            // if the hour modulo 12 equals 0 (i.e., for 0 or 12), set hour to 12. Otherwise, set it to the remainder of i divided by 12.
             const hour = i % 12 === 0 ? 12 : i % 12;
             const amPm = i < 12 ? 'AM' : 'PM';
+
+            // label and value are formatted as "hour AM/PM" (e.g., "1 AM", "2 PM").
             options.push({ label: `${hour} ${amPm}`, value: `${hour} ${amPm}` });
         }
         return options.map(option => <option key={option.value} value={option.label}>{option.label}</option>);
     };
+
 
     const updateEndHourOptions = (startHour) => {
         const startHourIndex = convertTo24HourFormat(startHour);
